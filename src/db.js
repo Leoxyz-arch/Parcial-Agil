@@ -92,6 +92,12 @@ async function createTablesPostgres() {
     );
     `;
     await pool.query(ddl);
+    await pool.query(`
+        ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS tipo_comprobante VARCHAR(50) DEFAULT 'Factura Electrónica';
+        ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS ruc_beneficiario VARCHAR(20) DEFAULT NULL;
+        ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS metodo_pago VARCHAR(50) DEFAULT 'Transferencia Bancaria';
+        ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS motivo_anulacion TEXT DEFAULT NULL;
+    `);
     console.log('📋 Esquema de tablas verificado en Neon PostgreSQL.');
 }
 
