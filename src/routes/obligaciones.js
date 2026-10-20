@@ -92,9 +92,9 @@ function enrichObligacionWithSemaforo(rawItem) {
         semaforo = {
             codigo: 'vencido',
             color: 'rojo',
-            etiqueta: `¡VENCIDO / EN MORA! (${Math.abs(diffDias)} ${Math.abs(diffDias) === 1 ? 'día' : 'días'} tarde)`,
+            etiqueta: `VENCIDO / EN MORA (${Math.abs(diffDias)} ${Math.abs(diffDias) === 1 ? 'día' : 'días'} tarde)`,
             dias_restantes: diffDias,
-            clase_badge: 'bg-red-600 text-white font-bold animate-pulse shadow-md',
+            clase_badge: 'bg-red-600 text-white font-bold shadow-sm',
             alerta_critica: true
         };
     } else if (diffDias <= 3) {
@@ -103,7 +103,7 @@ function enrichObligacionWithSemaforo(rawItem) {
         semaforo = {
             codigo: 'por_vencer',
             color: 'naranja',
-            etiqueta: `¡POR VENCER! (${textoDias})`,
+            etiqueta: `POR VENCER (${textoDias})`,
             dias_restantes: diffDias,
             clase_badge: 'bg-amber-500 text-white font-semibold',
             alerta_critica: true
@@ -158,6 +158,21 @@ router.get('/', async (req, res) => {
                 enriched = enriched.filter(o => o.estado === 'pendiente');
             }
         }
+
+        // Orden predeterminado: Vencidos -> Por Vencer (<= 3 días) -> Programados -> Pagados
+        const prioridadSemaforo = {
+            'vencido': 1,
+            'por_vencer': 2,
+            'programado': 3,
+            'pagado': 4
+        };
+
+        enriched.sort((a, b) => {
+            const pA = prioridadSemaforo[a.semaforo.codigo] || 99;
+            const pB = prioridadSemaforo[b.semaforo.codigo] || 99;
+            if (pA !== pB) return pA - pB;
+            return (a.fecha_vencimiento || '').localeCompare(b.fecha_vencimiento || '');
+        });
 
         res.json({
             ok: true,

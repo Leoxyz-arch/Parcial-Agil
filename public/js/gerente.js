@@ -2,6 +2,8 @@
 
 window.GerenteModule = {
     obligaciones: [],
+    paginaActual: 1,
+    ITEMS_POR_PAGINA: 15,
 
     init: async () => {
         GerenteModule.setDefaultPeriod();
@@ -23,16 +25,40 @@ window.GerenteModule = {
         const filtroCat = document.getElementById('filtro-categoria-gerente');
         const filtroEst = document.getElementById('filtro-estado-gerente');
 
-        if (btnConsultar) {
-            btnConsultar.onclick = () => GerenteModule.cargarDashboard();
-        }
+        const resetYcargar = () => {
+            GerenteModule.paginaActual = 1;
+            GerenteModule.cargarDashboard();
+        };
 
-        if (filtroCat) {
-            filtroCat.onchange = () => GerenteModule.renderTablaAuditoria();
-        }
+        const resetYfiltrar = () => {
+            GerenteModule.paginaActual = 1;
+            GerenteModule.renderTablaAuditoria();
+        };
 
-        if (filtroEst) {
-            filtroEst.onchange = () => GerenteModule.renderTablaAuditoria();
+        if (btnConsultar) btnConsultar.onclick = resetYcargar;
+        if (filtroCat) filtroCat.onchange = resetYfiltrar;
+        if (filtroEst) filtroEst.onchange = resetYfiltrar;
+
+        // Botones Paginación Gerente
+        const btnPrev = document.getElementById('btn-prev-gerente');
+        const btnNext = document.getElementById('btn-next-gerente');
+        if (btnPrev) {
+            btnPrev.onclick = () => {
+                if (GerenteModule.paginaActual > 1) {
+                    GerenteModule.paginaActual--;
+                    GerenteModule.renderTablaAuditoria();
+                }
+            };
+        }
+        if (btnNext) {
+            btnNext.onclick = () => {
+                const totalFiltradas = GerenteModule.getFiltradas().length;
+                const maxPag = Math.ceil(totalFiltradas / GerenteModule.ITEMS_POR_PAGINA) || 1;
+                if (GerenteModule.paginaActual < maxPag) {
+                    GerenteModule.paginaActual++;
+                    GerenteModule.renderTablaAuditoria();
+                }
+            };
         }
     },
 
@@ -77,7 +103,7 @@ window.GerenteModule = {
         const badgeCritico = document.getElementById('badge-critico-kpi');
         if (kpis.total_riesgo_mora > 0) {
             badgeCritico.textContent = `${conteos.en_alerta} En Alerta`;
-            badgeCritico.className = 'text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-red-600 text-white animate-pulse';
+            badgeCritico.className = 'text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-red-600 text-white';
         } else {
             badgeCritico.textContent = 'Al día';
             badgeCritico.className = 'text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
@@ -100,13 +126,11 @@ window.GerenteModule = {
         if (window.lucide) window.lucide.createIcons();
     },
 
-    renderTablaAuditoria: () => {
-        const tbody = document.getElementById('tabla-obligaciones-gerente');
-        const filtroCat = document.getElementById('filtro-categoria-gerente').value;
+    getFiltradas: () => {
+        const filtroCat = document.getElementById('filtro-categoria-gerente');
+        const catVal = filtroCat ? filtroCat.value : 'todas';
         const selectEst = document.getElementById('filtro-estado-gerente');
         const filtroEst = selectEst ? selectEst.value : 'pagado';
-
-        tbody.innerHTML = '';
 
         let filtradas = GerenteModule.obligaciones;
 
@@ -116,11 +140,30 @@ window.GerenteModule = {
         }
 
         // Filtro por Categoría
-        if (filtroCat && filtroCat !== 'todas') {
-            filtradas = filtradas.filter(o => o.categoria.toLowerCase() === filtroCat.toLowerCase());
+        if (catVal && catVal !== 'todas') {
+            filtradas = filtradas.filter(o => o.categoria.toLowerCase() === catVal.toLowerCase());
         }
 
-        if (filtradas.length === 0) {
+        return filtradas;
+    },
+
+    renderTablaAuditoria: () => {
+        const tbody = document.getElementById('tabla-obligaciones-gerente');
+        tbody.innerHTML = '';
+
+        const filtradas = GerenteModule.getFiltradas();
+        const totalItems = filtradas.length;
+        const totalPaginas = Math.ceil(totalItems / GerenteModule.ITEMS_POR_PAGINA) || 1;
+        if (GerenteModule.paginaActual > totalPaginas) {
+            GerenteModule.paginaActual = totalPaginas;
+        }
+
+        const infoPaginacion = document.getElementById('info-paginacion-gerente');
+        const badgePagina = document.getElementById('badge-pagina-gerente');
+        const btnPrev = document.getElementById('btn-prev-gerente');
+        const btnNext = document.getElementById('btn-next-gerente');
+
+        if (totalItems === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="py-6 text-center text-slate-400">
@@ -128,10 +171,27 @@ window.GerenteModule = {
                     </td>
                 </tr>
             `;
+            if (infoPaginacion) infoPaginacion.textContent = 'Mostrando 0';
+            if (badgePagina) badgePagina.textContent = '1 / 1';
+            if (btnPrev) btnPrev.disabled = true;
+            if (btnNext) btnNext.disabled = true;
             return;
         }
 
-        filtradas.forEach(item => {
+        const inicio = (GerenteModule.paginaActual - 1) * GerenteModule.ITEMS_POR_PAGINA;
+        const fin = Math.min(inicio + GerenteModule.ITEMS_POR_PAGINA, totalItems);
+        const itemsPagina = filtradas.slice(inicio, fin);
+
+        if (infoPaginacion) {
+            infoPaginacion.textContent = `Mostrando ${inicio + 1} - ${fin} de ${totalItems}`;
+        }
+        if (badgePagina) {
+            badgePagina.textContent = `${GerenteModule.paginaActual} / ${totalPaginas}`;
+        }
+        if (btnPrev) btnPrev.disabled = GerenteModule.paginaActual <= 1;
+        if (btnNext) btnNext.disabled = GerenteModule.paginaActual >= totalPaginas;
+
+        itemsPagina.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 

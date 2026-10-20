@@ -27,20 +27,6 @@ body {
     border-left: 6px solid #10b981 !important;
 }
 
-/* Animación sutil de pulso para deudas en mora */
-@keyframes moraPulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
-    }
-}
-
-.pulse-mora {
-    animation: moraPulse 2s infinite;
-}
-
 /* Visor de comprobante */
 .modal-backdrop {
     background-color: rgba(15, 23, 42, 0.75);

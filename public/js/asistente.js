@@ -2,21 +2,59 @@
 
 window.AsistenteModule = {
     obligaciones: [],
+    paginaActual: 1,
+    ITEMS_POR_PAGINA: 15,
 
     init: async () => {
+        const hoy = new Date();
+        const selMes = document.getElementById('filtro-mes-asistente');
+        const selAnio = document.getElementById('filtro-anio-asistente');
+        if (selMes) selMes.value = (hoy.getMonth() + 1).toString();
+        if (selAnio) selAnio.value = hoy.getFullYear().toString();
+
         AsistenteModule.bindEvents();
         await AsistenteModule.cargarObligaciones();
     },
 
     bindEvents: () => {
         // Filtros
+        const filtroMes = document.getElementById('filtro-mes-asistente');
+        const filtroAnio = document.getElementById('filtro-anio-asistente');
         const filtroCat = document.getElementById('filtro-categoria-asistente');
         const filtroEst = document.getElementById('filtro-estado-asistente');
         const btnRefresh = document.getElementById('btn-refresh-asistente');
 
-        if (filtroCat) filtroCat.onchange = () => AsistenteModule.cargarObligaciones();
-        if (filtroEst) filtroEst.onchange = () => AsistenteModule.cargarObligaciones();
-        if (btnRefresh) btnRefresh.onclick = () => AsistenteModule.cargarObligaciones();
+        const resetYcargar = () => {
+            AsistenteModule.paginaActual = 1;
+            AsistenteModule.cargarObligaciones();
+        };
+
+        if (filtroMes) filtroMes.onchange = resetYcargar;
+        if (filtroAnio) filtroAnio.onchange = resetYcargar;
+        if (filtroCat) filtroCat.onchange = resetYcargar;
+        if (filtroEst) filtroEst.onchange = resetYcargar;
+        if (btnRefresh) btnRefresh.onclick = resetYcargar;
+
+        // Botones Paginación Asistente
+        const btnPrev = document.getElementById('btn-prev-asistente');
+        const btnNext = document.getElementById('btn-next-asistente');
+        if (btnPrev) {
+            btnPrev.onclick = () => {
+                if (AsistenteModule.paginaActual > 1) {
+                    AsistenteModule.paginaActual--;
+                    AsistenteModule.renderTabla();
+                }
+            };
+        }
+        if (btnNext) {
+            btnNext.onclick = () => {
+                const maxPag = Math.ceil(AsistenteModule.obligaciones.length / AsistenteModule.ITEMS_POR_PAGINA) || 1;
+                if (AsistenteModule.paginaActual < maxPag) {
+                    AsistenteModule.paginaActual++;
+                    AsistenteModule.renderTabla();
+                }
+            };
+        }
 
         // Modal Crear Obligación
         const btnOpenCrear = document.getElementById('btn-open-modal-crear');
@@ -279,14 +317,19 @@ window.AsistenteModule = {
     },
 
     cargarObligaciones: async () => {
-        const filtroCat = document.getElementById('filtro-categoria-asistente').value;
-        const filtroEst = document.getElementById('filtro-estado-asistente').value;
+        const filtroMes = document.getElementById('filtro-mes-asistente');
+        const filtroAnio = document.getElementById('filtro-anio-asistente');
+        const filtroCat = document.getElementById('filtro-categoria-asistente');
+        const filtroEst = document.getElementById('filtro-estado-asistente');
+
+        const params = {};
+        if (filtroMes && filtroMes.value !== 'todos') params.mes = filtroMes.value;
+        if (filtroAnio && filtroAnio.value !== 'todos') params.anio = filtroAnio.value;
+        if (filtroCat && filtroCat.value !== 'todas') params.categoria = filtroCat.value;
+        if (filtroEst && filtroEst.value !== 'todos') params.estado = filtroEst.value;
 
         try {
-            const res = await API.getObligaciones({
-                categoria: filtroCat,
-                estado: filtroEst
-            });
+            const res = await API.getObligaciones(params);
 
             if (res.ok) {
                 AsistenteModule.obligaciones = res.obligaciones || [];
@@ -321,7 +364,18 @@ window.AsistenteModule = {
         const tbody = document.getElementById('tabla-obligaciones-asistente');
         tbody.innerHTML = '';
 
-        if (AsistenteModule.obligaciones.length === 0) {
+        const totalItems = AsistenteModule.obligaciones.length;
+        const totalPaginas = Math.ceil(totalItems / AsistenteModule.ITEMS_POR_PAGINA) || 1;
+        if (AsistenteModule.paginaActual > totalPaginas) {
+            AsistenteModule.paginaActual = totalPaginas;
+        }
+
+        const infoPaginacion = document.getElementById('info-paginacion-asistente');
+        const badgePagina = document.getElementById('badge-pagina-asistente');
+        const btnPrev = document.getElementById('btn-prev-asistente');
+        const btnNext = document.getElementById('btn-next-asistente');
+
+        if (totalItems === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" class="py-8 text-center text-slate-400">
@@ -330,17 +384,34 @@ window.AsistenteModule = {
                     </td>
                 </tr>
             `;
+            if (infoPaginacion) infoPaginacion.textContent = 'Mostrando 0 obligaciones';
+            if (badgePagina) badgePagina.textContent = '1 / 1';
+            if (btnPrev) btnPrev.disabled = true;
+            if (btnNext) btnNext.disabled = true;
             if (window.lucide) window.lucide.createIcons();
             return;
         }
 
-        AsistenteModule.obligaciones.forEach(item => {
+        const inicio = (AsistenteModule.paginaActual - 1) * AsistenteModule.ITEMS_POR_PAGINA;
+        const fin = Math.min(inicio + AsistenteModule.ITEMS_POR_PAGINA, totalItems);
+        const itemsPagina = AsistenteModule.obligaciones.slice(inicio, fin);
+
+        if (infoPaginacion) {
+            infoPaginacion.textContent = `Mostrando ${inicio + 1} - ${fin} de ${totalItems} obligaciones`;
+        }
+        if (badgePagina) {
+            badgePagina.textContent = `${AsistenteModule.paginaActual} / ${totalPaginas}`;
+        }
+        if (btnPrev) btnPrev.disabled = AsistenteModule.paginaActual <= 1;
+        if (btnNext) btnNext.disabled = AsistenteModule.paginaActual >= totalPaginas;
+
+        itemsPagina.forEach(item => {
             const tr = document.createElement('tr');
             
-            // Clase de semáforo en borde
+            // Clase de semáforo en borde (sin animación parpadeante)
             let borderClass = 'border-programado';
             if (item.estado === 'pagado') borderClass = 'border-pagado';
-            else if (item.semaforo.codigo === 'vencido') borderClass = 'border-mora-critica pulse-mora bg-red-50/20';
+            else if (item.semaforo.codigo === 'vencido') borderClass = 'border-mora-critica bg-red-50/20';
             else if (item.semaforo.codigo === 'por_vencer') borderClass = 'border-por-vencer bg-amber-50/20';
 
             tr.className = `hover:bg-slate-50 transition border-b border-slate-100 ${borderClass}`;

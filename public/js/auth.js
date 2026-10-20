@@ -39,26 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginErrorText = document.getElementById('login-error-text');
     const btnLogout = document.getElementById('btn-logout');
 
-    const btnQuickAsistente = document.getElementById('btn-quick-asistente');
-    const btnQuickGerente = document.getElementById('btn-quick-gerente');
-
-    // Botones rápidos de prueba para la sustentación
-    if (btnQuickAsistente) {
-        btnQuickAsistente.addEventListener('click', () => {
-            inputUsername.value = 'asistente';
-            inputPassword.value = 'asistente123';
-            formLogin.dispatchEvent(new Event('submit'));
-        });
-    }
-
-    if (btnQuickGerente) {
-        btnQuickGerente.addEventListener('click', () => {
-            inputUsername.value = 'gerente';
-            inputPassword.value = 'gerente123';
-            formLogin.dispatchEvent(new Event('submit'));
-        });
-    }
-
     // Submit Login
     if (formLogin) {
         formLogin.addEventListener('submit', async (e) => {
