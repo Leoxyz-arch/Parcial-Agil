@@ -420,6 +420,7 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
         const comprobanteUrl = `/uploads/${req.file.filename}`;
         const comprobanteTipo = req.file.mimetype;
         const fechaPagoFinal = fecha_pago || new Date().toISOString().split('T')[0];
+        const metodoPagoVal = (metodo_pago && String(metodo_pago).trim() !== '') ? String(metodo_pago).trim() : 'Transferencia Bancaria';
 
         const updateSql = `
             UPDATE obligaciones 
