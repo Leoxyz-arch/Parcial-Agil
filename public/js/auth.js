@@ -128,8 +128,8 @@ function switchModulo(modulo) {
         if (containerPeriodo) containerPeriodo.classList.remove('hidden');
         if (btnCrear) btnCrear.classList.add('hidden');
 
-        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 transition-subtle text-left';
-        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left';
+        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium bg-blue-600 text-white transition-subtle text-left shadow-xs';
+        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left';
 
         if (window.GerenteModule) window.GerenteModule.init();
     } else {
@@ -139,8 +139,8 @@ function switchModulo(modulo) {
         if (containerPeriodo) containerPeriodo.classList.add('hidden');
         if (btnCrear) btnCrear.classList.remove('hidden');
 
-        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 transition-subtle text-left';
-        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left';
+        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium bg-blue-600 text-white transition-subtle text-left shadow-xs';
+        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left';
 
         if (window.AsistenteModule) window.AsistenteModule.init();
     }

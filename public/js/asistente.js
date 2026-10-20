@@ -284,111 +284,158 @@ window.AsistenteModule = {
 
         AsistenteModule.obligaciones.forEach(item => {
             const tr = document.createElement('tr');
-            
-            // Clase de semáforo en borde para Light Mode
-            let borderClass = 'border-programado';
-            if (item.estado === 'anulado') borderClass = 'border-anulado opacity-60 bg-slate-50';
-            else if (item.estado === 'pagado') borderClass = 'border-pagado bg-emerald-50/20';
-            else if (item.semaforo.codigo === 'vencido') borderClass = 'border-mora-critica bg-rose-50/30';
-            else if (item.semaforo.codigo === 'por_vencer') borderClass = 'border-por-vencer bg-amber-50/30';
+            tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
+            tr.onclick = () => AsistenteModule.abrirDetalle(item.id);
 
-            tr.className = `hover:bg-slate-50 transition-subtle border-b border-slate-100 ${borderClass}`;
+            // Semáforo sobrio estilo GitHub / Dot Indicator
+            let semaforoHtml = '';
+            if (item.estado === 'pagado') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Pagado</span>';
+            } else if (item.estado === 'anulado') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-300"></span>Anulado</span>';
+            } else if (item.semaforo.codigo === 'vencido') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-700"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido</span>';
+            } else if (item.semaforo.codigo === 'por_vencer') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por vencer</span>';
+            } else {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado</span>';
+            }
 
-            // Badges Categoría para Light Mode
-            const catBadges = {
-                servicio: 'bg-blue-50 text-blue-700 border-blue-200',
-                impuesto: 'bg-amber-50 text-amber-800 border-amber-200',
-                proveedores: 'bg-purple-50 text-purple-700 border-purple-200',
-                prestamo: 'bg-emerald-50 text-emerald-800 border-emerald-200'
-            };
-            const catBadge = catBadges[item.categoria] || 'bg-slate-100 text-slate-700 border-slate-200';
+            // Concepto limpio con detalles secundarios discretos
+            const cuotaText = item.cuota_info ? ` <span class="text-slate-400 font-mono text-[11px]">(${item.cuota_info})</span>` : '';
+            const legalIndicator = item.advertencia_legal ? ` <span class="cursor-help text-amber-600" title="${item.advertencia_legal}"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline"></i></span>` : '';
 
-            // Semáforo badge classes en Light Mode
-            let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
-            if (item.estado === 'pagado') badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-            else if (item.estado === 'anulado') badgeStyle = 'bg-slate-100 text-slate-400 border-slate-200 line-through';
-            else if (item.semaforo.codigo === 'vencido') badgeStyle = 'bg-rose-50 text-rose-800 border-rose-200 font-bold';
-            else if (item.semaforo.codigo === 'por_vencer') badgeStyle = 'bg-amber-50 text-amber-900 border-amber-200 font-semibold';
-
-            const semaforoHtml = `
-                <div class="inline-flex flex-col">
-                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] border ${badgeStyle}">
-                        ${item.semaforo.alerta_critica && item.estado !== 'anulado' ? '<i data-lucide="alert-triangle" class="w-3 h-3 text-rose-600"></i>' : ''}
-                        <span>${item.semaforo.etiqueta}</span>
-                    </span>
-                    <span class="text-[10px] text-slate-500 mt-0.5">${item.semaforo.detalle_tiempo}</span>
-                </div>
-            `;
-
-            // Botones de acción
+            // Botones de acción compactos
             let actionHtml = '';
             if (item.estado === 'pagado') {
                 actionHtml = `
-                    <button type="button" onclick="window.GerenteModule.abrirVisorComprobante(${item.id})"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-medium transition-subtle shadow-xs" title="Ver comprobante archivado">
-                        <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i>
-                        <span>Auditar</span>
-                    </button>
+                    <div class="inline-flex items-center gap-1 justify-center">
+                        <button type="button" onclick="event.stopPropagation(); window.GerenteModule.abrirVisorComprobante(${item.id})"
+                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle" title="Ver comprobante auditado">
+                            <i data-lucide="file-check-2" class="w-3 h-3 text-emerald-600"></i>
+                            <span>Auditar</span>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
+                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
                 `;
             } else if (item.estado === 'anulado') {
                 actionHtml = `
-                    <span class="text-[11px] text-slate-400 font-mono">ANULADO</span>
+                    <div class="inline-flex items-center gap-1 justify-center">
+                        <span class="text-[11px] text-slate-400 font-mono">ANULADO</span>
+                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
+                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver motivo de anulación">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
                 `;
             } else {
                 actionHtml = `
-                    <div class="inline-flex items-center gap-1">
-                        <button type="button" onclick="window.AsistenteModule.abrirModalPagar(${item.id})"
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-700 hover:bg-blue-800 text-white text-xs font-medium shadow-xs transition-subtle" title="Registrar voucher de pago">
-                            <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
-                            <span>Pagar</span>
+                    <div class="inline-flex items-center gap-1 justify-center">
+                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalPagar(${item.id})"
+                            class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-subtle" title="Registrar pago">
+                            Pagar
                         </button>
-                        <button type="button" onclick="window.AsistenteModule.abrirModalAnular(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-subtle" title="Anular por error de digitación">
+                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
+                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalAnular(${item.id})"
+                            class="p-0.5 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle" title="Anular obligación">
                             <i data-lucide="ban" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 `;
             }
 
-            // Legal badge en Light Mode
-            const legalBadge = item.advertencia_legal ? `
-                <div class="mt-1 flex items-center gap-1 text-[10px] text-rose-700 font-medium">
-                    <i data-lucide="scale" class="w-3 h-3 flex-shrink-0"></i>
-                    <span>${item.advertencia_legal}</span>
-                </div>
-            ` : '';
-
             tr.innerHTML = `
-                <td class="py-3 px-3">${semaforoHtml}</td>
-                <td class="py-3 px-3">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="w-fit px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${catBadge}">
-                            ${item.categoria}
-                        </span>
-                        <span class="text-[11px] text-slate-500">${item.tipo_comprobante}</span>
-                    </div>
+                <td>${semaforoHtml}</td>
+                <td class="font-medium text-slate-900 max-w-xs truncate" title="${item.descripcion}">
+                    ${item.descripcion}${cuotaText}${legalIndicator}
                 </td>
-                <td class="py-3 px-3">
-                    <p class="font-semibold text-slate-900 text-xs">${item.descripcion}</p>
-                    ${item.cuota_info ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">${item.cuota_info}</span>` : ''}
-                    ${legalBadge}
+                <td class="text-slate-700 max-w-[180px] truncate" title="${item.beneficiario}">
+                    ${item.beneficiario}
                 </td>
-                <td class="py-3 px-3">
-                    <p class="font-medium text-slate-800 text-xs">${item.beneficiario}</p>
-                    <p class="text-[10px] text-slate-500 font-mono-numbers">RUC: ${item.ruc_beneficiario || 'S/N'}</p>
-                </td>
-                <td class="py-3 px-3 font-mono-numbers text-xs ${item.semaforo.alerta_critica && item.estado !== 'anulado' ? 'text-rose-700 font-bold' : 'text-slate-600'}">
-                    ${item.fecha_vencimiento}
-                </td>
-                <td class="py-3 px-3 text-right font-mono-numbers font-bold text-slate-900 text-xs">
+                <td class="text-slate-500">${item.tipo_comprobante || 'Factura'}</td>
+                <td class="font-mono-numbers text-slate-600">${item.fecha_vencimiento}</td>
+                <td class="text-right font-mono-numbers font-semibold text-slate-900">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td class="py-3 px-3 text-center">${actionHtml}</td>
+                <td class="text-center">${actionHtml}</td>
             `;
 
             tbody.appendChild(tr);
         });
 
+        if (window.lucide) window.lucide.createIcons();
+    },
+
+    abrirDetalle: (id) => {
+        const item = AsistenteModule.obligaciones.find(o => o.id === id);
+        if (!item) return;
+
+        const modal = document.getElementById('modal-detalle-obligacion');
+        if (!modal) return;
+
+        let badgeHtml = '';
+        if (item.estado === 'pagado') {
+            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-emerald-700 font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Liquidado / Pagado</span>';
+        } else if (item.estado === 'anulado') {
+            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Comprobante Anulado</span>';
+        } else if (item.semaforo.codigo === 'vencido') {
+            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-rose-700 font-bold"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido en Mora</span>';
+        } else if (item.semaforo.codigo === 'por_vencer') {
+            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-amber-700 font-semibold"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por Vencer</span>';
+        } else {
+            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-slate-600 font-medium"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado Normal</span>';
+        }
+
+        document.getElementById('detalle-estado-badge').innerHTML = badgeHtml;
+        document.getElementById('detalle-semaforo-tiempo').textContent = item.semaforo ? item.semaforo.detalle_tiempo : '';
+        document.getElementById('detalle-monto').textContent = `S/ ${(item.monto || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('detalle-concepto').textContent = item.descripcion;
+        document.getElementById('detalle-tipo-comprobante').textContent = item.tipo_comprobante || 'Factura Electrónica';
+        document.getElementById('detalle-beneficiario').textContent = item.beneficiario;
+        document.getElementById('detalle-ruc').textContent = item.ruc_beneficiario || 'No especificado (S/N)';
+        document.getElementById('detalle-fecha-emision').textContent = item.fecha_emision || 'No registrada';
+        document.getElementById('detalle-fecha-vencimiento').textContent = item.fecha_vencimiento;
+
+        const containerCuota = document.getElementById('detalle-container-cuota');
+        if (item.cuota_info) {
+            containerCuota.classList.remove('hidden');
+            document.getElementById('detalle-cuota').textContent = item.cuota_info;
+        } else {
+            containerCuota.classList.add('hidden');
+        }
+
+        const containerLegal = document.getElementById('detalle-container-legal');
+        if (item.advertencia_legal) {
+            containerLegal.classList.remove('hidden');
+            document.getElementById('detalle-legal-texto').textContent = item.advertencia_legal;
+        } else {
+            containerLegal.classList.add('hidden');
+        }
+
+        const containerPago = document.getElementById('detalle-container-pago');
+        if (item.estado === 'pagado') {
+            containerPago.classList.remove('hidden');
+            document.getElementById('detalle-fecha-pago').textContent = item.fecha_pago || 'No registrada';
+            document.getElementById('detalle-nro-operacion').textContent = item.nro_operacion || 'Sin Nro.';
+        } else {
+            containerPago.classList.add('hidden');
+        }
+
+        const containerAnulacion = document.getElementById('detalle-container-anulacion');
+        if (item.estado === 'anulado') {
+            containerAnulacion.classList.remove('hidden');
+            document.getElementById('detalle-motivo-anulacion').textContent = item.motivo_anulacion || 'Sin motivo registrado.';
+        } else {
+            containerAnulacion.classList.add('hidden');
+        }
+
+        modal.classList.remove('hidden');
         if (window.lucide) window.lucide.createIcons();
     },
 

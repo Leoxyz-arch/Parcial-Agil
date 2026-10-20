@@ -85,94 +85,74 @@
     <!-- ========================================== -->
     <div id="view-app" class="hidden flex-1 flex h-screen overflow-hidden">
         
-        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Estilo VS Code / GitHub / Linear) -->
-        <aside class="w-56 bg-white border-r border-slate-300 flex flex-col justify-between flex-shrink-0 z-20">
+        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Estilo Corporativo Sobrio) -->
+        <aside class="w-56 app-sidebar flex flex-col justify-between flex-shrink-0 z-20">
             <!-- Top: Brand -->
             <div>
-                <div class="h-12 px-3.5 border-b border-slate-200 flex items-center justify-between">
+                <div class="h-12 px-3.5 border-b border-slate-800 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded bg-blue-700 text-white flex items-center justify-center">
+                        <div class="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
                             <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                         </div>
-                        <span class="font-bold text-xs text-slate-900 tracking-tight">CashFlow Guard</span>
+                        <span class="font-semibold text-xs text-white tracking-tight">CashFlow Guard</span>
                     </div>
-                    <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 font-semibold">v1.0</span>
+                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">v1.0</span>
                 </div>
 
                 <!-- Navigation Modules -->
                 <div class="p-2 space-y-1">
-                    <p class="px-2 pt-2 pb-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">Módulos</p>
+                    <p class="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Módulos</p>
                     
                     <button type="button" id="nav-btn-asistente"
-                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left">
+                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left">
                         <div class="flex items-center gap-2">
-                            <i data-lucide="receipt" class="w-4 h-4 text-slate-500"></i>
+                            <i data-lucide="receipt" class="w-4 h-4 text-slate-400"></i>
                             <span>Obligaciones</span>
                         </div>
                     </button>
 
                     <button type="button" id="nav-btn-gerente"
-                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left">
+                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left">
                         <div class="flex items-center gap-2">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-500"></i>
+                            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
                             <span>Dashboard Ejecutivo</span>
                         </div>
                     </button>
 
-                    <div class="pt-2 border-t border-slate-200 my-1"></div>
-                    <p class="px-2 pt-1 pb-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">Herramientas</p>
+                    <div class="pt-2 border-t border-slate-800 my-1"></div>
+                    <p class="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Herramientas</p>
 
                     <button type="button" id="btn-export-csv"
-                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition-subtle text-left">
-                        <i data-lucide="download" class="w-4 h-4 text-emerald-600"></i>
+                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-300 transition-subtle text-left">
+                        <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
                         <span>Exportar CSV</span>
                     </button>
 
                     <button type="button" id="btn-show-context"
-                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 transition-subtle text-left">
-                        <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
                         <span>Ficha Técnica</span>
                     </button>
-
-                    <!-- Módulos Próximos (Demuestra Escalabilidad) -->
-                    <div class="pt-2 border-t border-slate-200 my-1"></div>
-                    <p class="px-2 pt-1 pb-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">Próximos</p>
-                    
-                    <div class="flex items-center justify-between px-2.5 py-1.5 text-xs text-slate-400 cursor-not-allowed">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="truck" class="w-4 h-4 text-slate-400"></i>
-                            <span>Proveedores</span>
-                        </div>
-                        <span class="text-[9px] px-1 py-0.2 rounded bg-slate-100 text-slate-400 border border-slate-200">Pronto</span>
-                    </div>
-
-                    <div class="flex items-center justify-between px-2.5 py-1.5 text-xs text-slate-400 cursor-not-allowed">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
-                            <span>Ajustes</span>
-                        </div>
-                        <span class="text-[9px] px-1 py-0.2 rounded bg-slate-100 text-slate-400 border border-slate-200">Pronto</span>
-                    </div>
                 </div>
             </div>
 
             <!-- Bottom: User & Status -->
-            <div class="p-2 border-t border-slate-200 bg-slate-50/60 space-y-2">
-                <div id="badge-db" class="hidden w-full flex items-center justify-between px-2 py-1 rounded text-[10px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <div class="p-2 border-t border-slate-800 bg-slate-950/60 space-y-2">
+                <div id="badge-db" class="hidden w-full flex items-center justify-between px-2 py-1 rounded text-[10px] font-mono bg-slate-800 text-emerald-400 border border-slate-700">
                     <span class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="text-db-status">PostgreSQL</span>
                     </span>
-                    <span class="text-[9px] uppercase font-bold text-emerald-600">ONLINE</span>
+                    <span class="text-[9px] uppercase font-bold text-emerald-400">ONLINE</span>
                 </div>
 
                 <div class="flex items-center justify-between px-1.5 pt-1">
                     <div class="min-w-0 pr-1">
-                        <p id="user-display-name" class="text-xs font-bold text-slate-800 truncate">Usuario</p>
-                        <span id="user-display-role" class="inline-block text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-slate-200 text-slate-700">ROL</span>
+                        <p id="user-display-name" class="text-xs font-medium text-white truncate">Usuario</p>
+                        <span id="user-display-role" class="inline-block text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">ROL</span>
                     </div>
                     <button type="button" id="btn-logout" title="Cerrar Sesión"
-                        class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle">
+                        class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-subtle">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -314,21 +294,21 @@
                             </button>
                         </div>
 
-                        <!-- Tabla Ultra Compacta (Dense Table) -->
+                        <!-- Tabla Compacta de Alta Productividad (GitHub Style) -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left dense-table text-slate-800">
-                                <thead class="bg-slate-100/90 text-slate-600 border-b border-slate-300 font-mono font-semibold uppercase">
+                                <thead>
                                     <tr>
-                                        <th class="py-1.5 px-2.5">Estado</th>
-                                        <th class="py-1.5 px-2.5">Comprobante</th>
-                                        <th class="py-1.5 px-2.5">Concepto</th>
-                                        <th class="py-1.5 px-2.5">Beneficiario / RUC</th>
-                                        <th class="py-1.5 px-2.5">Vencimiento</th>
-                                        <th class="py-1.5 px-2.5 text-right">Importe</th>
-                                        <th class="py-1.5 px-2.5 text-center">Acciones</th>
+                                        <th class="w-28">Estado</th>
+                                        <th>Concepto</th>
+                                        <th class="w-48">Beneficiario</th>
+                                        <th class="w-36">Comprobante</th>
+                                        <th class="w-28">Vencimiento</th>
+                                        <th class="w-28 text-right">Importe</th>
+                                        <th class="w-32 text-center">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabla-obligaciones-asistente" class="divide-y divide-slate-200">
+                                <tbody id="tabla-obligaciones-asistente">
                                     <!-- Filas dinámicas -->
                                 </tbody>
                             </table>
@@ -460,17 +440,17 @@
 
                             <div class="overflow-x-auto max-h-72 overflow-y-auto">
                                 <table class="w-full text-left dense-table text-slate-800">
-                                    <thead class="bg-slate-100/90 text-slate-600 border-b border-slate-300 font-mono font-semibold uppercase sticky top-0">
+                                    <thead class="sticky top-0">
                                         <tr>
-                                            <th class="py-1 px-2">Estado</th>
-                                            <th class="py-1 px-2">Categoría</th>
-                                            <th class="py-1 px-2">Concepto</th>
-                                            <th class="py-1 px-2">Vencimiento</th>
-                                            <th class="py-1 px-2 text-right">Importe</th>
-                                            <th class="py-1 px-2 text-center">Auditar</th>
+                                            <th class="w-28">Estado</th>
+                                            <th>Concepto</th>
+                                            <th class="w-32">Categoría</th>
+                                            <th class="w-28">Vencimiento</th>
+                                            <th class="w-28 text-right">Importe</th>
+                                            <th class="w-24 text-center">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tabla-obligaciones-gerente" class="divide-y divide-slate-200">
+                                    <tbody id="tabla-obligaciones-gerente">
                                         <!-- Filas dinámicas -->
                                     </tbody>
                                 </table>
@@ -724,7 +704,110 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL 5: FICHA TÉCNICA DEL SISTEMA         -->
+    <!-- MODAL 5: DETALLE COMPLETO DE OBLIGACIÓN    -->
+    <!-- ========================================== -->
+    <div id="modal-detalle-obligacion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded shadow-2xl max-w-lg w-full overflow-hidden border border-slate-300 max-h-[90vh] flex flex-col">
+            <div class="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="file-text" class="w-4 h-4 text-slate-700"></i>
+                    <h3 class="font-bold text-xs text-slate-900">Ficha Técnica de la Obligación</h3>
+                </div>
+                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="p-4 overflow-y-auto space-y-3 text-xs">
+                <!-- Encabezado con estado e importe -->
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-200">
+                    <div>
+                        <span id="detalle-estado-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold">
+                            <!-- Inyectado por JS -->
+                        </span>
+                        <p id="detalle-semaforo-tiempo" class="text-[11px] text-slate-500 mt-0.5"></p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-500 uppercase font-mono block">Importe Total</span>
+                        <span id="detalle-monto" class="text-base font-bold font-mono text-slate-900">S/ 0.00</span>
+                    </div>
+                </div>
+
+                <!-- Grilla de Parámetros -->
+                <div class="grid grid-cols-2 gap-2 text-slate-700">
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">Concepto</span>
+                        <span id="detalle-concepto" class="font-medium text-slate-900"></span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">Comprobante</span>
+                        <span id="detalle-tipo-comprobante" class="font-medium text-slate-900"></span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">Beneficiario</span>
+                        <span id="detalle-beneficiario" class="font-medium text-slate-900"></span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">RUC Fiscal</span>
+                        <span id="detalle-ruc" class="font-mono text-slate-900"></span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">Fecha Emisión</span>
+                        <span id="detalle-fecha-emision" class="font-mono text-slate-900"></span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <span class="text-[10px] uppercase font-mono text-slate-500 block">Fecha Vencimiento</span>
+                        <span id="detalle-fecha-vencimiento" class="font-mono text-slate-900"></span>
+                    </div>
+                </div>
+
+                <!-- Cuota (si aplica) -->
+                <div id="detalle-container-cuota" class="hidden p-2 bg-slate-50 rounded border border-slate-200 text-slate-700">
+                    <span class="text-[10px] uppercase font-mono text-slate-500 block">Cuota Financiera</span>
+                    <span id="detalle-cuota" class="font-medium font-mono text-slate-900"></span>
+                </div>
+
+                <!-- Alerta Legal (si aplica) -->
+                <div id="detalle-container-legal" class="hidden p-2.5 bg-amber-50 rounded border border-amber-200 text-amber-900">
+                    <div class="flex items-center gap-1.5 font-semibold text-[11px] mb-0.5">
+                        <i data-lucide="scale" class="w-3.5 h-3.5 text-amber-700"></i>
+                        <span>Consideración Legal / Fiscal</span>
+                    </div>
+                    <p id="detalle-legal-texto" class="text-[11px] text-amber-800"></p>
+                </div>
+
+                <!-- Pago / Liquidación (si aplica) -->
+                <div id="detalle-container-pago" class="hidden p-2.5 bg-emerald-50 rounded border border-emerald-200 text-emerald-900">
+                    <div class="flex items-center gap-1.5 font-semibold text-[11px] mb-1">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-700"></i>
+                        <span>Información de Liquidación</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 text-[11px]">
+                        <div><span class="text-emerald-700">Fecha de Pago:</span> <span id="detalle-fecha-pago" class="font-mono"></span></div>
+                        <div><span class="text-emerald-700">N° Operación:</span> <span id="detalle-nro-operacion" class="font-mono"></span></div>
+                    </div>
+                </div>
+
+                <!-- Anulación (si aplica) -->
+                <div id="detalle-container-anulacion" class="hidden p-2.5 bg-rose-50 rounded border border-rose-200 text-rose-900">
+                    <div class="flex items-center gap-1.5 font-semibold text-[11px] mb-1">
+                        <i data-lucide="ban" class="w-3.5 h-3.5 text-rose-700"></i>
+                        <span>Registro de Anulación</span>
+                    </div>
+                    <p id="detalle-motivo-anulacion" class="text-[11px] text-rose-800"></p>
+                </div>
+            </div>
+
+            <div class="p-2.5 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button type="button" class="btn-close-modal px-3 py-1 rounded border border-slate-300 text-xs text-slate-700 hover:bg-slate-100">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 6: FICHA TÉCNICA DEL SISTEMA         -->
     <!-- ========================================== -->
     <div id="modal-contexto-scrum" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white rounded shadow-2xl max-w-xl w-full overflow-hidden border border-slate-300 max-h-[85vh] flex flex-col">

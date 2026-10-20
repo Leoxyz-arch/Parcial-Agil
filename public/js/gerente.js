@@ -154,30 +154,33 @@ window.GerenteModule = {
 
         filtradas.forEach(item => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100';
+            tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
+            tr.onclick = () => {
+                if (window.AsistenteModule && window.AsistenteModule.abrirDetalle) {
+                    window.AsistenteModule.abrirDetalle(item.id);
+                }
+            };
 
-            let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
-            if (item.estado === 'pagado') badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-            else if (item.estado === 'anulado') badgeStyle = 'bg-slate-100 text-slate-400 border-slate-200 line-through';
-            else if (item.semaforo.codigo === 'vencido') badgeStyle = 'bg-rose-50 text-rose-800 border-rose-200 font-bold';
-            else if (item.semaforo.codigo === 'por_vencer') badgeStyle = 'bg-amber-50 text-amber-900 border-amber-200 font-semibold';
-
-            const semaforoBadge = `
-                <div class="inline-flex flex-col">
-                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] border ${badgeStyle}">
-                        ${item.semaforo.alerta_critica && item.estado !== 'anulado' ? '<i data-lucide="alert-triangle" class="w-2.5 h-2.5 text-rose-600"></i>' : ''}
-                        <span>${item.semaforo.etiqueta}</span>
-                    </span>
-                    <span class="text-[9px] text-slate-500 mt-0.5">${item.semaforo.detalle_tiempo}</span>
-                </div>
-            `;
+            // Semáforo sobrio estilo dot
+            let semaforoHtml = '';
+            if (item.estado === 'pagado') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Pagado</span>';
+            } else if (item.estado === 'anulado') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-300"></span>Anulado</span>';
+            } else if (item.semaforo.codigo === 'vencido') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-700"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido</span>';
+            } else if (item.semaforo.codigo === 'por_vencer') {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por vencer</span>';
+            } else {
+                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado</span>';
+            }
 
             let compHtml = '<span class="text-slate-400 font-mono text-[11px]">—</span>';
             if (item.estado === 'pagado') {
                 compHtml = `
-                    <button type="button" onclick="window.GerenteModule.abrirVisorComprobante(${item.id})"
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-subtle text-[11px] font-medium shadow-xs" title="Auditar comprobante">
-                        <i data-lucide="eye" class="w-3 h-3 text-emerald-700"></i>
+                    <button type="button" onclick="event.stopPropagation(); window.GerenteModule.abrirVisorComprobante(${item.id})"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 transition-subtle text-xs font-medium" title="Auditar comprobante">
+                        <i data-lucide="file-check-2" class="w-3 h-3 text-emerald-600"></i>
                         <span>Auditar</span>
                     </button>
                 `;
@@ -186,22 +189,16 @@ window.GerenteModule = {
             }
 
             tr.innerHTML = `
-                <td class="py-2.5 px-3">${semaforoBadge}</td>
-                <td class="py-2.5 px-3">
-                    <span class="uppercase text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700">
-                        ${item.categoria}
-                    </span>
-                    <p class="text-[10px] text-slate-500 mt-0.5">${item.tipo_comprobante || 'Factura'}</p>
+                <td>${semaforoHtml}</td>
+                <td class="font-medium text-slate-900 max-w-xs truncate" title="${item.descripcion}">
+                    ${item.descripcion}
                 </td>
-                <td class="py-2.5 px-3">
-                    <p class="font-semibold text-slate-900 text-xs">${item.descripcion}</p>
-                    <p class="text-[10px] text-slate-500">${item.beneficiario} • <span class="font-mono-numbers">RUC: ${item.ruc_beneficiario || 'S/N'}</span></p>
-                </td>
-                <td class="py-2.5 px-3 font-mono-numbers text-xs text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="py-2.5 px-3 text-right font-mono-numbers font-bold text-xs text-slate-900">
+                <td class="text-slate-500 capitalize text-xs">${item.categoria}</td>
+                <td class="font-mono-numbers text-xs text-slate-600">${item.fecha_vencimiento}</td>
+                <td class="text-right font-mono-numbers font-semibold text-xs text-slate-900">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td class="py-2.5 px-3 text-center">${compHtml}</td>
+                <td class="text-center">${compHtml}</td>
             `;
 
             tbody.appendChild(tr);

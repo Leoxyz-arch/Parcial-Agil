@@ -145,6 +145,25 @@ async function runTestSuite() {
     }
   });
 
+  // TEST 8: Apertura de Ficha Técnica Detallada de Obligación
+  await test('HU-07: Ficha técnica de obligación en modal (Anti-Bloat)', async () => {
+    // Volver a la vista de obligaciones
+    await page.click('#nav-btn-asistente');
+    await page.waitForSelector('#module-asistente', { state: 'visible' });
+
+    // Hacer click en la primera fila de la tabla
+    const firstRow = await page.$('#tabla-obligaciones-asistente tr');
+    assert(firstRow !== null, 'Debe existir al menos una fila en la tabla');
+    await firstRow.click();
+    await page.waitForSelector('#modal-detalle-obligacion:not(.hidden)');
+
+    const concepto = await page.textContent('#detalle-concepto');
+    assert(concepto.length > 0, 'La ficha técnica debe mostrar el concepto de la obligación');
+
+    await page.click('#modal-detalle-obligacion button.btn-close-modal >> nth=0');
+    await page.waitForSelector('#modal-detalle-obligacion', { state: 'hidden' });
+  });
+
   await browser.close();
 
   console.log('\n=======================================');
