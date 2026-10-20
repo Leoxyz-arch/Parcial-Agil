@@ -102,7 +102,7 @@ window.AsistenteModule = {
 
                 // Validación de coherencia de fechas
                 if (fecha_vencimiento < fecha_emision) {
-                    alert('⚠️ Error de validación: La fecha de vencimiento no puede ser anterior a la fecha de emisión.');
+                    alert('Error de validación: La fecha de vencimiento no puede ser anterior a la fecha de emisión.');
                     return;
                 }
 
@@ -220,6 +220,62 @@ window.AsistenteModule = {
                 }
             };
         }
+
+        // Modal Editar Obligación
+        const formEditar = document.getElementById('form-editar-obligacion');
+        const modalEditar = document.getElementById('modal-editar-obligacion');
+        const selectCatEditar = document.getElementById('editar-categoria');
+        const containerCuotaEditar = document.getElementById('container-editar-cuota');
+
+        if (selectCatEditar) {
+            selectCatEditar.onchange = (e) => {
+                if (e.target.value === 'prestamo') {
+                    containerCuotaEditar.classList.remove('hidden');
+                } else {
+                    containerCuotaEditar.classList.add('hidden');
+                }
+            };
+        }
+
+        if (formEditar) {
+            formEditar.onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('editar-id').value;
+                const categoria = document.getElementById('editar-categoria').value;
+                const descripcion = document.getElementById('editar-descripcion').value.trim();
+                const beneficiario = document.getElementById('editar-beneficiario').value.trim();
+                const monto = parseFloat(document.getElementById('editar-monto').value);
+                const fecha_emision = document.getElementById('editar-emision').value;
+                const fecha_vencimiento = document.getElementById('editar-vencimiento').value;
+                const cuota_info = categoria === 'prestamo' ? document.getElementById('editar-cuota').value.trim() : null;
+
+                if (fecha_vencimiento < fecha_emision) {
+                    alert('Error de validación: La fecha de vencimiento no puede ser anterior a la de emisión.');
+                    return;
+                }
+
+                try {
+                    const res = await API.editarObligacion(id, {
+                        categoria,
+                        descripcion,
+                        beneficiario,
+                        monto,
+                        fecha_emision,
+                        fecha_vencimiento,
+                        cuota_info
+                    });
+
+                    if (res.ok) {
+                        modalEditar.classList.add('hidden');
+                        await AsistenteModule.cargarObligaciones();
+                    } else {
+                        alert(res.mensaje || 'Error al actualizar la obligación.');
+                    }
+                } catch (err) {
+                    alert('Error de conexión al actualizar.');
+                }
+            };
+        }
     },
 
     cargarObligaciones: async () => {
@@ -324,6 +380,11 @@ window.AsistenteModule = {
                             <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                             <span>Pagar</span>
                         </button>
+                        <button type="button" onclick="window.AsistenteModule.abrirModalEditar(${item.id})"
+                            title="Editar obligación"
+                            class="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
                         <button type="button" onclick="window.AsistenteModule.eliminarObligacion(${item.id})"
                             title="Anular obligación creada por error"
                             class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition">
@@ -398,5 +459,30 @@ window.AsistenteModule = {
         } catch (e) {
             alert('Error de conexión con el servidor.');
         }
+    },
+
+    abrirModalEditar: (id) => {
+        const item = AsistenteModule.obligaciones.find(o => o.id === id);
+        if (!item) return;
+
+        document.getElementById('editar-id').value = item.id;
+        document.getElementById('editar-categoria').value = item.categoria;
+        document.getElementById('editar-descripcion').value = item.descripcion;
+        document.getElementById('editar-beneficiario').value = item.beneficiario;
+        document.getElementById('editar-monto').value = item.monto;
+        document.getElementById('editar-emision').value = item.fecha_emision;
+        document.getElementById('editar-vencimiento').value = item.fecha_vencimiento;
+
+        const containerCuotaEditar = document.getElementById('container-editar-cuota');
+        const inputCuotaEditar = document.getElementById('editar-cuota');
+        if (item.categoria === 'prestamo') {
+            containerCuotaEditar.classList.remove('hidden');
+            inputCuotaEditar.value = item.cuota_info || '';
+        } else {
+            containerCuotaEditar.classList.add('hidden');
+            inputCuotaEditar.value = '';
+        }
+
+        document.getElementById('modal-editar-obligacion').classList.remove('hidden');
     }
 };

@@ -138,7 +138,7 @@ window.GerenteModule = {
             // Semáforo badge
             const semaforoBadge = `
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${item.semaforo.clase_badge}">
-                    ${item.semaforo.alerta_critica ? '⚠️ ' : ''}${item.semaforo.etiqueta}
+                    ${item.semaforo.alerta_critica ? 'Alerta: ' : ''}${item.semaforo.etiqueta}
                 </span>
             `;
 

@@ -380,4 +380,102 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// PUT /api/obligaciones/:id (Editar obligación pendiente)
+router.put('/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const {
+            categoria,
+            descripcion,
+            beneficiario,
+            monto,
+            fecha_emision,
+            fecha_vencimiento,
+            cuota_info
+        } = req.body;
+
+        const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
+        if (!findRes.rows || findRes.rows.length === 0) {
+            return res.status(404).json({ ok: false, mensaje: 'Obligación no encontrada.' });
+        }
+
+        const oblig = findRes.rows[0];
+        if (oblig.estado === 'pagado') {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No se puede editar una obligación que ya ha sido pagada.'
+            });
+        }
+
+        const validCategorias = ['servicio', 'impuesto', 'proveedores', 'prestamo'];
+        if (!categoria || !validCategorias.includes(categoria.toLowerCase())) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La categoría debe ser: Servicio, Impuesto, Proveedores o Préstamo.'
+            });
+        }
+
+        if (!descripcion || descripcion.trim() === '') {
+            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar una descripción de la obligación.' });
+        }
+
+        if (!beneficiario || beneficiario.trim() === '') {
+            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar el beneficiario o proveedor.' });
+        }
+
+        const montoNum = parseFloat(monto);
+        if (isNaN(montoNum) || montoNum <= 0) {
+            return res.status(400).json({ ok: false, mensaje: 'El monto debe ser un número mayor a cero.' });
+        }
+
+        if (!fecha_emision || !fecha_vencimiento) {
+            return res.status(400).json({ ok: false, mensaje: 'Debe seleccionar la fecha de emisión y de vencimiento.' });
+        }
+
+        if (fecha_vencimiento < fecha_emision) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La fecha de vencimiento no puede ser anterior a la fecha de emisión.'
+            });
+        }
+
+        const updateSql = `
+            UPDATE obligaciones
+            SET categoria = $1,
+                descripcion = $2,
+                beneficiario = $3,
+                monto = $4,
+                fecha_emision = $5,
+                fecha_vencimiento = $6,
+                cuota_info = $7,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $8
+            RETURNING *
+        `;
+
+        const updateParams = [
+            categoria.toLowerCase(),
+            descripcion.trim(),
+            beneficiario.trim(),
+            montoNum,
+            fecha_emision,
+            fecha_vencimiento,
+            cuota_info ? cuota_info.trim() : null,
+            id
+        ];
+
+        const updateRes = await db.query(updateSql, updateParams);
+        const enriquecida = enrichObligacionWithSemaforo(updateRes.rows[0]);
+
+        res.json({
+            ok: true,
+            mensaje: 'Obligación actualizada exitosamente.',
+            obligacion: enriquecida
+        });
+    } catch (error) {
+        console.error('Error en PUT /api/obligaciones/:id:', error);
+        res.status(500).json({ ok: false, mensaje: 'Error interno al actualizar la obligación.' });
+    }
+});
+
 module.exports = router;

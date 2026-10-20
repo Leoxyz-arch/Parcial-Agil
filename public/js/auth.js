@@ -121,7 +121,7 @@ function renderAppView() {
     viewApp.classList.remove('hidden');
 
     userDisplayName.textContent = user.nombre_completo || user.username;
-    userDisplayRole.textContent = user.rol === 'gerente' ? '💼 Gerente' : '📋 Asistente';
+    userDisplayRole.textContent = user.rol === 'gerente' ? 'Gerente' : 'Asistente';
 
     if (user.rol === 'gerente') {
         moduleGerente.classList.remove('hidden');

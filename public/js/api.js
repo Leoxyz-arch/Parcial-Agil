@@ -58,6 +58,15 @@ const API = {
         return await res.json();
     },
 
+    editarObligacion: async (id, datos) => {
+        const res = await fetch(`/api/obligaciones/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+        return await res.json();
+    },
+
     // 4. Dashboard Gerencial
     getKpis: async (mes, anio) => {
         const queryParams = new URLSearchParams();

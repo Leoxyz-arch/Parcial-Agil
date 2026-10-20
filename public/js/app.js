@@ -1,7 +1,7 @@
 // app.js - Coordinador y Lifecycle Principal de la Aplicación
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Inicializando CashFlow Guard Web...');
+    console.log('Inicializando CashFlow Guard Web...');
 
     // 1. Verificar estado de la DB y API
     try {

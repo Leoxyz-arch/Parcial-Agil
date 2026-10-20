@@ -291,6 +291,26 @@ function executeLocalQuery(sqlText, params = []) {
         return { rows: [] };
     }
 
+    // 3.1 UPDATE obligaciones editar
+    if (text.startsWith('update obligaciones') && text.includes('set categoria =')) {
+        // params: [categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, id]
+        const id = parseInt(params[7], 10);
+        const item = db.obligaciones.find(o => o.id === id);
+        if (item) {
+            item.categoria = params[0];
+            item.descripcion = params[1];
+            item.beneficiario = params[2];
+            item.monto = parseFloat(params[3]);
+            item.fecha_emision = params[4];
+            item.fecha_vencimiento = params[5];
+            item.cuota_info = params[6] || null;
+            item.updated_at = new Date().toISOString();
+            writeLocalDb(db);
+            return { rows: [item] };
+        }
+        return { rows: [] };
+    }
+
     // 4. SELECT obligaciones (general o por id)
     if (text.includes('from obligaciones')) {
         if (text.includes('where id =')) {
