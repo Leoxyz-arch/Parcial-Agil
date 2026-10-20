@@ -170,45 +170,45 @@
                 <!-- ========================================== -->
                 <section id="module-asistente" class="space-y-3.5">
                     
-                    <!-- BENTO 1: Semáforo Metric Strip (4 Bento Cards Legibles) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                        <div class="bento-card p-3.5 border-l-4 border-l-rose-600 flex items-center justify-between">
+                    <!-- BENTO 1: Semáforo Metric Strip (Tarjetas con Color Sólido y Alto Contraste) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="rounded-lg p-4 bg-rose-600 text-white flex items-center justify-between shadow-xs border border-rose-700">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-rose-700 tracking-wider">Mora Activa</p>
-                                <p id="asistente-count-vencidos" class="text-2xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
+                                <p class="text-xs font-bold uppercase text-rose-100 tracking-wider">Mora Activa</p>
+                                <p id="asistente-count-vencidos" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">0</p>
                             </div>
-                            <div class="w-8 h-8 rounded bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
-                                <i data-lucide="flame" class="w-4 h-4"></i>
+                            <div class="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                <i data-lucide="flame" class="w-5 h-5"></i>
                             </div>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-amber-500 flex items-center justify-between">
+                        <div class="rounded-lg p-4 bg-amber-600 text-white flex items-center justify-between shadow-xs border border-amber-700">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-amber-800 tracking-wider">Vence en ≤ 3 días</p>
-                                <p id="asistente-count-porvencer" class="text-2xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
+                                <p class="text-xs font-bold uppercase text-amber-100 tracking-wider">Vence en ≤ 3 días</p>
+                                <p id="asistente-count-porvencer" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">0</p>
                             </div>
-                            <div class="w-8 h-8 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
-                                <i data-lucide="clock" class="w-4 h-4"></i>
+                            <div class="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                <i data-lucide="clock" class="w-5 h-5"></i>
                             </div>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-blue-600 flex items-center justify-between">
+                        <div class="rounded-lg p-4 bg-blue-600 text-white flex items-center justify-between shadow-xs border border-blue-700">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-blue-700 tracking-wider">Plazo Regular</p>
-                                <p id="asistente-count-programados" class="text-2xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
+                                <p class="text-xs font-bold uppercase text-blue-100 tracking-wider">Plazo Regular</p>
+                                <p id="asistente-count-programados" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">0</p>
                             </div>
-                            <div class="w-8 h-8 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
-                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                            <div class="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                <i data-lucide="calendar" class="w-5 h-5"></i>
                             </div>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-emerald-600 flex items-center justify-between">
+                        <div class="rounded-lg p-4 bg-emerald-600 text-white flex items-center justify-between shadow-xs border border-emerald-700">
                             <div>
-                                <p class="text-xs font-semibold uppercase text-emerald-700 tracking-wider">Liquidados al 100%</p>
-                                <p id="asistente-count-pagados" class="text-2xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
+                                <p class="text-xs font-bold uppercase text-emerald-100 tracking-wider">Liquidados al 100%</p>
+                                <p id="asistente-count-pagados" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">0</p>
                             </div>
-                            <div class="w-8 h-8 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <div class="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
                             </div>
                         </div>
                     </div>
@@ -325,103 +325,134 @@
                 <!-- ========================================== -->
                 <section id="module-gerente" class="space-y-3 hidden">
                     
-                    <!-- BENTO 1: 4 KPIs Principales -->
+                    <!-- BENTO 1: 4 KPIs Principales (Tarjetas con Color Sólido y Alto Contraste) -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div class="bento-card p-3.5">
+                        <div class="rounded-lg p-4 bg-slate-900 text-white shadow-xs border border-slate-800">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Compromisos</span>
-                                <i data-lucide="wallet" class="w-4 h-4 text-slate-400"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Total Compromisos</span>
+                                <div class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center">
+                                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                                </div>
                             </div>
-                            <p id="kpi-total-gastos" class="text-2xl font-bold font-mono-numbers text-slate-900">S/ 0.00</p>
+                            <p id="kpi-total-gastos" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">S/ 0.00</p>
                             <span class="text-xs text-slate-400">Mes consultado</span>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-emerald-600">
+                        <div class="rounded-lg p-4 bg-emerald-600 text-white shadow-xs border border-emerald-700">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Total Liquidado</span>
-                                <i data-lucide="check-check" class="w-4 h-4 text-emerald-600"></i>
-                            </div>
-                            <p id="kpi-total-pagado" class="text-2xl font-bold font-mono-numbers text-emerald-700">S/ 0.00</p>
-                            <div class="mt-1 flex items-center gap-1.5">
-                                <div class="w-full bg-slate-200 h-1.5 rounded overflow-hidden">
-                                    <div id="kpi-barra-progreso" class="bg-emerald-600 h-1.5" style="width: 0%"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-emerald-100">Total Liquidado</span>
+                                <div class="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                    <i data-lucide="check-check" class="w-4 h-4"></i>
                                 </div>
-                                <span id="kpi-porcentaje-pagado" class="text-xs font-bold text-emerald-700">0%</span>
+                            </div>
+                            <p id="kpi-total-pagado" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">S/ 0.00</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <div class="w-full bg-black/25 h-2 rounded-full overflow-hidden">
+                                    <div id="kpi-barra-progreso" class="bg-white h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <span id="kpi-porcentaje-pagado" class="text-xs font-bold text-white font-mono">0%</span>
                             </div>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-blue-600">
+                        <div class="rounded-lg p-4 bg-blue-600 text-white shadow-xs border border-blue-700">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-blue-700">Pendiente Regular</span>
-                                <i data-lucide="hourglass" class="w-4 h-4 text-blue-600"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider text-blue-100">Pendiente Regular</span>
+                                <div class="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                    <i data-lucide="hourglass" class="w-4 h-4"></i>
+                                </div>
                             </div>
-                            <p id="kpi-total-pendiente" class="text-2xl font-bold font-mono-numbers text-blue-800">S/ 0.00</p>
-                            <span class="text-xs text-blue-600 font-medium">En plazo de pago</span>
+                            <p id="kpi-total-pendiente" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">S/ 0.00</p>
+                            <span class="text-xs text-blue-100">En plazo de pago</span>
                         </div>
 
-                        <div class="bento-card p-3.5 border-l-4 border-l-rose-600">
+                        <div class="rounded-lg p-4 bg-rose-600 text-white shadow-xs border border-rose-700">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-rose-800 flex items-center gap-1">
-                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider text-rose-100 flex items-center gap-1">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-white"></i>
                                     Riesgo de Mora
                                 </span>
-                                <span id="badge-critico-kpi" class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                                <span id="badge-critico-kpi" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-white text-rose-700 shadow-xs">
                                     Al día
                                 </span>
                             </div>
-                            <p id="kpi-total-riesgo-mora" class="text-2xl font-bold font-mono-numbers text-rose-700">S/ 0.00</p>
-                            <span class="text-xs text-rose-600 font-medium">Vencidos + ≤ 3 días</span>
+                            <p id="kpi-total-riesgo-mora" class="text-3xl font-extrabold font-mono-numbers text-white mt-1">S/ 0.00</p>
+                            <span class="text-xs text-rose-100">Vencidos + ≤ 3 días</span>
                         </div>
                     </div>
 
                     <!-- BENTO 2: Desglose Categoría + Auditoría -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                        <!-- Desglose -->
-                        <div class="bento-card p-3 space-y-2.5">
-                            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                <span class="text-xs font-bold text-slate-800">Desglose por Categoría</span>
-                                <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <!-- Desglose por Categoría Ampliado y Proporcional -->
+                        <div class="bento-card p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-md bg-slate-900 text-white flex items-center justify-center">
+                                            <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-sm font-bold text-slate-900">Desglose por Categoría</span>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-400 font-mono tracking-wider">MES</span>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                                                <span>Servicios Públicos</span>
+                                            </span>
+                                            <span id="cat-monto-servicio" class="font-mono-numbers font-bold text-sm text-slate-900">S/ 0.00</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+                                            <div id="bar-cat-servicio" class="bg-blue-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                                                <span>Impuestos (SUNAT)</span>
+                                            </span>
+                                            <span id="cat-monto-impuesto" class="font-mono-numbers font-bold text-sm text-slate-900">S/ 0.00</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+                                            <div id="bar-cat-impuesto" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>
+                                                <span>Proveedores</span>
+                                            </span>
+                                            <span id="cat-monto-proveedores" class="font-mono-numbers font-bold text-sm text-slate-900">S/ 0.00</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+                                            <div id="bar-cat-proveedores" class="bg-purple-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                                                <span>Préstamos y Amortizaciones</span>
+                                            </span>
+                                            <span id="cat-monto-prestamo" class="font-mono-numbers font-bold text-sm text-slate-900">S/ 0.00</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/50">
+                                            <div id="bar-cat-prestamo" class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 mb-0.5">
-                                        <span>Servicios</span>
-                                        <span id="cat-monto-servicio" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 h-1 rounded overflow-hidden">
-                                        <div id="bar-cat-servicio" class="bg-blue-600 h-1" style="width: 0%"></div>
-                                    </div>
-                                </div>
 
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 mb-0.5">
-                                        <span>Impuestos</span>
-                                        <span id="cat-monto-impuesto" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 h-1 rounded overflow-hidden">
-                                        <div id="bar-cat-impuesto" class="bg-amber-500 h-1" style="width: 0%"></div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 mb-0.5">
-                                        <span>Proveedores</span>
-                                        <span id="cat-monto-proveedores" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 h-1 rounded overflow-hidden">
-                                        <div id="bar-cat-proveedores" class="bg-purple-600 h-1" style="width: 0%"></div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 mb-0.5">
-                                        <span>Préstamos</span>
-                                        <span id="cat-monto-prestamo" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
-                                    </div>
-                                    <div class="w-full bg-slate-100 h-1 rounded overflow-hidden">
-                                        <div id="bar-cat-prestamo" class="bg-emerald-600 h-1" style="width: 0%"></div>
-                                    </div>
-                                </div>
+                            <div class="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                                <span>Control Presupuestal</span>
+                                <span class="font-mono text-[11px] text-slate-400">Castillo Robles</span>
                             </div>
                         </div>
 

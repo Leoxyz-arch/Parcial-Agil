@@ -554,18 +554,18 @@ window.AsistenteModule = {
             tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
             tr.onclick = () => AsistenteModule.abrirDetalle(item.id);
 
-            // Etiquetas literales: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
+            // Etiquetas sólidas de alto contraste con iconos simbólicos
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
+                semaforoHtml = '<span class="status-pill status-pagado"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Pagado</span></span>';
             } else if (item.estado === 'anulado') {
-                semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
+                semaforoHtml = '<span class="status-pill status-anulado"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>Anulado</span></span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>Vencido</span>';
+                semaforoHtml = '<span class="status-pill status-vencido"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>Vencido</span></span>';
             } else if (item.semaforo.codigo === 'programado') {
-                semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
+                semaforoHtml = '<span class="status-pill status-programado"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Programado</span></span>';
             } else {
-                semaforoHtml = '<span class="status-pill status-por-pagar"><span class="status-pill-dot"></span>Por Pagar</span>';
+                semaforoHtml = '<span class="status-pill status-por-pagar"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Por Pagar</span></span>';
             }
 
             const cuotaText = item.cuota_info ? ` <span class="text-slate-500 font-mono text-xs">(${item.cuota_info})</span>` : '';

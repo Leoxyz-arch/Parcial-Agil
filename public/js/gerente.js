@@ -126,10 +126,10 @@ window.GerenteModule = {
         const badgeCritico = document.getElementById('badge-critico-kpi');
         if (kpis.total_riesgo_mora > 0) {
             badgeCritico.textContent = `${conteos.en_alerta} En Riesgo`;
-            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300';
+            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white text-rose-700 shadow-2xs';
         } else {
             badgeCritico.textContent = 'Al día';
-            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300';
+            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white text-emerald-700 shadow-2xs';
         }
 
         // Desglose por categorías
@@ -234,18 +234,18 @@ window.GerenteModule = {
                 }
             };
 
-            // Etiquetas literales solicitadas: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
+            // Etiquetas sólidas de alto contraste con iconos simbólicos
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
+                semaforoHtml = '<span class="status-pill status-pagado"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Pagado</span></span>';
             } else if (item.estado === 'anulado') {
-                semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
+                semaforoHtml = '<span class="status-pill status-anulado"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>Anulado</span></span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>Vencido</span>';
+                semaforoHtml = '<span class="status-pill status-vencido"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>Vencido</span></span>';
             } else if (item.semaforo.codigo === 'programado') {
-                semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
+                semaforoHtml = '<span class="status-pill status-programado"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Programado</span></span>';
             } else {
-                semaforoHtml = '<span class="status-pill status-por-pagar"><span class="status-pill-dot"></span>Por Pagar</span>';
+                semaforoHtml = '<span class="status-pill status-por-pagar"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Por Pagar</span></span>';
             }
 
             let compHtml = '<span class="text-slate-400 font-mono text-xs">—</span>';
