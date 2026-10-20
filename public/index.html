@@ -504,6 +504,9 @@
             </div>
 
             <form id="form-crear-obligacion" class="p-6 space-y-4">
+                <!-- Aviso Inline de Validación / Fechas -->
+                <div id="crear-aviso-inline" class="hidden p-3 rounded-xl border text-xs font-medium flex items-center gap-2.5 transition"></div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Categoría</label>
                     <select id="crear-categoria" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-blue-500">
@@ -650,8 +653,8 @@
                 <div class="flex items-center gap-2.5">
                     <i data-lucide="receipt" class="w-5 h-5 text-emerald-400"></i>
                     <div>
-                        <h3 class="font-bold text-base">Registrar Pago al 100%</h3>
-                        <p class="text-xs text-slate-400">Adjunta el comprobante o fotografía para certificar la cancelación</p>
+                        <h3 class="font-bold text-base" id="modal-pagar-header-titulo">Registrar Pago al 100%</h3>
+                        <p class="text-xs text-slate-400" id="modal-pagar-header-subtitulo">Adjunta el comprobante o fotografía para certificar la cancelación</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close-modal text-white/70 hover:text-white">
@@ -659,8 +662,15 @@
                 </button>
             </div>
 
+            <!-- PASO 1: Formulario de Registro de Pago -->
             <form id="form-pagar-obligacion" class="p-6 space-y-4">
                 <input type="hidden" id="pagar-id">
+
+                <!-- Alerta de Error Inline In-App (Sin popups de navegador) -->
+                <div id="pago-error-inline" class="hidden p-3 bg-red-50 text-red-700 border border-red-200 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 shrink-0"></i>
+                    <span id="pago-error-texto"></span>
+                </div>
 
                 <!-- Resumen de lo que se paga -->
                 <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
@@ -704,7 +714,7 @@
                     </div>
                 </div>
 
-                <!-- Declaración Jurada de Doble Verificación (Responsabilidad del Asistente) -->
+                <!-- Declaración Jurada de Responsabilidad -->
                 <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 space-y-2">
                     <label class="flex items-start gap-2.5 cursor-pointer">
                         <input type="checkbox" id="pagar-declaracion-responsabilidad" required
@@ -719,12 +729,49 @@
                     <button type="button" class="btn-close-modal px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
                         Cancelar
                     </button>
-                    <button type="submit" id="btn-submit-pago" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition text-sm flex items-center gap-2">
-                        <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Confirmar Pago al 100%</span>
+                    <button type="button" id="btn-pago-revisar" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition text-sm flex items-center gap-2">
+                        <span>Revisar y Continuar</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
             </form>
+
+            <!-- PASO 2: Doble Verificación Integrada en el Sistema (In-App) -->
+            <div id="pago-vista-confirmacion" class="hidden p-6 space-y-4">
+                <div class="p-4 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-3">
+                    <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                        <i data-lucide="shield-alert" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                        <span>Doble Verificación In-App de Pago</span>
+                    </div>
+                    <p class="text-xs text-slate-700 leading-relaxed">
+                        Revisa detenidamente los datos antes de formalizar la liquidación. Al procesar, el estado cambiará a <b>Pagado al 100%</b> y no se admitirán modificaciones.
+                    </p>
+
+                    <div class="bg-white rounded-xl p-3.5 border border-amber-200 divide-y divide-slate-100 text-xs">
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">Obligación:</span> <b class="text-slate-900 text-right" id="conf-pago-desc">--</b></div>
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">Beneficiario:</span> <b class="text-slate-900 text-right" id="conf-pago-benef">--</b></div>
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">Monto Liquidado:</span> <b class="text-emerald-700 text-sm font-extrabold text-right" id="conf-pago-monto">S/ 0.00</b></div>
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">Fecha de Pago:</span> <b class="text-slate-900 text-right" id="conf-pago-fecha">--</b></div>
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">N° Operación:</span> <b class="text-slate-900 text-right font-mono" id="conf-pago-nro">--</b></div>
+                        <div class="flex justify-between py-1.5"><span class="text-slate-500 font-medium">Comprobante Adjunto:</span> <b class="text-blue-700 text-right truncate max-w-[200px]" id="conf-pago-archivo">--</b></div>
+                    </div>
+
+                    <p class="text-[11px] text-amber-900 font-semibold bg-amber-100/60 p-2.5 rounded-lg border border-amber-200">
+                        ✓ El asistente asume formalmente la responsabilidad administrativa por la legitimidad de este pago.
+                    </p>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-3">
+                    <button type="button" id="btn-pago-volver-editar" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        <span>Corregir Datos</span>
+                    </button>
+                    <button type="button" id="btn-pago-confirmar-final" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition text-sm flex items-center gap-2">
+                        <i data-lucide="check-check" class="w-4 h-4"></i>
+                        <span>Sí, Registrar Pago Definitivo</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -791,6 +838,9 @@
             <form id="form-editar-obligacion" class="p-6 space-y-4">
                 <input type="hidden" id="editar-id">
 
+                <!-- Alerta Inline de Validación -->
+                <div id="editar-aviso-inline" class="hidden p-3 rounded-xl border text-xs font-medium flex items-center gap-2.5 transition"></div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Categoría</label>
                     <select id="editar-categoria" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-blue-500">
@@ -848,6 +898,42 @@
             </form>
         </div>
     </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 5: CONFIRMACIÓN IN-APP GENÉRICA      -->
+    <!-- ========================================== -->
+    <div id="modal-confirmar-generico" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 p-4 text-white flex items-center justify-between">
+                <h3 class="font-bold text-sm" id="modal-conf-titulo">Confirmar Acción</h3>
+                <button type="button" id="btn-cerrar-modal-conf" class="text-white/70 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="flex items-start gap-3">
+                    <div id="modal-conf-icono-box" class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 id="modal-conf-subtitulo" class="text-sm font-bold text-slate-900">¿Estás seguro?</h4>
+                        <p id="modal-conf-mensaje" class="text-xs text-slate-600 mt-1 leading-relaxed">Mensaje explicativo...</p>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button type="button" id="btn-cancelar-conf" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                        Cancelar
+                    </button>
+                    <button type="button" id="btn-aceptar-conf" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de Notificaciones Toast In-App -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full"></div>
 
     <!-- Scripts de la Aplicación -->
     <script src="/js/api.js"></script>

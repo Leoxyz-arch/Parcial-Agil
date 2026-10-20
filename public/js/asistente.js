@@ -79,6 +79,24 @@ window.AsistenteModule = {
         const inputVencimiento = document.getElementById('crear-vencimiento');
         const lblEmision = document.getElementById('lbl-crear-emision');
         const lblVencimiento = document.getElementById('lbl-crear-vencimiento');
+        const avisoCrear = document.getElementById('crear-aviso-inline');
+
+        let timerAvisoCrear = null;
+        const mostrarAvisoCrear = (msg, tipo = 'warning') => {
+            if (!avisoCrear) return;
+            const clases = {
+                warning: 'bg-amber-50 text-amber-900 border-amber-200',
+                error: 'bg-red-50 text-red-800 border-red-200',
+                info: 'bg-blue-50 text-blue-800 border-blue-200',
+                success: 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            };
+            avisoCrear.className = `p-3 rounded-xl border text-xs font-semibold flex items-center gap-2.5 transition ${clases[tipo] || clases.warning}`;
+            avisoCrear.innerHTML = `<i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>${msg}</span>`;
+            avisoCrear.classList.remove('hidden');
+            if (window.lucide) window.lucide.createIcons();
+            if (timerAvisoCrear) clearTimeout(timerAvisoCrear);
+            timerAvisoCrear = setTimeout(() => avisoCrear.classList.add('hidden'), 4500);
+        };
 
         const recalcularMontoCuota = () => {
             const m = parseFloat(inputMonto.value) || 0;
@@ -131,21 +149,34 @@ window.AsistenteModule = {
             };
         }
 
+        // Lógica de Fechas In-App (Sin alertas ni popups de navegador)
         if (inputEmision && inputVencimiento) {
             inputEmision.addEventListener('change', () => {
                 const hoyStr = new Date().toISOString().split('T')[0];
                 if (selectCatCrear && selectCatCrear.value === 'prestamo' && inputEmision.value < hoyStr) {
-                    alert('Atención: La fecha del préstamo no puede ser menor a la fecha actual.');
                     inputEmision.value = hoyStr;
+                    mostrarAvisoCrear('La fecha del préstamo no puede ser anterior a hoy; se ajustó automáticamente a la fecha actual.', 'warning');
                 }
                 inputVencimiento.min = inputEmision.value;
+                if (inputVencimiento.value && inputVencimiento.value < inputEmision.value) {
+                    inputVencimiento.value = inputEmision.value;
+                    mostrarAvisoCrear('La fecha de vencimiento no puede ser anterior a la de emisión; se sincronizó automáticamente.', 'info');
+                }
                 recalcularMontoCuota();
+            });
+
+            inputVencimiento.addEventListener('change', () => {
+                if (inputEmision.value && inputVencimiento.value < inputEmision.value) {
+                    inputVencimiento.value = inputEmision.value;
+                    mostrarAvisoCrear('La fecha de vencimiento no puede ser anterior a la de emisión; se corrigió automáticamente.', 'warning');
+                }
             });
         }
 
         if (btnOpenCrear) {
             btnOpenCrear.onclick = () => {
                 formCrear.reset();
+                if (avisoCrear) avisoCrear.classList.add('hidden');
                 const hoyStr = new Date().toISOString().split('T')[0];
                 inputEmision.value = hoyStr;
                 inputVencimiento.min = hoyStr;
@@ -190,13 +221,12 @@ window.AsistenteModule = {
                 const hoyStr = new Date().toISOString().split('T')[0];
 
                 if (categoria === 'prestamo' && fecha_emision < hoyStr) {
-                    alert('Error de validación: La fecha del préstamo no puede ser menor a la fecha actual.');
+                    mostrarAvisoCrear('La fecha del préstamo no puede ser menor a la fecha actual.', 'error');
                     return;
                 }
 
-                // Validación de coherencia de fechas
                 if (fecha_vencimiento < fecha_emision) {
-                    alert('Error de validación: La fecha de vencimiento no puede ser anterior a la fecha de emisión.');
+                    mostrarAvisoCrear('La fecha de vencimiento no puede ser anterior a la fecha de emisión.', 'error');
                     return;
                 }
 
@@ -231,19 +261,23 @@ window.AsistenteModule = {
 
                     if (res.ok) {
                         modalCrear.classList.add('hidden');
+                        window.mostrarNotificacion('Obligación registrada exitosamente.', 'success');
                         await AsistenteModule.cargarObligaciones();
                     } else {
-                        alert(res.mensaje || 'Error al registrar la obligación.');
+                        mostrarAvisoCrear(res.mensaje || 'Error al registrar la obligación.', 'error');
                     }
                 } catch (err) {
-                    alert('Error de conexión con el servidor.');
+                    mostrarAvisoCrear('Error de conexión con el servidor.', 'error');
                 }
             };
         }
 
-        // Modal Registrar Pago con Evidencia
+        // ==========================================
+        // Modal Registrar Pago con Doble Verificación In-App
+        // ==========================================
         const modalPagar = document.getElementById('modal-pagar-obligacion');
         const formPagar = document.getElementById('form-pagar-obligacion');
+        const vistaConfirmacionPagar = document.getElementById('pago-vista-confirmacion');
         const inputArchivo = document.getElementById('pagar-archivo');
         const checkDeclaracion = document.getElementById('pagar-declaracion-responsabilidad');
         const previewPlaceholder = document.getElementById('preview-placeholder');
@@ -251,11 +285,26 @@ window.AsistenteModule = {
         const previewImg = document.getElementById('preview-img');
         const previewFilename = document.getElementById('preview-filename');
 
-        // Previsualización inmediata de comprobante
+        const btnPagarRevisar = document.getElementById('btn-pago-revisar');
+        const btnPagarVolver = document.getElementById('btn-pago-volver-editar');
+        const btnPagarConfirmarFinal = document.getElementById('btn-pago-confirmar-final');
+        const pagoErrorInline = document.getElementById('pago-error-inline');
+        const pagoErrorTexto = document.getElementById('pago-error-texto');
+
+        const mostrarErrorPagoInline = (msg) => {
+            if (pagoErrorTexto && pagoErrorInline) {
+                pagoErrorTexto.textContent = msg;
+                pagoErrorInline.classList.remove('hidden');
+                if (window.lucide) window.lucide.createIcons();
+            }
+        };
+
+        // Previsualización de comprobante
         if (inputArchivo) {
             inputArchivo.onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
+                    if (pagoErrorInline) pagoErrorInline.classList.add('hidden');
                     previewPlaceholder.classList.add('hidden');
                     previewContainer.classList.remove('hidden');
                     previewFilename.textContent = `Archivo: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
@@ -275,79 +324,137 @@ window.AsistenteModule = {
             };
         }
 
-        if (formPagar) {
-            formPagar.onsubmit = async (e) => {
-                e.preventDefault();
+        // Paso 1 -> Paso 2: Revisar y validar in-app (Sin ventanas de confirm browser)
+        if (btnPagarRevisar) {
+            btnPagarRevisar.onclick = () => {
+                const file = inputArchivo.files[0];
+                const nro_operacion = document.getElementById('pagar-nro-operacion').value.trim();
+
+                if (!nro_operacion) {
+                    mostrarErrorPagoInline('Debe ingresar el número de operación o referencia bancaria.');
+                    return;
+                }
+
+                if (!file) {
+                    mostrarErrorPagoInline('Debe adjuntar la evidencia fotográfica o PDF del voucher.');
+                    return;
+                }
+
+                if (!checkDeclaracion || !checkDeclaracion.checked) {
+                    mostrarErrorPagoInline('Debe marcar la casilla de verificación y asunción de responsabilidad para continuar.');
+                    return;
+                }
+
+                if (pagoErrorInline) pagoErrorInline.classList.add('hidden');
+
+                // Llenar vista de confirmación in-app
+                document.getElementById('conf-pago-desc').textContent = document.getElementById('pagar-desc-resumen').textContent;
+                document.getElementById('conf-pago-benef').textContent = document.getElementById('pagar-benef-resumen').textContent;
+                document.getElementById('conf-pago-monto').textContent = document.getElementById('pagar-monto-resumen').textContent;
+                document.getElementById('conf-pago-fecha').textContent = document.getElementById('pagar-fecha').value;
+                document.getElementById('conf-pago-nro').textContent = nro_operacion;
+                document.getElementById('conf-pago-archivo').textContent = file.name;
+
+                // Transición al Paso 2 dentro del modal
+                formPagar.classList.add('hidden');
+                vistaConfirmacionPagar.classList.remove('hidden');
+                document.getElementById('modal-pagar-header-titulo').textContent = 'Confirmación In-App de Pago';
+                document.getElementById('modal-pagar-header-subtitulo').textContent = 'Paso final: Revisa y formaliza la liquidación';
+                if (window.lucide) window.lucide.createIcons();
+            };
+        }
+
+        // Paso 2 -> Paso 1: Regresar a corregir
+        if (btnPagarVolver) {
+            btnPagarVolver.onclick = () => {
+                vistaConfirmacionPagar.classList.add('hidden');
+                formPagar.classList.remove('hidden');
+                document.getElementById('modal-pagar-header-titulo').textContent = 'Registrar Pago al 100%';
+                document.getElementById('modal-pagar-header-subtitulo').textContent = 'Adjunta el comprobante o fotografía para certificar la cancelación';
+                if (window.lucide) window.lucide.createIcons();
+            };
+        }
+
+        // Paso 2: Envío definitivo tras doble verificación
+        if (btnPagarConfirmarFinal) {
+            btnPagarConfirmarFinal.onclick = async () => {
                 const id = document.getElementById('pagar-id').value;
                 const fecha_pago = document.getElementById('pagar-fecha').value;
                 const nro_operacion = document.getElementById('pagar-nro-operacion').value.trim();
                 const file = inputArchivo.files[0];
-
-                if (!file) {
-                    alert('Debe adjuntar la evidencia fotográfica o PDF del voucher.');
-                    return;
-                }
-
-                // Doble Verificación: 1) Casilla de asunción de responsabilidad obligatoria
-                if (!checkDeclaracion || !checkDeclaracion.checked) {
-                    alert('Debe marcar la casilla de verificación y asunción de responsabilidad para poder registrar el pago.');
-                    return;
-                }
-
-                // Doble Verificación: 2) Diálogo formal de confirmación con detalle
-                const descResumen = document.getElementById('pagar-desc-resumen').textContent;
-                const benefResumen = document.getElementById('pagar-benef-resumen').textContent;
-                const montoResumen = document.getElementById('pagar-monto-resumen').textContent;
-
-                const confirmar = confirm(
-                    `DOBLE VERIFICACIÓN DE PAGO (ASUNCIÓN DE RESPONSABILIDAD):\n\n` +
-                    `• Obligación: ${descResumen}\n` +
-                    `• Beneficiario: ${benefResumen}\n` +
-                    `• Monto: ${montoResumen}\n` +
-                    `• N° de Operación: ${nro_operacion}\n` +
-                    `• Archivo: ${file.name}\n\n` +
-                    `¿Declara y asume formalmente la responsabilidad de que este pago y su comprobante son correctos y verídicos?\n(Esta acción no se puede revertir).`
-                );
-
-                if (!confirmar) return;
 
                 const formData = new FormData();
                 formData.append('fecha_pago', fecha_pago);
                 formData.append('nro_operacion', nro_operacion);
                 formData.append('comprobante', file);
 
-                const btnSubmit = document.getElementById('btn-submit-pago');
-                btnSubmit.disabled = true;
-                btnSubmit.textContent = 'Subiendo voucher...';
+                btnPagarConfirmarFinal.disabled = true;
+                btnPagarConfirmarFinal.textContent = 'Procesando pago...';
 
                 try {
                     const res = await API.pagarObligacion(id, formData);
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Confirmar Pago al 100%</span>`;
+                    btnPagarConfirmarFinal.disabled = false;
+                    btnPagarConfirmarFinal.innerHTML = `<i data-lucide="check-check" class="w-4 h-4"></i><span>Sí, Registrar Pago Definitivo</span>`;
 
                     if (res.ok) {
                         modalPagar.classList.add('hidden');
                         formPagar.reset();
+                        vistaConfirmacionPagar.classList.add('hidden');
+                        formPagar.classList.remove('hidden');
                         if (checkDeclaracion) checkDeclaracion.checked = false;
                         previewPlaceholder.classList.remove('hidden');
                         previewContainer.classList.add('hidden');
+                        window.mostrarNotificacion('Pago registrado exitosamente con comprobante fotográfico.', 'success');
                         await AsistenteModule.cargarObligaciones();
                     } else {
-                        alert(res.mensaje || 'Error al procesar el pago.');
+                        window.mostrarNotificacion(res.mensaje || 'Error al procesar el pago.', 'error');
                     }
                 } catch (err) {
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = `Confirmar Pago al 100%`;
-                    alert('Error de conexión al subir el comprobante.');
+                    btnPagarConfirmarFinal.disabled = false;
+                    btnPagarConfirmarFinal.innerHTML = `<i data-lucide="check-check" class="w-4 h-4"></i><span>Sí, Registrar Pago Definitivo</span>`;
+                    window.mostrarNotificacion('Error de conexión al subir el comprobante.', 'error');
                 }
             };
         }
 
+        // ==========================================
         // Modal Editar Obligación
+        // ==========================================
         const formEditar = document.getElementById('form-editar-obligacion');
         const modalEditar = document.getElementById('modal-editar-obligacion');
         const selectCatEditar = document.getElementById('editar-categoria');
         const containerCuotaEditar = document.getElementById('container-editar-cuota');
+        const inputEditarEmision = document.getElementById('editar-emision');
+        const inputEditarVenc = document.getElementById('editar-vencimiento');
+        const avisoEditar = document.getElementById('editar-aviso-inline');
+
+        let timerAvisoEditar = null;
+        const mostrarAvisoEditar = (msg) => {
+            if (!avisoEditar) return;
+            avisoEditar.className = 'p-3 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 text-xs font-semibold flex items-center gap-2';
+            avisoEditar.innerHTML = `<i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>${msg}</span>`;
+            avisoEditar.classList.remove('hidden');
+            if (window.lucide) window.lucide.createIcons();
+            if (timerAvisoEditar) clearTimeout(timerAvisoEditar);
+            timerAvisoEditar = setTimeout(() => avisoEditar.classList.add('hidden'), 4000);
+        };
+
+        if (inputEditarEmision && inputEditarVenc) {
+            inputEditarEmision.addEventListener('change', () => {
+                inputEditarVenc.min = inputEditarEmision.value;
+                if (inputEditarVenc.value && inputEditarVenc.value < inputEditarEmision.value) {
+                    inputEditarVenc.value = inputEditarEmision.value;
+                    mostrarAvisoEditar('La fecha de vencimiento se sincronizó con la fecha de emisión.');
+                }
+            });
+
+            inputEditarVenc.addEventListener('change', () => {
+                if (inputEditarEmision.value && inputEditarVenc.value < inputEditarEmision.value) {
+                    inputEditarVenc.value = inputEditarEmision.value;
+                    mostrarAvisoEditar('La fecha de vencimiento no puede ser anterior a la de emisión; se corrigió automáticamente.');
+                }
+            });
+        }
 
         if (selectCatEditar) {
             selectCatEditar.onchange = (e) => {
@@ -372,7 +479,7 @@ window.AsistenteModule = {
                 const cuota_info = categoria === 'prestamo' ? document.getElementById('editar-cuota').value.trim() : null;
 
                 if (fecha_vencimiento < fecha_emision) {
-                    alert('Error de validación: La fecha de vencimiento no puede ser anterior a la de emisión.');
+                    mostrarAvisoEditar('La fecha de vencimiento no puede ser anterior a la de emisión.');
                     return;
                 }
 
@@ -389,12 +496,13 @@ window.AsistenteModule = {
 
                     if (res.ok) {
                         modalEditar.classList.add('hidden');
+                        window.mostrarNotificacion('Obligación actualizada exitosamente.', 'success');
                         await AsistenteModule.cargarObligaciones();
                     } else {
-                        alert(res.mensaje || 'Error al actualizar la obligación.');
+                        mostrarAvisoEditar(res.mensaje || 'Error al actualizar la obligación.');
                     }
                 } catch (err) {
-                    alert('Error de conexión al actualizar.');
+                    mostrarAvisoEditar('Error de conexión al actualizar.');
                 }
             };
         }
@@ -587,6 +695,20 @@ window.AsistenteModule = {
         document.getElementById('pagar-fecha').value = new Date().toISOString().split('T')[0];
         document.getElementById('pagar-nro-operacion').value = '';
 
+        // Reset de vistas (Asegura volver al paso 1)
+        const formPagar = document.getElementById('form-pagar-obligacion');
+        const vistaConf = document.getElementById('pago-vista-confirmacion');
+        const errInline = document.getElementById('pago-error-inline');
+        const checkDecl = document.getElementById('pagar-declaracion-responsabilidad');
+
+        if (formPagar) formPagar.classList.remove('hidden');
+        if (vistaConf) vistaConf.classList.add('hidden');
+        if (errInline) errInline.classList.add('hidden');
+        if (checkDecl) checkDecl.checked = false;
+
+        document.getElementById('modal-pagar-header-titulo').textContent = 'Registrar Pago al 100%';
+        document.getElementById('modal-pagar-header-subtitulo').textContent = 'Adjunta el comprobante o fotografía para certificar la cancelación';
+
         // Reset vista previa
         const previewPlaceholder = document.getElementById('preview-placeholder');
         const previewContainer = document.getElementById('preview-container');
@@ -595,25 +717,33 @@ window.AsistenteModule = {
         document.getElementById('pagar-archivo').value = '';
 
         document.getElementById('modal-pagar-obligacion').classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
     },
 
     eliminarObligacion: async (id) => {
         const item = AsistenteModule.obligaciones.find(o => o.id === id);
         if (!item) return;
 
-        const confirmar = confirm(`¿Estás seguro de anular la obligación: "${item.descripcion}" por S/ ${item.monto.toFixed(2)}?\n\nEsta acción quitará el compromiso de pago del sistema.`);
-        if (!confirmar) return;
-
-        try {
-            const res = await API.eliminarObligacion(id);
-            if (res.ok) {
-                await AsistenteModule.cargarObligaciones();
-            } else {
-                alert(res.mensaje || 'No se pudo anular la obligación.');
+        window.mostrarConfirmacion({
+            titulo: 'Anular Obligación Pendiente',
+            subtitulo: `¿Deseas anular "${item.descripcion}"?`,
+            mensaje: `Esta acción retirará el compromiso de pago de S/ ${item.monto.toFixed(2)} (${item.beneficiario}) del sistema de Castillo Robles.`,
+            textoBoton: 'Sí, Anular Obligación',
+            esPeligroso: true,
+            onConfirm: async () => {
+                try {
+                    const res = await API.eliminarObligacion(id);
+                    if (res.ok) {
+                        window.mostrarNotificacion('Obligación anulada correctamente.', 'success');
+                        await AsistenteModule.cargarObligaciones();
+                    } else {
+                        window.mostrarNotificacion(res.mensaje || 'No se pudo anular la obligación.', 'error');
+                    }
+                } catch (e) {
+                    window.mostrarNotificacion('Error de conexión con el servidor.', 'error');
+                }
             }
-        } catch (e) {
-            alert('Error de conexión con el servidor.');
-        }
+        });
     },
 
     abrirModalEditar: (id) => {

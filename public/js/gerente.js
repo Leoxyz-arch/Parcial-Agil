@@ -246,7 +246,7 @@ window.GerenteModule = {
         }
 
         if (!item || !item.comprobante_url) {
-            alert('No se encontró el comprobante para esta obligación.');
+            window.mostrarNotificacion('No se encontró comprobante registrado para esta obligación.', 'warning');
             return;
         }
 
