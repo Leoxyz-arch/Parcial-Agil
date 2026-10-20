@@ -60,6 +60,7 @@ async function runTestSuite() {
 
     await page.fill('#crear-descripcion', 'Prueba Inconsistencia Fechas');
     await page.fill('#crear-beneficiario', 'Proveedor Test');
+    await page.fill('#crear-ruc', '20100047218');
     await page.fill('#crear-monto', '500');
     await page.fill('#crear-emision', '2026-10-25');
     await page.fill('#crear-vencimiento', '2026-10-10'); // Anterior a emisión

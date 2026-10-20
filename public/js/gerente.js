@@ -37,9 +37,14 @@ window.GerenteModule = {
             GerenteModule.renderTablaAuditoria();
         };
 
+        const filtroMesAuditoria = document.getElementById('filtro-mes-gerente');
+        const filtroAnioAuditoria = document.getElementById('filtro-anio-gerente');
+
         if (btnConsultar) btnConsultar.onclick = resetYcargar;
         if (filtroCat) filtroCat.onchange = resetYfiltrar;
         if (filtroEst) filtroEst.onchange = resetYfiltrar;
+        if (filtroMesAuditoria) filtroMesAuditoria.onchange = resetYfiltrar;
+        if (filtroAnioAuditoria) filtroAnioAuditoria.onchange = resetYfiltrar;
 
         // Paginación Gerente
         const btnPrev = document.getElementById('btn-prev-gerente');
@@ -304,7 +309,7 @@ window.GerenteModule = {
         titulo.textContent = `Auditoría: ${item.descripcion}`;
         subtitulo.textContent = `${item.beneficiario} (RUC: ${item.ruc_beneficiario || 'S/N'})`;
         opText.textContent = item.nro_operacion || 'Sin registro';
-        fechaText.textContent = item.fecha_pago || 'No registrada';
+        fechaText.textContent = item.fecha_pago ? (item.fecha_pago + (item.hora_pago ? ' ' + item.hora_pago : '')) : 'No registrada';
         btnDescargar.href = item.comprobante_url;
 
         const metodoText = document.getElementById('visor-metodo');

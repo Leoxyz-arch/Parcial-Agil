@@ -1,5 +1,25 @@
 // asistente.js - Módulo de Gestión Operativa del Asistente
 
+function validarDocIdentidad(doc) {
+    if (!doc || doc.trim() === '') return { valido: false, mensaje: 'Debe ingresar el RUC o DNI del beneficiario.' };
+    const limpio = doc.trim();
+    if (!/^\d+$/.test(limpio)) return { valido: false, mensaje: 'El RUC o DNI debe contener únicamente dígitos numéricos.' };
+    if (limpio.length === 8) return { valido: true, tipo: 'DNI' };
+    if (limpio.length === 11) {
+        if (!/^(10|20)\d{9}$/.test(limpio)) {
+            return { valido: false, mensaje: 'RUC inválido. Los RUC de personas o empresas en Perú deben iniciar con 10 o 20.' };
+        }
+        return { valido: true, tipo: 'RUC' };
+    }
+    return { valido: false, mensaje: 'El documento debe tener 8 dígitos (DNI) o 11 dígitos (RUC).' };
+}
+
+function validarAnioCoherente(fechaStr) {
+    if (!fechaStr) return false;
+    const y = parseInt(fechaStr.split('-')[0], 10);
+    return !isNaN(y) && y >= 2020 && y <= 2035;
+}
+
 window.AsistenteModule = {
     obligaciones: [],
     paginaActual: 1,
@@ -24,6 +44,32 @@ window.AsistenteModule = {
         const filtroEst = document.getElementById('filtro-estado-asistente');
         const btnRefresh = document.getElementById('btn-refresh-asistente');
         const buscador = document.getElementById('buscador-asistente');
+        // Sanitización en tiempo real de RUC/DNI (solo dígitos)
+        const inputCrearRuc = document.getElementById('crear-ruc');
+        const inputEditarRuc = document.getElementById('editar-ruc');
+        const soloDigitosRuc = (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11); };
+        if (inputCrearRuc) inputCrearRuc.addEventListener('input', soloDigitosRuc);
+        if (inputEditarRuc) inputEditarRuc.addEventListener('input', soloDigitosRuc);
+
+        // Bloqueo de letra 'e', 'E', '+' y '-' en campos de monto
+        const blockInvalidAmountKeys = (e) => {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+            }
+        };
+        const inputCrearMonto = document.getElementById('crear-monto');
+        const inputEditarMonto = document.getElementById('editar-monto');
+        if (inputCrearMonto) inputCrearMonto.addEventListener('keydown', blockInvalidAmountKeys);
+        if (inputEditarMonto) inputEditarMonto.addEventListener('keydown', blockInvalidAmountKeys);
+
+        // Sanitización de N° Operación (solo dígitos)
+        const inputNroOp = document.getElementById('pagar-nro-operacion');
+        if (inputNroOp) {
+            inputNroOp.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+            });
+        }
+
 
         const resetYcargar = () => {
             AsistenteModule.paginaActual = 1;
@@ -245,6 +291,17 @@ window.AsistenteModule = {
                 const fecha_emision = document.getElementById('crear-emision').value;
                 let fecha_vencimiento = document.getElementById('crear-vencimiento').value;
 
+                const docCheck = validarDocIdentidad(ruc_beneficiario);
+                if (!docCheck.valido) {
+                    mostrarAvisoCrear(docCheck.mensaje, 'error');
+                    return;
+                }
+
+                if (!validarAnioCoherente(fecha_emision) || !validarAnioCoherente(fecha_vencimiento)) {
+                    mostrarAvisoCrear('Las fechas deben tener un año válido de 4 dígitos entre 2020 y 2035.', 'error');
+                    return;
+                }
+
                 const esAutoCuotas = categoria === 'prestamo' && modAuto.checked;
                 const tasa_interes = parseFloat(inputInteres.value) || 0;
                 const num_cuotas = parseInt(inputNumCuotas.value, 10) || 1;
@@ -260,6 +317,7 @@ window.AsistenteModule = {
                         tipo_comprobante,
                         descripcion,
                         beneficiario,
+                        ruc_beneficiario,
                         ruc_beneficiario,
                         monto,
                         fecha_emision,
@@ -321,10 +379,17 @@ window.AsistenteModule = {
                 e.preventDefault();
                 const id = document.getElementById('pagar-id').value;
                 const fecha_pago = document.getElementById('pagar-fecha').value;
+                const horaInput = document.getElementById('pagar-hora');
+                const hora_pago = (horaInput ? horaInput.value : '').trim();
                 const nro_operacion = document.getElementById('pagar-nro-operacion').value.trim();
                 const metodoSelect = document.getElementById('pagar-metodo');
                 const metodo_pago = (metodoSelect ? metodoSelect.value : 'Transferencia Bancaria').trim();
                 const file = inputArchivo.files[0];
+
+                if (!/^\d{4,12}$/.test(nro_operacion)) {
+                    window.Toast.warning('El N° de operación debe contener entre 4 y 12 dígitos numéricos sin letras.');
+                    return;
+                }
 
                 if (!file) {
                     window.Toast.warning('Es obligatorio adjuntar el voucher bancario o PDF.');
@@ -343,6 +408,7 @@ window.AsistenteModule = {
 
                 const formData = new FormData();
                 formData.append('fecha_pago', fecha_pago);
+                formData.append('hora_pago', hora_pago);
                 formData.append('nro_operacion', nro_operacion);
                 formData.append('metodo_pago', metodo_pago);
                 formData.append('comprobante', file);
@@ -396,10 +462,22 @@ window.AsistenteModule = {
                 const categoria = document.getElementById('editar-categoria').value;
                 const descripcion = document.getElementById('editar-descripcion').value.trim();
                 const beneficiario = document.getElementById('editar-beneficiario').value.trim();
+                const ruc_beneficiario = document.getElementById('editar-ruc').value.trim();
                 const monto = parseFloat(document.getElementById('editar-monto').value);
                 const fecha_emision = document.getElementById('editar-emision').value;
                 const fecha_vencimiento = document.getElementById('editar-vencimiento').value;
                 const cuota_info = categoria === 'prestamo' ? document.getElementById('editar-cuota').value.trim() : null;
+
+                const docCheck = validarDocIdentidad(ruc_beneficiario);
+                if (!docCheck.valido) {
+                    window.Toast.error(docCheck.mensaje);
+                    return;
+                }
+
+                if (!validarAnioCoherente(fecha_emision) || !validarAnioCoherente(fecha_vencimiento)) {
+                    window.Toast.error('Las fechas deben tener un año válido entre 2020 y 2035.');
+                    return;
+                }
 
                 if (fecha_vencimiento < fecha_emision) {
                     window.Toast.error('La fecha de vencimiento no puede ser anterior a la de emisión.');
@@ -639,6 +717,7 @@ window.AsistenteModule = {
         document.getElementById('editar-categoria').value = item.categoria;
         document.getElementById('editar-descripcion').value = item.descripcion;
         document.getElementById('editar-beneficiario').value = item.beneficiario;
+        document.getElementById('editar-ruc').value = item.ruc_beneficiario || '';
         document.getElementById('editar-monto').value = item.monto;
         document.getElementById('editar-emision').value = item.fecha_emision;
         document.getElementById('editar-vencimiento').value = item.fecha_vencimiento;
@@ -752,11 +831,14 @@ window.AsistenteModule = {
         const item = AsistenteModule.obligaciones.find(o => o.id === id);
         if (!item) return;
 
+        const ahora = new Date();
         document.getElementById('pagar-id').value = item.id;
         document.getElementById('pagar-desc-resumen').textContent = item.descripcion;
         document.getElementById('pagar-benef-resumen').textContent = `${item.beneficiario} (RUC: ${item.ruc_beneficiario || 'S/N'})`;
         document.getElementById('pagar-monto-resumen').textContent = `S/ ${item.monto.toFixed(2)}`;
-        document.getElementById('pagar-fecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('pagar-fecha').value = ahora.toISOString().split('T')[0];
+        const inputHoraPagar = document.getElementById('pagar-hora');
+        if (inputHoraPagar) inputHoraPagar.value = ahora.toTimeString().slice(0, 5);
         document.getElementById('pagar-nro-operacion').value = '';
 
         const selMetodo = document.getElementById('pagar-metodo');

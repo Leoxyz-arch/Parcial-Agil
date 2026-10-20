@@ -97,6 +97,7 @@ async function createTablesPostgres() {
         ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS ruc_beneficiario VARCHAR(20) DEFAULT NULL;
         ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS metodo_pago VARCHAR(50) DEFAULT 'Transferencia Bancaria';
         ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS motivo_anulacion TEXT DEFAULT NULL;
+        ALTER TABLE obligaciones ADD COLUMN IF NOT EXISTS hora_pago VARCHAR(10) DEFAULT NULL;
     `);
     console.log('📋 Esquema de tablas verificado en Neon PostgreSQL.');
 }
@@ -367,16 +368,17 @@ function executeLocalQuery(sqlText, params = []) {
 
     // 3. UPDATE obligaciones pagar
     if (text.startsWith('update obligaciones') && text.includes("set estado = 'pagado'")) {
-        // params: [fecha_pago, nro_operacion, comprobante_url, comprobante_tipo, metodo_pago, id]
+        // params: [fecha_pago, hora_pago, nro_operacion, comprobante_url, comprobante_tipo, metodo_pago, id]
         const id = parseInt(params[params.length - 1], 10);
         const item = db.obligaciones.find(o => o.id === id);
         if (item) {
             item.estado = 'pagado';
             item.fecha_pago = params[0];
-            item.nro_operacion = params[1];
-            item.comprobante_url = params[2];
-            item.comprobante_tipo = params[3];
-            item.metodo_pago = params.length > 5 ? params[4] : 'Transferencia Bancaria';
+            item.hora_pago = params[1];
+            item.nro_operacion = params[2];
+            item.comprobante_url = params[3];
+            item.comprobante_tipo = params[4];
+            item.metodo_pago = params.length > 6 ? params[5] : 'Transferencia Bancaria';
             item.updated_at = new Date().toISOString();
             writeLocalDb(db);
             return { rows: [item] };
@@ -386,17 +388,18 @@ function executeLocalQuery(sqlText, params = []) {
 
     // 3.1 UPDATE obligaciones editar
     if (text.startsWith('update obligaciones') && text.includes('set categoria =')) {
-        // params: [categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, id]
-        const id = parseInt(params[7], 10);
+        // params: [categoria, descripcion, beneficiario, ruc_beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, id]
+        const id = parseInt(params[8], 10);
         const item = db.obligaciones.find(o => o.id === id);
         if (item) {
             item.categoria = params[0];
             item.descripcion = params[1];
             item.beneficiario = params[2];
-            item.monto = parseFloat(params[3]);
-            item.fecha_emision = params[4];
-            item.fecha_vencimiento = params[5];
-            item.cuota_info = params[6] || null;
+            item.ruc_beneficiario = params[3];
+            item.monto = parseFloat(params[4]);
+            item.fecha_emision = params[5];
+            item.fecha_vencimiento = params[6];
+            item.cuota_info = params[7] || null;
             item.updated_at = new Date().toISOString();
             writeLocalDb(db);
             return { rows: [item] };

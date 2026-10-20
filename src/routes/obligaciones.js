@@ -56,7 +56,8 @@ function enrichObligacionWithSemaforo(rawItem) {
         ...rawItem,
         fecha_vencimiento: fVencStr,
         fecha_emision: fEmisStr,
-        fecha_pago: fPagoStr
+        fecha_pago: fPagoStr,
+        hora_pago: rawItem.hora_pago || null
     };
 
     const hoy = new Date();
@@ -165,6 +166,10 @@ router.get('/', async (req, res) => {
                 enriched = enriched.filter(o => o.semaforo.codigo === 'vencido');
             } else if (estado === 'por_vencer') {
                 enriched = enriched.filter(o => o.semaforo.codigo === 'por_vencer');
+            } else if (estado === 'programado') {
+                enriched = enriched.filter(o => o.semaforo.codigo === 'programado' && o.estado !== 'pagado' && o.estado !== 'anulado');
+            } else if (estado === 'pendiente') {
+                enriched = enriched.filter(o => o.estado === 'pendiente');
             } else {
                 enriched = enriched.filter(o => o.estado === estado);
             }
@@ -270,16 +275,31 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // 5. Validación de RUC (Normativa Tributaria Peruana SUNAT si es provista)
-        if (ruc_beneficiario && ruc_beneficiario.trim() !== '') {
-            const rucLimpio = ruc_beneficiario.trim();
-            const rucValido = /^(10|20)\d{9}$/.test(rucLimpio);
-            if (!rucValido) {
-                return res.status(400).json({
-                    ok: false,
-                    mensaje: 'RUC inválido. Para personas o empresas peruanas debe contener 11 dígitos numéricos iniciando con 10 o 20.'
-                });
-            }
+        // 5. Validación estricta de RUC / DNI (Obligatorio en normativa peruana)
+        if (!ruc_beneficiario || ruc_beneficiario.trim() === '') {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Debe ingresar el RUC (11 dígitos) o DNI (8 dígitos) del beneficiario.'
+            });
+        }
+        const rucLimpio = ruc_beneficiario.trim();
+        const esDni = /^\d{8}$/.test(rucLimpio);
+        const esRuc = /^(10|20)\d{9}$/.test(rucLimpio);
+        if (!esDni && !esRuc) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Documento tributario inválido. Debe ser un DNI de 8 dígitos o un RUC de 11 dígitos iniciando con 10 o 20.'
+            });
+        }
+
+        // Validación de año coherente (2020 a 2035)
+        const yEmis = parseInt(fecha_emision.split('-')[0], 10);
+        const yVenc = parseInt(fecha_vencimiento.split('-')[0], 10);
+        if (isNaN(yEmis) || yEmis < 2020 || yEmis > 2035 || isNaN(yVenc) || yVenc < 2020 || yVenc > 2035) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Las fechas deben tener un año coherente de 4 dígitos entre 2020 y 2035.'
+            });
         }
 
         // Función auxiliar para calcular el mismo día del mes en meses sucesivos
@@ -385,7 +405,7 @@ router.post('/', async (req, res) => {
 router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const { nro_operacion, fecha_pago, metodo_pago } = req.body;
+        const { nro_operacion, fecha_pago, hora_pago, metodo_pago } = req.body;
 
         // Comprobar estado previo
         const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
@@ -410,33 +430,36 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
             });
         }
 
-        if (!nro_operacion || nro_operacion.trim() === '') {
+        if (!nro_operacion || !/^\d{4,12}$/.test(nro_operacion.trim())) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Debe ingresar el código de operación o trazabilidad bancaria.'
+                mensaje: 'El N° de operación o código bancario debe contener entre 4 y 12 dígitos numéricos (sin letras).'
             });
         }
 
         const comprobanteUrl = `/uploads/${req.file.filename}`;
         const comprobanteTipo = req.file.mimetype;
         const fechaPagoFinal = fecha_pago || new Date().toISOString().split('T')[0];
+        const horaPagoFinal = hora_pago || new Date().toTimeString().slice(0, 5);
         const metodoPagoVal = (metodo_pago && String(metodo_pago).trim() !== '') ? String(metodo_pago).trim() : 'Transferencia Bancaria';
 
         const updateSql = `
             UPDATE obligaciones 
             SET estado = 'pagado',
                 fecha_pago = $1,
-                nro_operacion = $2,
-                comprobante_url = $3,
-                comprobante_tipo = $4,
-                metodo_pago = $5,
+                hora_pago = $2,
+                nro_operacion = $3,
+                comprobante_url = $4,
+                comprobante_tipo = $5,
+                metodo_pago = $6,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = $6
+            WHERE id = $7
             RETURNING *
         `;
 
         const updateRes = await db.query(updateSql, [
             fechaPagoFinal,
+            horaPagoFinal,
             nro_operacion.trim(),
             comprobanteUrl,
             comprobanteTipo,
@@ -540,6 +563,7 @@ router.put('/:id', async (req, res) => {
             categoria,
             descripcion,
             beneficiario,
+            ruc_beneficiario,
             monto,
             fecha_emision,
             fecha_vencimiento,
@@ -575,6 +599,20 @@ router.put('/:id', async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: 'Debe ingresar el beneficiario o proveedor.' });
         }
 
+        if (!ruc_beneficiario || ruc_beneficiario.trim() === '') {
+            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar el RUC o DNI del beneficiario.' });
+        }
+
+        const rucLimpio = ruc_beneficiario.trim();
+        const esDni = /^\d{8}$/.test(rucLimpio);
+        const esRuc = /^(10|20)\d{9}$/.test(rucLimpio);
+        if (!esDni && !esRuc) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Documento tributario inválido. Debe ser un DNI de 8 dígitos o un RUC de 11 dígitos iniciando con 10 o 20.'
+            });
+        }
+
         const montoNum = parseFloat(monto);
         if (isNaN(montoNum) || montoNum <= 0) {
             return res.status(400).json({ ok: false, mensaje: 'El monto debe ser un número mayor a cero.' });
@@ -591,17 +629,25 @@ router.put('/:id', async (req, res) => {
             });
         }
 
+        // Validación de año coherente (2020 a 2035)
+        const yEmis = parseInt(fecha_emision.split('-')[0], 10);
+        const yVenc = parseInt(fecha_vencimiento.split('-')[0], 10);
+        if (isNaN(yEmis) || yEmis < 2020 || yEmis > 2035 || isNaN(yVenc) || yVenc < 2020 || yVenc > 2035) {
+            return res.status(400).json({ ok: false, mensaje: 'Las fechas deben tener un año coherente entre 2020 y 2035.' });
+        }
+
         const updateSql = `
             UPDATE obligaciones
             SET categoria = $1,
                 descripcion = $2,
                 beneficiario = $3,
-                monto = $4,
-                fecha_emision = $5,
-                fecha_vencimiento = $6,
-                cuota_info = $7,
+                ruc_beneficiario = $4,
+                monto = $5,
+                fecha_emision = $6,
+                fecha_vencimiento = $7,
+                cuota_info = $8,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = $8
+            WHERE id = $9
             RETURNING *
         `;
 
@@ -609,6 +655,7 @@ router.put('/:id', async (req, res) => {
             categoria.toLowerCase(),
             descripcion.trim(),
             beneficiario.trim(),
+            rucLimpio,
             montoNum,
             fecha_emision,
             fecha_vencimiento,
