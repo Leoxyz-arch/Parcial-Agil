@@ -338,11 +338,11 @@ router.post('/', async (req, res) => {
     }
 });
 
-// POST /api/obligaciones/:id/pagar (Registro de pago con evidencia fotográfica o PDF)
+// POST /api/obligaciones/:id/pagar (Registro de pago con evidencia fotográfica o PDF y método de pago)
 router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const { nro_operacion, fecha_pago } = req.body;
+        const { nro_operacion, fecha_pago, metodo_pago } = req.body;
 
         // Validar evidencia
         if (!req.file) {
@@ -360,6 +360,7 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
         }
 
         const fechaPagoVal = fecha_pago || new Date().toISOString().split('T')[0];
+        const metodoPagoVal = (metodo_pago || 'Transferencia Bancaria').trim();
         const ext = path.extname(req.file.originalname).toLowerCase();
         const comprobanteTipo = ext === '.pdf' ? 'pdf' : 'imagen';
         const comprobanteUrl = `/uploads/${req.file.filename}`;
@@ -371,8 +372,9 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
                 nro_operacion = $2,
                 comprobante_url = $3,
                 comprobante_tipo = $4,
+                metodo_pago = $5,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = $5
+            WHERE id = $6
             RETURNING *
         `;
 
@@ -381,6 +383,7 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
             nro_operacion.trim(),
             comprobanteUrl,
             comprobanteTipo,
+            metodoPagoVal,
             id
         ]);
 
