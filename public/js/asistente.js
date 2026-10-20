@@ -272,8 +272,8 @@ window.AsistenteModule = {
         if (AsistenteModule.obligaciones.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="py-12 text-center text-slate-500">
-                        <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                    <td colspan="7" class="py-12 text-center text-slate-400">
+                        <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
                         <p class="font-medium text-xs">No se encontraron obligaciones con los criterios especificados.</p>
                     </td>
                 </tr>
@@ -285,68 +285,74 @@ window.AsistenteModule = {
         AsistenteModule.obligaciones.forEach(item => {
             const tr = document.createElement('tr');
             
-            // Clase de semáforo sobrio en borde
+            // Clase de semáforo en borde para Light Mode
             let borderClass = 'border-programado';
-            if (item.estado === 'anulado') borderClass = 'border-anulado opacity-50 bg-slate-900/30';
-            else if (item.estado === 'pagado') borderClass = 'border-pagado bg-emerald-950/10';
-            else if (item.semaforo.codigo === 'vencido') borderClass = 'border-mora-critica bg-rose-950/20';
-            else if (item.semaforo.codigo === 'por_vencer') borderClass = 'border-por-vencer bg-amber-950/20';
+            if (item.estado === 'anulado') borderClass = 'border-anulado opacity-60 bg-slate-50';
+            else if (item.estado === 'pagado') borderClass = 'border-pagado bg-emerald-50/20';
+            else if (item.semaforo.codigo === 'vencido') borderClass = 'border-mora-critica bg-rose-50/30';
+            else if (item.semaforo.codigo === 'por_vencer') borderClass = 'border-por-vencer bg-amber-50/30';
 
-            tr.className = `hover:bg-slate-800/40 transition-subtle border-b border-slate-800 ${borderClass}`;
+            tr.className = `hover:bg-slate-50 transition-subtle border-b border-slate-100 ${borderClass}`;
 
-            // Badge Categoría técnico
+            // Badges Categoría para Light Mode
             const catBadges = {
-                servicio: 'bg-blue-950 text-blue-300 border-blue-800/80',
-                impuesto: 'bg-amber-950 text-amber-300 border-amber-800/80',
-                proveedores: 'bg-purple-950 text-purple-300 border-purple-800/80',
-                prestamo: 'bg-emerald-950 text-emerald-300 border-emerald-800/80'
+                servicio: 'bg-blue-50 text-blue-700 border-blue-200',
+                impuesto: 'bg-amber-50 text-amber-800 border-amber-200',
+                proveedores: 'bg-purple-50 text-purple-700 border-purple-200',
+                prestamo: 'bg-emerald-50 text-emerald-800 border-emerald-200'
             };
-            const catBadge = catBadges[item.categoria] || 'bg-slate-800 text-slate-300 border-slate-700';
+            const catBadge = catBadges[item.categoria] || 'bg-slate-100 text-slate-700 border-slate-200';
 
-            // Etiqueta semáforo
+            // Semáforo badge classes en Light Mode
+            let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
+            if (item.estado === 'pagado') badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+            else if (item.estado === 'anulado') badgeStyle = 'bg-slate-100 text-slate-400 border-slate-200 line-through';
+            else if (item.semaforo.codigo === 'vencido') badgeStyle = 'bg-rose-50 text-rose-800 border-rose-200 font-bold';
+            else if (item.semaforo.codigo === 'por_vencer') badgeStyle = 'bg-amber-50 text-amber-900 border-amber-200 font-semibold';
+
             const semaforoHtml = `
                 <div class="inline-flex flex-col">
-                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border ${item.semaforo.clase_badge}">
-                        ${item.semaforo.alerta_critica ? '<i data-lucide="alert-triangle" class="w-3 h-3 text-white"></i>' : ''}
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] border ${badgeStyle}">
+                        ${item.semaforo.alerta_critica && item.estado !== 'anulado' ? '<i data-lucide="alert-triangle" class="w-3 h-3 text-rose-600"></i>' : ''}
                         <span>${item.semaforo.etiqueta}</span>
                     </span>
-                    <span class="text-[10px] text-slate-400 mt-0.5">${item.semaforo.detalle_tiempo}</span>
+                    <span class="text-[10px] text-slate-500 mt-0.5">${item.semaforo.detalle_tiempo}</span>
                 </div>
             `;
 
-            // Botón de acción
+            // Botones de acción
             let actionHtml = '';
             if (item.estado === 'pagado') {
                 actionHtml = `
                     <button type="button" onclick="window.GerenteModule.abrirVisorComprobante(${item.id})"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-emerald-700/60 bg-emerald-950/50 hover:bg-emerald-900 text-emerald-300 text-xs font-medium transition-subtle" title="Ver comprobante archivado">
+                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-medium transition-subtle shadow-xs" title="Ver comprobante archivado">
                         <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i>
                         <span>Auditar</span>
                     </button>
                 `;
             } else if (item.estado === 'anulado') {
                 actionHtml = `
-                    <span class="text-[11px] text-slate-500 font-mono">ANULADO</span>
+                    <span class="text-[11px] text-slate-400 font-mono">ANULADO</span>
                 `;
             } else {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1">
                         <button type="button" onclick="window.AsistenteModule.abrirModalPagar(${item.id})"
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium shadow-sm transition-subtle" title="Registrar voucher de pago">
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-700 hover:bg-blue-800 text-white text-xs font-medium shadow-xs transition-subtle" title="Registrar voucher de pago">
                             <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
                             <span>Pagar</span>
                         </button>
                         <button type="button" onclick="window.AsistenteModule.abrirModalAnular(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900 transition-subtle" title="Anular por error de digitación">
+                            class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-subtle" title="Anular por error de digitación">
                             <i data-lucide="ban" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 `;
             }
 
-            // Legal badge si aplica
+            // Legal badge en Light Mode
             const legalBadge = item.advertencia_legal ? `
-                <div class="mt-1 flex items-center gap-1 text-[10px] text-rose-400 font-medium">
+                <div class="mt-1 flex items-center gap-1 text-[10px] text-rose-700 font-medium">
                     <i data-lucide="scale" class="w-3 h-3 flex-shrink-0"></i>
                     <span>${item.advertencia_legal}</span>
                 </div>
@@ -359,22 +365,22 @@ window.AsistenteModule = {
                         <span class="w-fit px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${catBadge}">
                             ${item.categoria}
                         </span>
-                        <span class="text-[11px] text-slate-400">${item.tipo_comprobante}</span>
+                        <span class="text-[11px] text-slate-500">${item.tipo_comprobante}</span>
                     </div>
                 </td>
                 <td class="py-3 px-3">
-                    <p class="font-semibold text-slate-200 text-xs">${item.descripcion}</p>
-                    ${item.cuota_info ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-1.5 py-0.2 rounded border border-emerald-800">${item.cuota_info}</span>` : ''}
+                    <p class="font-semibold text-slate-900 text-xs">${item.descripcion}</p>
+                    ${item.cuota_info ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">${item.cuota_info}</span>` : ''}
                     ${legalBadge}
                 </td>
                 <td class="py-3 px-3">
-                    <p class="font-medium text-slate-300 text-xs">${item.beneficiario}</p>
+                    <p class="font-medium text-slate-800 text-xs">${item.beneficiario}</p>
                     <p class="text-[10px] text-slate-500 font-mono-numbers">RUC: ${item.ruc_beneficiario || 'S/N'}</p>
                 </td>
-                <td class="py-3 px-3 font-mono-numbers text-xs ${item.semaforo.alerta_critica ? 'text-rose-400 font-bold' : 'text-slate-400'}">
+                <td class="py-3 px-3 font-mono-numbers text-xs ${item.semaforo.alerta_critica && item.estado !== 'anulado' ? 'text-rose-700 font-bold' : 'text-slate-600'}">
                     ${item.fecha_vencimiento}
                 </td>
-                <td class="py-3 px-3 text-right font-mono-numbers font-bold text-slate-100 text-xs">
+                <td class="py-3 px-3 text-right font-mono-numbers font-bold text-slate-900 text-xs">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="py-3 px-3 text-center">${actionHtml}</td>

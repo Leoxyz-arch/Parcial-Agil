@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CashFlow Guard • Control Financiero y Prevención de Mora</title>
+    <title>CashFlow Guard • Control Financiero y Gestión de Pagos</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,10 +11,12 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: {
-                            850: '#0f172a',
-                            900: '#0b0f19',
-                            950: '#030712'
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e'
                         }
                     }
                 }
@@ -25,22 +27,22 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="bg-slate-950 text-slate-200 antialiased min-h-screen flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col font-sans">
 
     <!-- ========================================== -->
     <!-- 1. VISTA DE INICIO DE SESIÓN (LOGIN)      -->
     <!-- ========================================== -->
     <div id="view-login" class="flex-1 flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-slate-900 rounded-md border border-slate-800 shadow-2xl overflow-hidden">
+        <div class="max-w-md w-full bg-white rounded-md border border-slate-200 shadow-lg overflow-hidden">
             <!-- Header Login Corporativo -->
-            <div class="p-6 border-b border-slate-800 bg-slate-900/60">
+            <div class="p-6 border-b border-slate-200 bg-slate-50/70">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h1 class="text-base font-bold text-slate-100 tracking-tight">CashFlow Guard</h1>
-                        <p class="text-[11px] text-slate-400 font-mono">Control de Pasivos y Alertas de Mora</p>
+                        <h1 class="text-base font-bold text-slate-900 tracking-tight">CashFlow Guard</h1>
+                        <p class="text-[11px] text-slate-500 font-medium">Sistema Corporativo de Pasivos y Prevención de Mora</p>
                     </div>
                 </div>
             </div>
@@ -48,53 +50,53 @@
             <!-- Formulario Login -->
             <div class="p-6 space-y-4">
                 <!-- Alerta de Error -->
-                <div id="login-error" class="hidden p-3 bg-rose-950/80 border border-rose-800 text-rose-200 text-xs rounded flex items-center gap-2">
-                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 flex-shrink-0"></i>
+                <div id="login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 flex-shrink-0"></i>
                     <span id="login-error-text">Credenciales no autorizadas</span>
                 </div>
 
                 <form id="form-login" class="space-y-4">
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Identificador de Usuario</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Identificador de Usuario</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                                 <i data-lucide="user" class="w-4 h-4"></i>
                             </span>
                             <input type="text" id="login-username" required placeholder="asistente o gerente" autocomplete="username"
-                                class="w-full pl-9 pr-3 py-2 rounded bg-slate-950 border border-slate-800 focus:outline-none focus:border-blue-500 text-xs text-slate-100 placeholder-slate-600">
+                                class="w-full pl-9 pr-3 py-2 rounded bg-white border border-slate-300 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-xs text-slate-900 placeholder-slate-400">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Clave de Seguridad</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Clave de Seguridad</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                                 <i data-lucide="lock" class="w-4 h-4"></i>
                             </span>
                             <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password"
-                                class="w-full pl-9 pr-3 py-2 rounded bg-slate-950 border border-slate-800 focus:outline-none focus:border-blue-500 text-xs text-slate-100 placeholder-slate-600">
+                                class="w-full pl-9 pr-3 py-2 rounded bg-white border border-slate-300 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-xs text-slate-900 placeholder-slate-400">
                         </div>
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-4 rounded transition-subtle flex items-center justify-center gap-2 text-xs">
-                        <span>Acceder al Sistema</span>
+                        class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2.5 px-4 rounded transition-subtle flex items-center justify-center gap-2 text-xs shadow-sm">
+                        <span>Ingresar al Sistema</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </form>
 
-                <!-- Accesos Rápidos para Demo / Sustentación -->
-                <div class="pt-4 border-t border-slate-800">
-                    <p class="text-[10px] text-slate-400 mb-2 font-semibold uppercase tracking-wider text-center">Acceso Rápido para Evaluación</p>
+                <!-- Accesos Rápidos para Evaluación -->
+                <div class="pt-4 border-t border-slate-100">
+                    <p class="text-[10px] text-slate-400 mb-2 font-semibold uppercase tracking-wider text-center">Acceso Rápido por Perfil</p>
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button" id="btn-quick-asistente"
-                            class="flex items-center justify-center gap-2 p-2 rounded border border-slate-800 bg-slate-950 hover:bg-slate-800/80 hover:border-slate-700 text-slate-300 transition-subtle">
-                            <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-blue-400"></i>
+                            class="flex items-center justify-center gap-2 p-2 rounded border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-slate-700 transition-subtle">
+                            <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-blue-600"></i>
                             <span class="text-xs font-medium">Asistente</span>
                         </button>
                         <button type="button" id="btn-quick-gerente"
-                            class="flex items-center justify-center gap-2 p-2 rounded border border-slate-800 bg-slate-950 hover:bg-slate-800/80 hover:border-slate-700 text-slate-300 transition-subtle">
-                            <i data-lucide="line-chart" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            class="flex items-center justify-center gap-2 p-2 rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-slate-700 transition-subtle">
+                            <i data-lucide="line-chart" class="w-3.5 h-3.5 text-indigo-600"></i>
                             <span class="text-xs font-medium">Gerente</span>
                         </button>
                     </div>
@@ -108,45 +110,58 @@
     <!-- ========================================== -->
     <div id="view-app" class="hidden flex-1 flex flex-col">
         <!-- Barra de Navegación Superior -->
-        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
                 <!-- Logo & Brand -->
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+                    <div class="w-8 h-8 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
                         <i data-lucide="shield-check" class="w-4 h-4"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="font-bold text-slate-100 tracking-tight text-sm">CashFlow Guard</h2>
-                            <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 border border-slate-700 text-slate-300">Sprint 1</span>
+                            <h2 class="font-bold text-slate-900 tracking-tight text-sm">CashFlow Guard</h2>
+                            <span class="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">v1.0 Producción</span>
                         </div>
-                        <p class="text-[10px] text-slate-400">Control Financiero & Prevención de Mora</p>
+                        <p class="text-[10px] text-slate-500">Gestión de Pasivos y Control de Mora</p>
                     </div>
                 </div>
 
-                <!-- Conexión a Base de Datos & Acciones -->
+                <!-- Menú Modular Escalable (Preparado para agregar más módulos) -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <button type="button" class="px-3 py-1.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                        Gestión de Pagos
+                    </button>
+                    <button type="button" class="px-3 py-1.5 rounded text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-subtle cursor-not-allowed opacity-60" title="Módulo en expansión">
+                        Proveedores
+                    </button>
+                    <button type="button" class="px-3 py-1.5 rounded text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-subtle cursor-not-allowed opacity-60" title="Módulo en expansión">
+                        Configuración
+                    </button>
+                </nav>
+
+                <!-- Estado de Base de Datos & Acciones -->
                 <div class="flex items-center gap-3">
                     <!-- Badge Base de Datos -->
-                    <div id="badge-db" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono bg-emerald-950/40 text-emerald-400 border border-emerald-800/80">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div id="badge-db" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="text-db-status">PostgreSQL</span>
                     </div>
 
-                    <!-- Botón Contexto Scrum / Proyecto -->
+                    <!-- Botón Información del Sistema -->
                     <button type="button" id="btn-show-context"
-                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-slate-800 hover:border-slate-700 bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 transition-subtle">
-                        <i data-lucide="file-code" class="w-3.5 h-3.5 text-blue-400"></i>
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-slate-200 hover:bg-slate-100 bg-white text-xs text-slate-700 transition-subtle">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-blue-600"></i>
                         <span>Ficha Técnica</span>
                     </button>
 
                     <!-- Info Usuario y Rol -->
-                    <div class="flex items-center gap-3 pl-3 border-l border-slate-800">
+                    <div class="flex items-center gap-3 pl-3 border-l border-slate-200">
                         <div class="text-right">
-                            <p id="user-display-name" class="text-xs font-semibold text-slate-200">Usuario</p>
-                            <span id="user-display-role" class="inline-block text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">ROL</span>
+                            <p id="user-display-name" class="text-xs font-semibold text-slate-800">Usuario</p>
+                            <span id="user-display-role" class="inline-block text-[10px] uppercase font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">ROL</span>
                         </div>
                         <button type="button" id="btn-logout" title="Cerrar Sesión"
-                            class="p-1.5 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900 transition-subtle">
+                            class="p-1.5 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-subtle">
                             <i data-lucide="log-out" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -155,23 +170,23 @@
         </header>
 
         <!-- Contenido Central -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 w-full flex-1">
 
             <!-- ========================================== -->
             <!-- VISTA ASISTENTE (MÓDULO OPERATIVO)        -->
             <!-- ========================================== -->
             <section id="module-asistente" class="space-y-4">
                 <!-- Barra de Acciones del Asistente -->
-                <div class="bg-slate-900 p-4 rounded-md border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div class="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">Módulo Operativo</span>
-                            <span class="text-xs text-slate-400">• Control de Compromisos y Liquidaciones</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">Módulo Operativo</span>
+                            <span class="text-xs text-slate-500">• Registro de Compromisos y Certificación de Pagos</span>
                         </div>
-                        <h2 class="text-base font-bold text-slate-100 mt-1">Obligaciones Financieras Pendientes</h2>
+                        <h2 class="text-base font-bold text-slate-900 mt-1">Obligaciones Financieras por Liquidar</h2>
                     </div>
                     <button type="button" id="btn-open-modal-crear"
-                        class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-3.5 py-2 rounded border border-blue-500 text-xs transition-subtle flex items-center gap-2 flex-shrink-0">
+                        class="bg-blue-700 hover:bg-blue-800 text-white font-medium px-3.5 py-2 rounded text-xs transition-subtle flex items-center gap-2 flex-shrink-0 shadow-sm">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span>Registrar Obligación</span>
                     </button>
@@ -180,64 +195,64 @@
                 <!-- Resumen de Alertas Rápidas del Semáforo -->
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <!-- 1. Vencidos / Mora -->
-                    <div class="bg-slate-900 p-3.5 rounded border border-slate-800 border-l-4 border-l-rose-500 flex items-center justify-between">
+                    <div class="bg-white p-3.5 rounded border border-slate-200 border-l-4 border-l-rose-600 shadow-xs flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono uppercase text-rose-400 tracking-wider">Mora Activa</p>
-                            <p id="asistente-count-vencidos" class="text-xl font-bold font-mono-numbers text-slate-100 mt-0.5">0</p>
+                            <p class="text-[10px] font-semibold uppercase text-rose-700 tracking-wider">Mora Activa</p>
+                            <p id="asistente-count-vencidos" class="text-xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
                         </div>
-                        <div class="w-8 h-8 rounded bg-rose-950/80 text-rose-400 border border-rose-800/60 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
                             <i data-lucide="flame" class="w-4 h-4"></i>
                         </div>
                     </div>
 
                     <!-- 2. Por vencer <= 3 días -->
-                    <div class="bg-slate-900 p-3.5 rounded border border-slate-800 border-l-4 border-l-amber-500 flex items-center justify-between">
+                    <div class="bg-white p-3.5 rounded border border-slate-200 border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono uppercase text-amber-400 tracking-wider">Vence en ≤ 3 días</p>
-                            <p id="asistente-count-porvencer" class="text-xl font-bold font-mono-numbers text-slate-100 mt-0.5">0</p>
+                            <p class="text-[10px] font-semibold uppercase text-amber-800 tracking-wider">Vence en ≤ 3 días</p>
+                            <p id="asistente-count-porvencer" class="text-xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
                         </div>
-                        <div class="w-8 h-8 rounded bg-amber-950/80 text-amber-400 border border-amber-800/60 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
                             <i data-lucide="clock" class="w-4 h-4"></i>
                         </div>
                     </div>
 
                     <!-- 3. Programados > 3 días -->
-                    <div class="bg-slate-900 p-3.5 rounded border border-slate-800 border-l-4 border-l-blue-500 flex items-center justify-between">
+                    <div class="bg-white p-3.5 rounded border border-slate-200 border-l-4 border-l-blue-600 shadow-xs flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono uppercase text-blue-400 tracking-wider">Plazo Regular</p>
-                            <p id="asistente-count-programados" class="text-xl font-bold font-mono-numbers text-slate-100 mt-0.5">0</p>
+                            <p class="text-[10px] font-semibold uppercase text-blue-700 tracking-wider">Plazo Regular</p>
+                            <p id="asistente-count-programados" class="text-xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
                         </div>
-                        <div class="w-8 h-8 rounded bg-blue-950/80 text-blue-400 border border-blue-800/60 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
                             <i data-lucide="calendar" class="w-4 h-4"></i>
                         </div>
                     </div>
 
                     <!-- 4. Liquidados -->
-                    <div class="bg-slate-900 p-3.5 rounded border border-slate-800 border-l-4 border-l-emerald-500 flex items-center justify-between">
+                    <div class="bg-white p-3.5 rounded border border-slate-200 border-l-4 border-l-emerald-600 shadow-xs flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-mono uppercase text-emerald-400 tracking-wider">Liquidados al 100%</p>
-                            <p id="asistente-count-pagados" class="text-xl font-bold font-mono-numbers text-slate-100 mt-0.5">0</p>
+                            <p class="text-[10px] font-semibold uppercase text-emerald-700 tracking-wider">Liquidados al 100%</p>
+                            <p id="asistente-count-pagados" class="text-xl font-bold font-mono-numbers text-slate-900 mt-0.5">0</p>
                         </div>
-                        <div class="w-8 h-8 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
                             <i data-lucide="check-circle" class="w-4 h-4"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Barra de Filtrado y Búsqueda en Tiempo Real -->
-                <div class="bg-slate-900 p-3 rounded border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3">
+                <div class="bg-white p-3 rounded border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="flex items-center gap-2 w-full md:w-auto flex-wrap">
                         <!-- Buscador instantáneo -->
                         <div class="relative w-full md:w-64">
-                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-500">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400">
                                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </span>
                             <input type="text" id="buscador-asistente" placeholder="Buscar concepto, RUC o proveedor..."
-                                class="w-full pl-8 pr-3 py-1.5 rounded bg-slate-950 border border-slate-800 focus:outline-none focus:border-blue-500 text-xs text-slate-100 placeholder-slate-500">
+                                class="w-full pl-8 pr-3 py-1.5 rounded bg-white border border-slate-300 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-xs text-slate-900 placeholder-slate-400">
                         </div>
 
                         <!-- Filtro Categoría -->
-                        <select id="filtro-categoria-asistente" class="px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-300 font-medium focus:border-blue-500">
+                        <select id="filtro-categoria-asistente" class="px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-medium focus:border-blue-600">
                             <option value="todas">Todas las categorías</option>
                             <option value="servicio">Servicios Básicos</option>
                             <option value="impuesto">Impuestos (SUNAT)</option>
@@ -246,7 +261,7 @@
                         </select>
 
                         <!-- Filtro Estado -->
-                        <select id="filtro-estado-asistente" class="px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-300 font-medium focus:border-blue-500">
+                        <select id="filtro-estado-asistente" class="px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-medium focus:border-blue-600">
                             <option value="todos">Todos los estados</option>
                             <option value="riesgo">En Riesgo (Mora o ≤ 3 días)</option>
                             <option value="pendiente">Pendientes de Pago</option>
@@ -256,7 +271,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                        <button type="button" id="btn-refresh-asistente" class="px-2.5 py-1.5 rounded border border-slate-800 bg-slate-950 hover:bg-slate-800 text-xs text-slate-400 hover:text-slate-200 transition-subtle flex items-center gap-1.5">
+                        <button type="button" id="btn-refresh-asistente" class="px-2.5 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 hover:text-slate-900 transition-subtle flex items-center gap-1.5">
                             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                             <span>Actualizar</span>
                         </button>
@@ -264,10 +279,10 @@
                 </div>
 
                 <!-- Tabla de Obligaciones Asistente -->
-                <div class="bg-slate-900 rounded border border-slate-800 overflow-hidden">
+                <div class="bg-white rounded border border-slate-200 shadow-xs overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-slate-300">
-                            <thead class="bg-slate-950 text-[10px] font-mono uppercase text-slate-400 border-b border-slate-800">
+                        <table class="w-full text-left text-xs text-slate-700">
+                            <thead class="bg-slate-100/70 text-[10px] font-semibold uppercase text-slate-600 border-b border-slate-200">
                                 <tr>
                                     <th class="py-2.5 px-3">Estado / Semáforo</th>
                                     <th class="py-2.5 px-3">Comprobante</th>
@@ -278,7 +293,7 @@
                                     <th class="py-2.5 px-3 text-center">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-obligaciones-asistente" class="divide-y divide-slate-800/80">
+                            <tbody id="tabla-obligaciones-asistente" class="divide-y divide-slate-100">
                                 <!-- Filas dinámicas -->
                             </tbody>
                         </table>
@@ -291,19 +306,19 @@
             <!-- ========================================== -->
             <section id="module-gerente" class="space-y-4 hidden">
                 <!-- Barra de Control Ejecutivo & Selector de Periodo -->
-                <div class="bg-slate-900 p-4 rounded-md border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div class="bg-white p-4 rounded-md border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">Panel Ejecutivo</span>
-                            <span class="text-xs text-slate-400">• Supervisión Financiera de Pasivos</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Panel Ejecutivo</span>
+                            <span class="text-xs text-slate-500">• Supervisión Financiera y Auditoría de Pasivos</span>
                         </div>
-                        <h2 class="text-base font-bold text-slate-100 mt-1">Control Consolidado del Periodo</h2>
+                        <h2 class="text-base font-bold text-slate-900 mt-1">Consolidado Mensual de Obligaciones</h2>
                     </div>
 
                     <!-- Controles: Periodo y Exportación CSV -->
                     <div class="flex items-center gap-2 flex-wrap">
-                        <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded border border-slate-800">
-                            <select id="gerente-mes" class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-xs font-medium text-slate-200">
+                        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded border border-slate-200">
+                            <select id="gerente-mes" class="px-2 py-1 rounded bg-white border border-slate-300 text-xs font-medium text-slate-700">
                                 <option value="1">Enero</option>
                                 <option value="2">Febrero</option>
                                 <option value="3">Marzo</option>
@@ -317,19 +332,19 @@
                                 <option value="11">Noviembre</option>
                                 <option value="12">Diciembre</option>
                             </select>
-                            <select id="gerente-anio" class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-xs font-medium text-slate-200 font-mono-numbers">
+                            <select id="gerente-anio" class="px-2 py-1 rounded bg-white border border-slate-300 text-xs font-medium text-slate-700 font-mono-numbers">
                                 <option value="2025">2025</option>
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
                             </select>
-                            <button type="button" id="btn-consultar-gerente" class="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs px-2.5 py-1 rounded transition-subtle">
+                            <button type="button" id="btn-consultar-gerente" class="bg-blue-700 hover:bg-blue-800 text-white font-medium text-xs px-2.5 py-1 rounded transition-subtle shadow-xs">
                                 Consultar
                             </button>
                         </div>
 
                         <!-- Botón Exportar CSV Contable -->
-                        <button type="button" id="btn-export-csv" class="px-3 py-1.5 rounded border border-emerald-800 bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 text-xs font-medium transition-subtle flex items-center gap-1.5" title="Descargar libro contable en CSV">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <button type="button" id="btn-export-csv" class="px-3 py-1.5 rounded border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-medium transition-subtle flex items-center gap-1.5 shadow-xs" title="Descargar libro contable en CSV">
+                            <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-700"></i>
                             <span>Exportar CSV</span>
                         </button>
                     </div>
@@ -338,127 +353,127 @@
                 <!-- 4 TARJETAS KPI CLAVE SOLICITADAS POR EL GERENTE -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- KPI 1: Total Gastos del Mes -->
-                    <div class="bg-slate-900 p-4 rounded border border-slate-800">
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-xs">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">1. Compromisos del Mes</span>
-                            <div class="w-7 h-7 rounded bg-slate-800 text-slate-400 flex items-center justify-center">
+                            <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">1. Compromisos del Mes</span>
+                            <div class="w-7 h-7 rounded bg-slate-100 text-slate-600 flex items-center justify-center">
                                 <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
                             </div>
                         </div>
-                        <p id="kpi-total-gastos" class="text-xl font-bold font-mono-numbers text-slate-100">S/ 0.00</p>
+                        <p id="kpi-total-gastos" class="text-xl font-bold font-mono-numbers text-slate-900">S/ 0.00</p>
                         <p class="text-[10px] text-slate-500 mt-0.5">Pasivo total registrado</p>
                     </div>
 
                     <!-- KPI 2: Total Ya Pagado -->
-                    <div class="bg-slate-900 p-4 rounded border border-emerald-900/60 bg-emerald-950/10">
+                    <div class="bg-white p-4 rounded border border-emerald-200 bg-emerald-50/20 shadow-xs">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400">2. Total Liquidado</span>
-                            <div class="w-7 h-7 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center justify-center">
+                            <span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">2. Total Liquidado</span>
+                            <div class="w-7 h-7 rounded bg-emerald-100 text-emerald-700 flex items-center justify-center">
                                 <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
                             </div>
                         </div>
-                        <p id="kpi-total-pagado" class="text-xl font-bold font-mono-numbers text-emerald-400">S/ 0.00</p>
+                        <p id="kpi-total-pagado" class="text-xl font-bold font-mono-numbers text-emerald-700">S/ 0.00</p>
                         <div class="mt-2 flex items-center gap-2">
-                            <div class="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
-                                <div id="kpi-barra-progreso" class="bg-emerald-500 h-1.5" style="width: 0%"></div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded overflow-hidden">
+                                <div id="kpi-barra-progreso" class="bg-emerald-600 h-1.5" style="width: 0%"></div>
                             </div>
-                            <span id="kpi-porcentaje-pagado" class="text-[10px] font-mono text-emerald-400">0%</span>
+                            <span id="kpi-porcentaje-pagado" class="text-[10px] font-semibold text-emerald-700">0%</span>
                         </div>
                     </div>
 
                     <!-- KPI 3: Total Pendiente por Pagar -->
-                    <div class="bg-slate-900 p-4 rounded border border-blue-900/60 bg-blue-950/10">
+                    <div class="bg-white p-4 rounded border border-blue-200 bg-blue-50/20 shadow-xs">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-blue-400">3. Pendiente Regular</span>
-                            <div class="w-7 h-7 rounded bg-blue-950 text-blue-400 border border-blue-800 flex items-center justify-center">
+                            <span class="text-[10px] font-semibold uppercase tracking-wider text-blue-700">3. Pendiente Regular</span>
+                            <div class="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center">
                                 <i data-lucide="hourglass" class="w-3.5 h-3.5"></i>
                             </div>
                         </div>
-                        <p id="kpi-total-pendiente" class="text-xl font-bold font-mono-numbers text-blue-300">S/ 0.00</p>
-                        <p class="text-[10px] text-blue-400/80 mt-0.5">Dentro del plazo de vencimiento</p>
+                        <p id="kpi-total-pendiente" class="text-xl font-bold font-mono-numbers text-blue-800">S/ 0.00</p>
+                        <p class="text-[10px] text-blue-600/80 mt-0.5">Dentro del plazo de vencimiento</p>
                     </div>
 
                     <!-- KPI 4: Total en Riesgo de Mora -->
-                    <div class="bg-slate-900 p-4 rounded border border-rose-800 bg-rose-950/20">
+                    <div class="bg-white p-4 rounded border-2 border-rose-400 bg-rose-50/40 shadow-xs">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-rose-300 flex items-center gap-1 font-bold">
-                                <i data-lucide="alert-triangle" class="w-3 h-3 text-rose-400"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
+                                <i data-lucide="alert-triangle" class="w-3 h-3 text-rose-600"></i>
                                 4. Riesgo de Mora
                             </span>
-                            <span id="badge-critico-kpi" class="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800">
+                            <span id="badge-critico-kpi" class="text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-rose-100 text-rose-800 border border-rose-300">
                                 Al día
                             </span>
                         </div>
-                        <p id="kpi-total-riesgo-mora" class="text-xl font-bold font-mono-numbers text-rose-400">S/ 0.00</p>
-                        <p class="text-[10px] text-rose-300/80 mt-0.5">Vencidos + Próximos ≤ 3 días</p>
+                        <p id="kpi-total-riesgo-mora" class="text-xl font-bold font-mono-numbers text-rose-700">S/ 0.00</p>
+                        <p class="text-[10px] text-rose-700 font-medium mt-0.5">Vencidos + Próximos ≤ 3 días</p>
                     </div>
                 </div>
 
                 <!-- Desglose por Categoría y Auditoría -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- Tarjeta: Distribución por Categoría -->
-                    <div class="bg-slate-900 p-4 rounded border border-slate-800">
-                        <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-                            <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-xs">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-800 mb-3 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-blue-600"></i>
                             <span>Desglose por Categoría</span>
                         </h3>
                         <div class="space-y-3">
                             <div>
-                                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                                <div class="flex justify-between text-[11px] text-slate-600 mb-1">
                                     <span>Servicios Básicos</span>
-                                    <span id="cat-monto-servicio" class="font-mono-numbers font-semibold text-slate-200">S/ 0.00</span>
+                                    <span id="cat-monto-servicio" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
                                 </div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded overflow-hidden border border-slate-800">
-                                    <div id="bar-cat-servicio" class="bg-blue-500 h-1.5" style="width: 0%"></div>
+                                <div class="w-full bg-slate-100 h-1.5 rounded overflow-hidden">
+                                    <div id="bar-cat-servicio" class="bg-blue-600 h-1.5" style="width: 0%"></div>
                                 </div>
                             </div>
 
                             <div>
-                                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                                <div class="flex justify-between text-[11px] text-slate-600 mb-1">
                                     <span>Impuestos (SUNAT)</span>
-                                    <span id="cat-monto-impuesto" class="font-mono-numbers font-semibold text-slate-200">S/ 0.00</span>
+                                    <span id="cat-monto-impuesto" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
                                 </div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded overflow-hidden border border-slate-800">
+                                <div class="w-full bg-slate-100 h-1.5 rounded overflow-hidden">
                                     <div id="bar-cat-impuesto" class="bg-amber-500 h-1.5" style="width: 0%"></div>
                                 </div>
                             </div>
 
                             <div>
-                                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                                <div class="flex justify-between text-[11px] text-slate-600 mb-1">
                                     <span>Proveedores & Compras</span>
-                                    <span id="cat-monto-proveedores" class="font-mono-numbers font-semibold text-slate-200">S/ 0.00</span>
+                                    <span id="cat-monto-proveedores" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
                                 </div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded overflow-hidden border border-slate-800">
-                                    <div id="bar-cat-proveedores" class="bg-purple-500 h-1.5" style="width: 0%"></div>
+                                <div class="w-full bg-slate-100 h-1.5 rounded overflow-hidden">
+                                    <div id="bar-cat-proveedores" class="bg-purple-600 h-1.5" style="width: 0%"></div>
                                 </div>
                             </div>
 
                             <div>
-                                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                                <div class="flex justify-between text-[11px] text-slate-600 mb-1">
                                     <span>Préstamos Bancarios (Cuotas)</span>
-                                    <span id="cat-monto-prestamo" class="font-mono-numbers font-semibold text-slate-200">S/ 0.00</span>
+                                    <span id="cat-monto-prestamo" class="font-mono-numbers font-semibold text-slate-900">S/ 0.00</span>
                                 </div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded overflow-hidden border border-slate-800">
-                                    <div id="bar-cat-prestamo" class="bg-emerald-500 h-1.5" style="width: 0%"></div>
+                                <div class="w-full bg-slate-100 h-1.5 rounded overflow-hidden">
+                                    <div id="bar-cat-prestamo" class="bg-emerald-600 h-1.5" style="width: 0%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tabla de Auditoría General de Pagos -->
-                    <div class="lg:col-span-2 bg-slate-900 p-4 rounded border border-slate-800">
+                    <div class="lg:col-span-2 bg-white p-4 rounded border border-slate-200 shadow-xs">
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
                             <div>
-                                <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                                    <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                                    <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-emerald-600"></i>
                                     <span>Auditoría de Comprobantes del Periodo</span>
                                 </h3>
                                 <p class="text-[10px] text-slate-500">Inspección de evidencias digitales archivadas.</p>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="buscador-gerente" placeholder="Filtrar auditoría..."
-                                    class="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-blue-500 w-full sm:w-40">
-                                <select id="filtro-categoria-gerente" class="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-xs text-slate-300 font-medium">
+                                <input type="text" id="buscador-gerente" placeholder="Filtrar comprobantes..."
+                                    class="px-2 py-1 rounded bg-white border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-600 w-full sm:w-40">
+                                <select id="filtro-categoria-gerente" class="px-2 py-1 rounded bg-white border border-slate-300 text-xs text-slate-700 font-medium">
                                     <option value="todas">Todas</option>
                                     <option value="servicio">Servicios</option>
                                     <option value="impuesto">Impuestos</option>
@@ -469,8 +484,8 @@
                         </div>
 
                         <div class="overflow-x-auto max-h-80 overflow-y-auto">
-                            <table class="w-full text-left text-xs text-slate-300">
-                                <thead class="bg-slate-950 text-[10px] font-mono uppercase text-slate-400 border-b border-slate-800 sticky top-0">
+                            <table class="w-full text-left text-xs text-slate-700">
+                                <thead class="bg-slate-100/70 text-[10px] font-semibold uppercase text-slate-600 border-b border-slate-200 sticky top-0">
                                     <tr>
                                         <th class="py-2 px-3">Estado</th>
                                         <th class="py-2 px-3">Categoría</th>
@@ -480,7 +495,7 @@
                                         <th class="py-2 px-3 text-center">Auditoría</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tabla-obligaciones-gerente" class="divide-y divide-slate-800/80">
+                                <tbody id="tabla-obligaciones-gerente" class="divide-y divide-slate-100">
                                     <!-- Filas dinámicas -->
                                 </tbody>
                             </table>
@@ -495,13 +510,13 @@
     <!-- MODAL 1: REGISTRAR NUEVA OBLIGACIÓN        -->
     <!-- ========================================== -->
     <div id="modal-crear-obligacion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-slate-900 rounded-md shadow-2xl max-w-lg w-full overflow-hidden border border-slate-800">
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="bg-white rounded-md shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="file-plus" class="w-4 h-4 text-blue-400"></i>
-                    <h3 class="font-bold text-sm text-slate-100">Nueva Obligación Financiera</h3>
+                    <i data-lucide="file-plus" class="w-4 h-4 text-blue-600"></i>
+                    <h3 class="font-bold text-sm text-slate-900">Nueva Obligación Financiera</h3>
                 </div>
-                <button type="button" class="btn-close-modal text-slate-400 hover:text-white">
+                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -509,8 +524,8 @@
             <form id="form-crear-obligacion" class="p-5 space-y-3.5">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Categoría</label>
-                        <select id="crear-categoria" required class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-medium focus:border-blue-500">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Categoría</label>
+                        <select id="crear-categoria" required class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-medium focus:border-blue-600">
                             <option value="servicio">Servicios Básicos</option>
                             <option value="impuesto">Impuestos (SUNAT)</option>
                             <option value="proveedores">Proveedores & Compras</option>
@@ -519,8 +534,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Tipo de Comprobante</label>
-                        <select id="crear-tipo-comprobante" class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-medium focus:border-blue-500">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Tipo de Comprobante</label>
+                        <select id="crear-tipo-comprobante" class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-medium focus:border-blue-600">
                             <option value="Factura Electrónica">Factura Electrónica</option>
                             <option value="Recibo por Honorarios">Recibo por Honorarios</option>
                             <option value="Recibo Servicios Públicos">Recibo Servicios Públicos</option>
@@ -533,53 +548,53 @@
 
                 <div class="grid grid-cols-3 gap-3">
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Razón Social Beneficiario / Proveedor</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Razón Social Beneficiario / Proveedor</label>
                         <input type="text" id="crear-beneficiario" required placeholder="ej. Luz del Sur S.A.A."
-                            class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-blue-500">
+                            class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-600">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">RUC / DNI</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">RUC / DNI</label>
                         <input type="text" id="crear-ruc" placeholder="11 dígitos" maxlength="11"
-                            class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono-numbers placeholder-slate-600 focus:border-blue-500">
+                            class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-mono-numbers placeholder-slate-400 focus:border-blue-600">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Concepto o Detalle de la Obligación</label>
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Concepto o Detalle de la Obligación</label>
                     <input type="text" id="crear-descripcion" required placeholder="ej. Recibo de Energía Eléctrica - Sede Central"
-                        class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-blue-500">
+                        class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-600">
                 </div>
 
                 <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Importe (S/)</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Importe (S/)</label>
                         <input type="number" id="crear-monto" step="0.01" min="0.01" required placeholder="0.00"
-                            class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono-numbers placeholder-slate-600 focus:border-blue-500 font-bold">
+                            class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-900 font-mono-numbers placeholder-slate-400 focus:border-blue-600 font-bold">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Fecha Emisión</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Fecha Emisión</label>
                         <input type="date" id="crear-emision" required
-                            class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono-numbers focus:border-blue-500">
+                            class="w-full px-2 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-mono-numbers focus:border-blue-600">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Fecha Vencimiento</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Fecha Vencimiento</label>
                         <input type="date" id="crear-vencimiento" required
-                            class="w-full px-2 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono-numbers focus:border-blue-500">
+                            class="w-full px-2 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-mono-numbers focus:border-blue-600">
                     </div>
                 </div>
 
                 <!-- Campo dinámico para Préstamos -->
-                <div id="container-cuota-prestamo" class="hidden p-2.5 bg-slate-950 rounded border border-slate-800">
-                    <label class="block text-[11px] font-semibold text-emerald-400 uppercase tracking-wider mb-1">Número o Cronograma de Cuota</label>
+                <div id="container-cuota-prestamo" class="hidden p-2.5 bg-slate-50 rounded border border-slate-200">
+                    <label class="block text-[11px] font-semibold text-emerald-800 uppercase tracking-wider mb-1">Número o Cronograma de Cuota</label>
                     <input type="text" id="crear-cuota" placeholder="ej. Cuota 3 de 12 (BCP Préstamo Pyme)"
-                        class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-emerald-500">
+                        class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:border-emerald-600">
                 </div>
 
-                <div class="pt-3 border-t border-slate-800 flex justify-end gap-2">
-                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-800 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-subtle">
+                <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-200 text-xs text-slate-600 hover:bg-slate-100 transition-subtle">
                         Cancelar
                     </button>
-                    <button type="submit" class="px-4 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-subtle">
+                    <button type="submit" class="px-4 py-1.5 rounded bg-blue-700 hover:bg-blue-800 text-white text-xs font-medium transition-subtle shadow-xs">
                         Registrar Obligación
                     </button>
                 </div>
@@ -591,13 +606,13 @@
     <!-- MODAL 2: REGISTRAR PAGO Y SUBIR VOUCHER     -->
     <!-- ========================================== -->
     <div id="modal-pagar-obligacion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-slate-900 rounded-md shadow-2xl max-w-md w-full overflow-hidden border border-slate-800">
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="bg-white rounded-md shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-4 h-4 text-emerald-400"></i>
-                    <h3 class="font-bold text-sm text-slate-100">Certificación y Pago al 100%</h3>
+                    <i data-lucide="receipt" class="w-4 h-4 text-emerald-600"></i>
+                    <h3 class="font-bold text-sm text-slate-900">Certificación y Pago al 100%</h3>
                 </div>
-                <button type="button" class="btn-close-modal text-slate-400 hover:text-white">
+                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -606,49 +621,49 @@
                 <input type="hidden" id="pagar-id">
 
                 <!-- Resumen Obligación -->
-                <div class="p-3 bg-slate-950 rounded border border-slate-800 space-y-1">
-                    <p id="pagar-desc-resumen" class="text-xs font-semibold text-slate-200">Concepto de la obligación</p>
-                    <div class="flex justify-between items-center text-[11px] text-slate-400">
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 space-y-1">
+                    <p id="pagar-desc-resumen" class="text-xs font-semibold text-slate-900">Concepto de la obligación</p>
+                    <div class="flex justify-between items-center text-[11px] text-slate-600">
                         <span id="pagar-benef-resumen">Proveedor</span>
-                        <span id="pagar-monto-resumen" class="font-mono-numbers font-bold text-emerald-400">S/ 0.00</span>
+                        <span id="pagar-monto-resumen" class="font-mono-numbers font-bold text-emerald-700">S/ 0.00</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Fecha de Operación</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Fecha de Operación</label>
                         <input type="date" id="pagar-fecha" required
-                            class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono-numbers focus:border-blue-500">
+                            class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-mono-numbers focus:border-blue-600">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">N° Operación / Referencia</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">N° Operación / Referencia</label>
                         <input type="text" id="pagar-nro-operacion" required placeholder="ej. OP-982341-BCP"
-                            class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono placeholder-slate-600 focus:border-blue-500">
+                            class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 font-mono placeholder-slate-400 focus:border-blue-600">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Evidencia Digital (JPG, PNG, PDF, SVG)</label>
-                    <div class="border border-dashed border-slate-700 rounded p-4 text-center bg-slate-950 relative hover:border-blue-500 transition-subtle">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Evidencia Digital (JPG, PNG, PDF, SVG)</label>
+                    <div class="border border-dashed border-slate-300 rounded p-4 text-center bg-slate-50 relative hover:border-blue-600 transition-subtle">
                         <input type="file" id="pagar-archivo" accept=".png,.jpg,.jpeg,.webp,.pdf,.svg" required
                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                         <div id="preview-placeholder">
-                            <i data-lucide="upload-cloud" class="w-6 h-6 mx-auto text-slate-500 mb-1"></i>
-                            <p class="text-xs text-slate-300 font-medium">Arrastra el archivo o haz clic aquí</p>
+                            <i data-lucide="upload-cloud" class="w-6 h-6 mx-auto text-slate-400 mb-1"></i>
+                            <p class="text-xs text-slate-700 font-medium">Arrastra el archivo o haz clic aquí</p>
                             <p class="text-[10px] text-slate-500 mt-0.5">Voucher bancario o PDF oficial (hasta 10MB)</p>
                         </div>
                         <div id="preview-container" class="hidden">
-                            <img id="preview-img" class="max-h-32 mx-auto rounded border border-slate-700 mb-2 object-contain" alt="Preview">
-                            <p id="preview-filename" class="text-xs font-mono text-emerald-400"></p>
+                            <img id="preview-img" class="max-h-32 mx-auto rounded border border-slate-200 mb-2 object-contain" alt="Preview">
+                            <p id="preview-filename" class="text-xs font-mono text-emerald-700 font-semibold"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-3 border-t border-slate-800 flex justify-end gap-2">
-                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-800 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-subtle">
+                <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
+                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-200 text-xs text-slate-600 hover:bg-slate-100 transition-subtle">
                         Cancelar
                     </button>
-                    <button type="submit" id="btn-submit-pago" class="px-4 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-subtle flex items-center gap-1.5">
+                    <button type="submit" id="btn-submit-pago" class="px-4 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-subtle flex items-center gap-1.5 shadow-xs">
                         <i data-lucide="check" class="w-3.5 h-3.5"></i>
                         <span>Certificar Pago al 100%</span>
                     </button>
@@ -661,37 +676,37 @@
     <!-- MODAL 3: ANULAR OBLIGACIÓN (MANEJO ERROR) -->
     <!-- ========================================== -->
     <div id="modal-anular-obligacion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-slate-900 rounded-md shadow-2xl max-w-sm w-full overflow-hidden border border-slate-800">
-            <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="bg-white rounded-md shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
+            <div class="p-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-400"></i>
-                    <h3 class="font-bold text-sm text-slate-100">Anular Obligación</h3>
+                    <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-600"></i>
+                    <h3 class="font-bold text-sm text-slate-900">Anular Obligación</h3>
                 </div>
-                <button type="button" class="btn-close-modal text-slate-400 hover:text-white">
+                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
             <form id="form-anular-obligacion" class="p-4 space-y-3">
                 <input type="hidden" id="anular-id">
-                <p class="text-xs text-slate-400">
+                <p class="text-xs text-slate-600">
                     Se retirará esta obligación del pasivo exigible y no computará en moras ni gastos.
                 </p>
-                <div class="p-2.5 bg-slate-950 rounded border border-slate-800 text-xs font-mono text-slate-300" id="anular-concepto-resumen">
+                <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs font-mono text-slate-700" id="anular-concepto-resumen">
                     Detalle
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Motivo de la anulación (Error Humano)</label>
-                    <input type="text" id="anular-motivo" required placeholder="ej. Error en digitación de importe o comprobante duplicado"
-                        class="w-full px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-rose-500">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Motivo de la anulación (Error Humano)</label>
+                    <input type="text" id="anular-motivo" required placeholder="ej. Error en digitación de importe o duplicidad"
+                        class="w-full px-2.5 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:border-rose-600">
                 </div>
 
-                <div class="pt-2 border-t border-slate-800 flex justify-end gap-2">
-                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-800 text-xs text-slate-400 hover:text-slate-200 transition-subtle">
+                <div class="pt-2 border-t border-slate-200 flex justify-end gap-2">
+                    <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-200 text-xs text-slate-600 hover:bg-slate-100 transition-subtle">
                         Volver
                     </button>
-                    <button type="submit" class="px-3.5 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium transition-subtle">
+                    <button type="submit" class="px-3.5 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium transition-subtle shadow-xs">
                         Confirmar Anulación
                     </button>
                 </div>
@@ -703,91 +718,91 @@
     <!-- MODAL 4: VISOR DE COMPROBANTE AUDITADO     -->
     <!-- ========================================== -->
     <div id="modal-visor-comprobante" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-slate-900 rounded-md shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-800 flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="bg-white rounded-md shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
                 <div>
-                    <h3 id="visor-titulo" class="font-bold text-sm text-slate-100">Auditoría de Comprobante</h3>
-                    <p id="visor-subtitulo" class="text-[11px] text-slate-400 font-mono mt-0.5">Detalle</p>
+                    <h3 id="visor-titulo" class="font-bold text-sm text-slate-900">Auditoría de Comprobante</h3>
+                    <p id="visor-subtitulo" class="text-[11px] text-slate-500 font-mono mt-0.5">Detalle</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <a id="visor-descargar" href="#" target="_blank" download
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 transition-subtle">
+                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-xs text-slate-700 border border-slate-200 transition-subtle">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i>
                         <span>Descargar</span>
                     </a>
-                    <button type="button" class="btn-close-modal text-slate-400 hover:text-white p-1">
+                    <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700 p-1">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Metadatos de Auditoría Bancaria -->
-            <div class="grid grid-cols-2 p-3 bg-slate-950 border-b border-slate-800 text-xs">
+            <div class="grid grid-cols-2 p-3 bg-slate-50 border-b border-slate-200 text-xs">
                 <div>
                     <span class="text-slate-500 text-[10px] uppercase font-mono block">Código de Operación / Trazabilidad:</span>
-                    <span id="visor-operacion" class="font-mono font-bold text-emerald-400">S/N</span>
+                    <span id="visor-operacion" class="font-mono font-bold text-emerald-700">S/N</span>
                 </div>
                 <div class="text-right">
                     <span class="text-slate-500 text-[10px] uppercase font-mono block">Fecha de Certificación:</span>
-                    <span id="visor-fecha" class="font-mono text-slate-300">N/A</span>
+                    <span id="visor-fecha" class="font-mono text-slate-700">N/A</span>
                 </div>
             </div>
 
             <!-- Contenedor Imagen o PDF -->
-            <div id="visor-contenido" class="p-4 flex-1 overflow-auto flex items-center justify-center bg-slate-950/40">
+            <div id="visor-contenido" class="p-4 flex-1 overflow-auto flex items-center justify-center bg-slate-100/50">
                 <!-- Se inyecta dinámicamente -->
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL 5: FICHA TÉCNICA SCRUM DEL PROYECTO  -->
+    <!-- MODAL 5: INFORMACIÓN TÉCNICA DEL SISTEMA   -->
     <!-- ========================================== -->
     <div id="modal-contexto-scrum" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-slate-900 rounded-md shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-800 max-h-[85vh] flex flex-col">
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="bg-white rounded-md shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 max-h-[85vh] flex flex-col">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4 text-blue-400"></i>
-                    <h3 class="font-bold text-sm text-slate-100">Ficha Técnica de Sustentación • Scrum Sprint 1</h3>
+                    <i data-lucide="book-open" class="w-4 h-4 text-blue-700"></i>
+                    <h3 class="font-bold text-sm text-slate-900">Especificaciones Técnicas del Sistema</h3>
                 </div>
-                <button type="button" class="btn-close-modal text-slate-400 hover:text-white">
+                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <div class="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
-                <div class="grid grid-cols-2 gap-3 p-3 bg-slate-950 rounded border border-slate-800">
+            <div class="p-5 overflow-y-auto space-y-4 text-xs text-slate-700">
+                <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded border border-slate-200">
                     <div>
-                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Metodología & Duración</span>
-                        <span class="font-semibold text-slate-200">Scrum • Sprint 1 (1 Semana)</span>
+                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Arquitectura del Servidor</span>
+                        <span class="font-semibold text-slate-800">Node.js • Express REST API Modular</span>
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Capacidad del Equipo</span>
-                        <span class="font-semibold text-slate-200">5 Devs × 40 hrs = 200 Horas Hombre</span>
+                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Capa de Persistencia</span>
+                        <span class="font-semibold text-slate-800">PostgreSQL (Neon Cloud) + JSON Local Fallback</span>
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Presupuesto Sprint 1 (MVP)</span>
-                        <span class="font-mono-numbers font-bold text-emerald-400">S/. 8,855.00</span>
+                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Procesamiento de Archivos</span>
+                        <span class="font-semibold text-slate-800">Multer Engine (JPG, PNG, PDF, SVG)</span>
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Historias de Usuario (HU)</span>
-                        <span class="font-semibold text-slate-200">HU-01 a HU-06 (31 Story Points)</span>
+                        <span class="text-[10px] font-mono uppercase text-slate-500 block">Seguridad y Roles</span>
+                        <span class="font-semibold text-slate-800">Sesión segmentada: Gerente / Asistente</span>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="font-mono uppercase text-[11px] font-bold text-slate-200 mb-2">Criterios de Aceptación & Mitigaciones de Riesgo</h4>
-                    <ul class="space-y-1.5 list-disc list-inside text-slate-400">
-                        <li><strong class="text-slate-200">Prevención de Error Humano:</strong> Validación temporal de vencimiento $\ge$ emisión, detección de facturas duplicadas y anulación con registro de motivo.</li>
-                        <li><strong class="text-slate-200">Rigor Fiscal SUNAT:</strong> Validación de RUC 11 dígitos y advertencias legales sobre TIM (Tasa de Interés Moratorio) y sanciones del Art. 178 del Código Tributario.</li>
-                        <li><strong class="text-slate-200">Arquitectura Técnica:</strong> Backend modular Node.js/Express, persistencia híbrida (PostgreSQL Neon + JSON local fallback) y UI de alta densidad con tipografía monoespaciada para auditoría.</li>
+                    <h4 class="font-mono uppercase text-[11px] font-bold text-slate-900 mb-2">Protocolos de Integridad y Mitigación de Errores</h4>
+                    <ul class="space-y-1.5 list-disc list-inside text-slate-600">
+                        <li><strong class="text-slate-800">Validación Temporal:</strong> Control estricto de vencimiento posterior o igual a la emisión del comprobante.</li>
+                        <li><strong class="text-slate-800">Trazabilidad Fiscal:</strong> Registro con RUC de 11 dígitos y Tipo de Comprobante según normativa tributaria.</li>
+                        <li><strong class="text-slate-800">Certificación Inmutable:</strong> Todo pago requiere código de operación bancario y comprobante digital obligatorio.</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="p-3 border-t border-slate-800 bg-slate-950 flex justify-end">
-                <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-800 text-xs text-slate-300 hover:bg-slate-800 transition-subtle">
-                    Cerrar Ficha
+            <div class="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button type="button" class="btn-close-modal px-3 py-1.5 rounded border border-slate-200 text-xs text-slate-700 hover:bg-slate-200 transition-subtle">
+                    Cerrar Especificaciones
                 </button>
             </div>
         </div>

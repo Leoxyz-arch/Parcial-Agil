@@ -1,22 +1,23 @@
 {
-  "name": "cashflow-guard-mvp",
+  "name": "cashflow-guard",
   "version": "1.0.0",
-  "description": "Sistema Ágil de Control de Pagos y Alertas de Mora - Scrum MVP",
+  "description": "Sistema Corporativo de Control Financiero y Gestión de Pagos",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "test": "node tests/e2e.test.js"
   },
   "keywords": [
-    "scrum",
-    "agile",
-    "mvp",
     "cashflow",
-    "neon",
+    "financial",
+    "banking",
     "postgresql",
-    "nodejs"
+    "neon",
+    "nodejs",
+    "express"
   ],
-  "author": "Equipo de Desarrollo Agile",
+  "author": "Equipo de Desarrollo",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",

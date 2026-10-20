@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnQuickAsistente = document.getElementById('btn-quick-asistente');
     const btnQuickGerente = document.getElementById('btn-quick-gerente');
 
-    // Botones rápidos de prueba para la sustentación
+    // Botones rápidos de prueba para la evaluación
     if (btnQuickAsistente) {
         btnQuickAsistente.addEventListener('click', () => {
             inputUsername.value = 'asistente';
@@ -121,7 +121,7 @@ function renderAppView() {
     viewApp.classList.remove('hidden');
 
     userDisplayName.textContent = user.nombre_completo || user.username;
-    userDisplayRole.textContent = user.rol === 'gerente' ? '💼 Gerente' : '📋 Asistente';
+    userDisplayRole.textContent = user.rol === 'gerente' ? 'Gerente' : 'Asistente';
 
     if (user.rol === 'gerente') {
         moduleGerente.classList.remove('hidden');

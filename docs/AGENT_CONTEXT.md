@@ -1,95 +1,94 @@
-# 🤖 AGENT_CONTEXT.md - Contexto Central del Proyecto
+# AGENT_CONTEXT.md — Contexto Maestro del Sistema
 
 > **Propósito de este archivo:**  
-> Este documento permite que cualquier Inteligencia Artificial o miembro del equipo de desarrollo (los 5 desarrolladores, Scrum Master o Product Owner) comprenda al 100% el propósito del sistema, la arquitectura técnica, las reglas de negocio y el estado del sprint con solo leer este archivo.
+> Permite a cualquier Inteligencia Artificial, desarrollador o arquitecto incorporarse al proyecto y comprender de forma inmediata la arquitectura, reglas de negocio, modelos de datos, estándares de calidad y mecanismos de integridad implementados.
 
 ---
 
-## 📌 1. Visión General del Negocio
-- **Nombre del Sistema:** **CashFlow Guard** - Sistema Ágil de Control de Pagos y Alertas de Mora.
-- **Cliente / Product Owner:** Dueño de negocio / Profesor.
-- **Problema Principal:** Se olvidan los pagos de servicios, impuestos, proveedores y cuotas de préstamos, lo que genera cobro de **moras, penalizaciones e intereses innecesarios**.
-- **Solución Ágil (MVP):** Un sistema web ligero donde el **Asistente** registra compromisos y pagos con evidencia fotográfica/PDF, y el **Gerente** visualiza de inmediato los gastos del mes y el riesgo de mora.
-- **Regla de Oro:** **Facilitarle la vida al asistente**, sin pasos engorrosos ni formularios sobrecargados.
+## 1. Visión General del Negocio
+- **Sistema:** **CashFlow Guard** — Control Financiero y Gestión de Pasivos.
+- **Problema de Negocio:** Penalizaciones financieras, intereses moratorios bancarios y multas de SUNAT generadas por olvido o desorganización de los plazos de vencimiento.
+- **Solución:** Sistema web modular de alta fidelidad donde el **Asistente** registra pasivos certificados con RUC y comprobante, y el **Gerente** supervisa en tiempo real los 4 KPIs clave del mes y audita vouchers fotográficos y PDFs.
+- **Enfoque de Experiencia:** Alta densidad de datos, cifras tabulares monoespaciadas y ausencia total de bloqueos intrusivos (`alert()` sustituido por sistema de Toasts asíncronos).
 
 ---
 
-## 👥 2. Roles del Sistema
-1. **Asistente (Perfil Operativo):**
-   - Registra obligaciones de pago por categoría.
-   - Monitorea el semáforo de vencimientos (identificando pagos a $\le 3$ días o vencidos).
-   - Realiza los pagos al 100% (o cuota del mes) y los marca como **"Pagado"** adjuntando el voucher fotográfico o PDF y N° de operación.
-2. **Gerente (Perfil Ejecutivo / Supervisión):**
-   - Visualiza en una sola pantalla los **4 KPIs financieros del mes**:
-     1. Total gastos del mes.
-     2. Total ya pagado.
-     3. Total pendiente por pagar.
-     4. Total en riesgo de mora ($\le 3$ días o vencidos).
-   - Filtra obligaciones por mes, año y categoría.
-   - Audita los pagos abriendo la evidencia fotográfica en pantalla completa.
+## 2. Perfiles y Segmentación de Roles
+1. **Asistente (Operativo):**
+   - Registro de compromisos financieros por categoría.
+   - Validación estricta de coherencia temporal (vencimiento $\ge$ emisión).
+   - Monitoreo del semáforo visual de urgencia en tiempo real.
+   - Certificación de pago al 100% adjuntando código de operación bancario y voucher digital.
+   - Anulación formal de obligaciones en caso de error de digitación (sin borrado destructivo).
+   - Búsqueda en tiempo real sobre la tabla de trabajo.
+2. **Gerente (Supervisión Ejecutiva):**
+   - Consulta consolidada de los **4 KPIs Financieros del Periodo**:
+     1. Total compromisos del mes.
+     2. Total liquidado (con barra de avance porcentual).
+     3. Total pendiente en plazo regular.
+     4. Total en riesgo de mora (vencidos + próximos $\le 3$ días).
+   - Desglose presupuestario por categoría.
+   - Auditoría de comprobantes digitales a pantalla completa.
+   - Exportación de libros contables en formato **CSV compatible con Microsoft Excel**.
 
 ---
 
-## 🚦 3. Reglas de Negocio Clave
-1. **Categorías soportadas:**
-   - `servicio` (Luz, agua, internet, etc.).
-   - `impuesto` (SUNAT, tributos municipales, etc.).
-   - `proveedores` (Facturas de insumos y mercadería).
-   - `prestamo` (Cuotas bancarias recurrentes mes a mes).
-2. **Semáforo de Vencimiento:**
-   - 🔴 **VENCIDO / MORA:** Fecha de vencimiento < Fecha actual y `estado != 'pagado'`.
-   - 🟠 **POR VENCER:** Faltan entre 0 y 3 días para vencer y `estado != 'pagado'`.
-   - 🔵 **PROGRAMADO:** Faltan más de 3 días para vencer y `estado != 'pagado'`.
-   - 🟢 **PAGADO:** Obligación cancelada al 100% con voucher adjunto.
-3. **Validación de Pago:**
-   - No se puede marcar un pago como pagado sin subir la foto del comprobante o archivo PDF.
-4. **Cálculo de KPIs del Mes para el Gerente:**
-   - Se calculan sobre el mes y año seleccionados.
-   - `Total en Riesgo de Mora` = Suma de montos de pagos **Vencidos** + pagos **Por Vencer ($\le 3$ días)**.
+## 3. Reglas de Negocio e Integridad Fiscal
+1. **Categorías Soportadas:**
+   - `servicio` (Energía, agua, telecomunicaciones).
+   - `impuesto` (SUNAT PDT, tributos municipales).
+   - `proveedores` (Facturas comerciales y compras de insumos).
+   - `prestamo` (Cuotas bancarias amortizadas con cronograma).
+2. **Tipos de Comprobante de Pago (Normativa SUNAT):**
+   - Factura Electrónica, Recibo por Honorarios, Recibo Servicios Públicos, Declaración Jurada PDT, Liquidación de Crédito, Boleta de Venta.
+3. **Validación de Identificador Fiscal:**
+   - RUC de 11 dígitos (validación de prefijos 10, 15, 17, 20) o DNI de 8 dígitos.
+4. **Semáforo de Vencimiento:**
+   - **Mora Activa:** Vencimiento < Fecha actual y `estado == 'pendiente'`.
+   - **Vencimiento Inminente:** Faltan entre 0 y 3 días y `estado == 'pendiente'`.
+   - **Plazo Regular:** Faltan más de 3 días y `estado == 'pendiente'`.
+   - **Liquidado:** Obligación cancelada al 100% con evidencia archivada.
+   - **Anulado:** Obligación cancelada por error de digitación con motivo registrado (no computa pasivos monetarios).
+5. **Advertencia Legal Tributaria:**
+   - Impuestos en mora despliegan automáticamente la alerta legal sobre aplicación de TIM (Tasa de Interés Moratorio) y sanción por omisión conforme al Art. 178 Numeral 1 del Código Tributario.
+6. **Inmutabilidad de Liquidaciones:**
+   - Una obligación en estado `pagado` no puede ser modificada, re-pagada ni anulada.
 
 ---
 
-## 💻 4. Stack Tecnológico Seleccionado
-- **Backend:** Node.js (v26+) con **Express.js**.
-- **Base de Datos:** **Neon PostgreSQL** en la nube (con soporte de cadena de conexión `DATABASE_URL` y fallback de memoria/local para desarrollo sin desconexión).
-- **Gestión de Archivos:** **Multer** para carga de imágenes (JPG, PNG, WEBP) y documentos PDF en la carpeta `/uploads`.
-- **Frontend:** **HTML5, CSS3, JavaScript Vanilla modular** con **Tailwind CSS (CDN)** para diseño moderno, responsivo y profesional, e iconos vectoriales con **Lucide Icons**.
+## 4. Stack Tecnológico y Arquitectura
+- **Backend:** Node.js (v18+) con **Express.js** estructurado en controladores y rutas REST desacopladas.
+- **Persistencia:** Conector híbrido a **PostgreSQL (Neon Cloud)** con respaldo automático a motor JSON local (`data/local_db.json`) si no hay conexión a internet.
+- **Gestión de Archivos:** **Multer** para carga y validación de vouchers (JPG, PNG, WEBP, PDF, SVG) con nombres hasheados únicos.
+- **Frontend:** SPA modular con Vanilla JavaScript, Tailwind CSS (configurado en modo corporativo Light), tipografía dual (`Plus Jakarta Sans` + `JetBrains Mono`) e iconografía vectorial **Lucide Icons**.
+- **Testing:** Suite E2E con **Playwright** (`npm test`).
 
 ---
 
-## 📋 5. Estructura de Directorios del Proyecto
+## 5. Estructura de Directorios
 ```text
 Paarcial_Agile/
 │
-├── docs/                      # Documentación del proyecto y agentes
-│   ├── AGENT_CONTEXT.md       # (Este archivo) Contexto maestro del proyecto
-│   ├── SCRUM_SPRINT.md        # Planificación Scrum, HU y Criterios de Aceptación
-│   ├── DATABASE_SCHEMA.sql    # DDL y esquema relacional para Neon PostgreSQL
-│   └── API_SPEC.md            # Especificación de endpoints REST
+├── docs/                      # Documentación del sistema
+│   ├── AGENT_CONTEXT.md       # (Este archivo) Contexto maestro
+│   ├── SCRUM_SPRINT.md        # Planificación y criterios Given-When-Then
+│   └── DATABASE_SCHEMA.sql    # DDL relacional PostgreSQL
 │
-├── src/                       # Código del Servidor Node.js
-│   ├── server.js              # Servidor Express principal y middlewares
-│   ├── db.js                  # Conexión a Neon PostgreSQL / migración automática
-│   ├── routes/                # Rutas modulares de la API
-│   │   ├── auth.js            # Login y control de roles
-│   │   ├── obligaciones.js    # CRUD de gastos, semáforo y subida de vouchers
-│   │   └── dashboard.js       # Cálculo de los 4 KPIs del Gerente
-│   └── seed.js                # Datos iniciales para la presentación
+├── src/                       # Backend Express
+│   ├── server.js              # Servidor principal
+│   ├── db.js                  # Conexión Neon / motor fallback
+│   └── routes/                # Endpoints modulares (auth, obligaciones, dashboard)
 │
-├── uploads/                   # Vouchers y comprobantes fotográficos/PDF
+├── tests/                     # Suite de pruebas automatizadas
+│   └── e2e.test.js            # Pruebas End-to-End con Playwright
 │
-├── public/                    # Frontend Web (HTML, CSS, JS)
-│   ├── index.html             # Interfaz unificada (Login, Vista Asistente, Vista Gerente)
-│   ├── css/
-│   │   └── styles.css         # Estilos personalizados y animaciones de alertas
-│   └── js/
-│       ├── api.js             # Cliente HTTP para interactuar con el backend
-│       ├── auth.js            # Manejo de sesión y roles
-│       ├── asistente.js       # Lógica del módulo del asistente (registro y pagos)
-│       └── gerente.js         # Lógica del dashboard gerencial y visor de vouchers
+├── uploads/                   # Repositorio de vouchers digitales
 │
-├── .env.example               # Plantilla de variables de entorno (Neon DB URL)
-├── .env                       # Variables de entorno locales
-├── package.json               # Dependencias del proyecto
-└── README.md                  # Instrucciones de ejecución
+├── public/                    # Frontend Web (Light Mode Corporativo)
+│   ├── index.html             # Interfaz SPA
+│   ├── css/styles.css         # Estilos y sistema Toast
+│   └── js/                    # Módulos JS (api, auth, asistente, gerente, app)
+│
+├── package.json
+└── README.md
 ```
