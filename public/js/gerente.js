@@ -237,15 +237,17 @@ window.GerenteModule = {
             // Etiquetas sólidas de alto contraste con iconos simbólicos
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="status-pill status-pagado"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Pagado</span></span>';
+                semaforoHtml = '<span class="status-pill status-pagado" title="Obligación liquidada al 100%"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Pagado al 100%</span></span>';
             } else if (item.estado === 'anulado') {
                 semaforoHtml = '<span class="status-pill status-anulado"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>Anulado</span></span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="status-pill status-vencido"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>Vencido</span></span>';
+                const txt = item.semaforo.etiqueta || 'Vencido';
+                semaforoHtml = `<span class="status-pill status-vencido" title="${item.semaforo.detalle_tiempo || txt}"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>${txt}</span></span>`;
             } else if (item.semaforo.codigo === 'programado') {
                 semaforoHtml = '<span class="status-pill status-programado"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Programado</span></span>';
             } else {
-                semaforoHtml = '<span class="status-pill status-por-pagar"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Por Pagar</span></span>';
+                const txt = item.semaforo.etiqueta || 'Por Vencer';
+                semaforoHtml = `<span class="status-pill status-por-pagar" title="${item.semaforo.detalle_tiempo || txt}"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>${txt}</span></span>`;
             }
 
             let compHtml = '<span class="text-slate-400 font-mono text-xs">—</span>';
@@ -300,18 +302,23 @@ window.GerenteModule = {
         const btnDescargar = document.getElementById('visor-descargar');
 
         titulo.textContent = `Auditoría: ${item.descripcion}`;
-        subtitulo.textContent = `${item.beneficiario} (RUC: ${item.ruc_beneficiario || 'S/N'}) • Monto: S/ ${item.monto.toFixed(2)}`;
+        subtitulo.textContent = `${item.beneficiario} (RUC: ${item.ruc_beneficiario || 'S/N'})`;
         opText.textContent = item.nro_operacion || 'Sin registro';
         fechaText.textContent = item.fecha_pago || 'No registrada';
         btnDescargar.href = item.comprobante_url;
 
+        const metodoText = document.getElementById('visor-metodo');
+        if (metodoText) metodoText.textContent = item.metodo_pago || 'Transferencia Bancaria';
+        const montoText = document.getElementById('visor-monto');
+        if (montoText) montoText.textContent = 'S/ ' + (item.monto || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
         if (item.comprobante_tipo === 'pdf' || (item.comprobante_url && item.comprobante_url.endsWith('.pdf'))) {
             contenido.innerHTML = `
-                <iframe src="${item.comprobante_url}" class="w-full h-96 rounded border border-slate-200 bg-white"></iframe>
+                <iframe src="${item.comprobante_url}" class="w-full h-[65vh] rounded-md border border-slate-200 bg-white shadow-xs"></iframe>
             `;
         } else {
             contenido.innerHTML = `
-                <img src="${item.comprobante_url}" alt="Comprobante de Pago" class="max-h-[60vh] max-w-full rounded border border-slate-200 mx-auto object-contain bg-slate-50 p-2 shadow-xs">
+                <img src="${item.comprobante_url}" alt="Comprobante de Pago" class="max-h-[70vh] max-w-full rounded-md border border-slate-200 mx-auto object-contain bg-white p-3 shadow-md">
             `;
         }
 
