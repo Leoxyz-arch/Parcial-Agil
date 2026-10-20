@@ -112,52 +112,63 @@ function renderAppView() {
     userDisplayName.textContent = user.nombre_completo || user.username;
     userDisplayRole.textContent = user.rol === 'gerente' ? 'Gerente' : 'Asistente';
 
-    if (user.rol === 'gerente') {
-        moduleGerente.classList.remove('hidden');
-        moduleAsistente.classList.add('hidden');
-        if (window.GerenteModule && typeof window.GerenteModule.init === 'function') {
-            window.GerenteModule.init();
-        }
-    } else {
-        moduleAsistente.classList.remove('hidden');
-        moduleGerente.classList.add('hidden');
-        if (window.AsistenteModule && typeof window.AsistenteModule.init === 'function') {
-            window.AsistenteModule.init();
-        }
-    }
-
-    // Configurar tabs en la barra lateral si el usuario es Gerente
     const tabAsistente = document.getElementById('nav-btn-asistente') || document.getElementById('tab-nav-asistente');
     const tabGerente = document.getElementById('nav-btn-gerente') || document.getElementById('tab-nav-gerente');
 
-    if (tabAsistente && tabGerente) {
-        if (user.rol === 'gerente') {
-            tabAsistente.classList.remove('hidden');
-            tabGerente.classList.remove('hidden');
-
-            tabAsistente.onclick = () => {
-                moduleAsistente.classList.remove('hidden');
-                moduleGerente.classList.add('hidden');
-                tabAsistente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
-                tabAsistente.classList.remove('text-slate-400');
-                tabGerente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
-                tabGerente.classList.add('text-slate-400');
-                if (window.AsistenteModule) window.AsistenteModule.init();
-            };
-
-            tabGerente.onclick = () => {
-                moduleGerente.classList.remove('hidden');
-                moduleAsistente.classList.add('hidden');
+    function switchModule(modulo) {
+        if (modulo === 'gerente') {
+            moduleGerente.classList.remove('hidden');
+            moduleAsistente.classList.add('hidden');
+            if (tabGerente) {
                 tabGerente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
                 tabGerente.classList.remove('text-slate-400');
+            }
+            if (tabAsistente) {
                 tabAsistente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
                 tabAsistente.classList.add('text-slate-400');
-                if (window.GerenteModule) window.GerenteModule.init();
-            };
+            }
+            if (window.GerenteModule && typeof window.GerenteModule.init === 'function') {
+                window.GerenteModule.init();
+            }
         } else {
+            moduleAsistente.classList.remove('hidden');
+            moduleGerente.classList.add('hidden');
+            if (tabAsistente) {
+                tabAsistente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
+                tabAsistente.classList.remove('text-slate-400');
+            }
+            if (tabGerente) {
+                tabGerente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
+                tabGerente.classList.add('text-slate-400');
+            }
+            if (window.AsistenteModule && typeof window.AsistenteModule.init === 'function') {
+                window.AsistenteModule.init();
+            }
+        }
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    if (user.rol === 'gerente') {
+        if (tabAsistente) {
             tabAsistente.classList.remove('hidden');
+            tabAsistente.onclick = () => switchModule('asistente');
+        }
+        if (tabGerente) {
+            tabGerente.classList.remove('hidden');
+            tabGerente.onclick = () => switchModule('gerente');
+        }
+        switchModule('gerente');
+    } else {
+        if (tabAsistente) {
+            tabAsistente.classList.remove('hidden');
+            tabAsistente.onclick = null;
+        }
+        if (tabGerente) {
             tabGerente.classList.add('hidden');
         }
+        switchModule('asistente');
     }
 
     if (window.lucide) {
