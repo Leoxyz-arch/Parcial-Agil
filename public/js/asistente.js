@@ -560,6 +560,8 @@ window.AsistenteModule = {
                 semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
             } else if (item.estado === 'anulado') {
                 semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
+            } else if (item.semaforo.codigo === 'vencido') {
+                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>Vencido</span>';
             } else if (item.semaforo.codigo === 'programado') {
                 semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
             } else {
