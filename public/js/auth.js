@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnQuickAsistente = document.getElementById('btn-quick-asistente');
     const btnQuickGerente = document.getElementById('btn-quick-gerente');
 
-    // Botones rápidos de prueba para la evaluación
+    // Botones rápidos de prueba
     if (btnQuickAsistente) {
         btnQuickAsistente.addEventListener('click', () => {
             inputUsername.value = 'asistente';
@@ -99,14 +99,59 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAppView();
         });
     }
+
+    // Navegación Sidebar de Módulos
+    const navBtnAsistente = document.getElementById('nav-btn-asistente');
+    const navBtnGerente = document.getElementById('nav-btn-gerente');
+
+    if (navBtnAsistente) {
+        navBtnAsistente.onclick = () => switchModulo('asistente');
+    }
+    if (navBtnGerente) {
+        navBtnGerente.onclick = () => switchModulo('gerente');
+    }
 });
+
+function switchModulo(modulo) {
+    const moduleAsistente = document.getElementById('module-asistente');
+    const moduleGerente = document.getElementById('module-gerente');
+    const breadcrumb = document.getElementById('view-title-breadcrumb');
+    const containerPeriodo = document.getElementById('container-periodo-gerente');
+    const btnCrear = document.getElementById('btn-open-modal-crear');
+    const navBtnAsistente = document.getElementById('nav-btn-asistente');
+    const navBtnGerente = document.getElementById('nav-btn-gerente');
+
+    if (modulo === 'gerente') {
+        moduleGerente.classList.remove('hidden');
+        moduleAsistente.classList.add('hidden');
+        if (breadcrumb) breadcrumb.textContent = 'Dashboard Ejecutivo';
+        if (containerPeriodo) containerPeriodo.classList.remove('hidden');
+        if (btnCrear) btnCrear.classList.add('hidden');
+
+        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 transition-subtle text-left';
+        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left';
+
+        if (window.GerenteModule) window.GerenteModule.init();
+    } else {
+        moduleAsistente.classList.remove('hidden');
+        moduleGerente.classList.add('hidden');
+        if (breadcrumb) breadcrumb.textContent = 'Obligaciones Financieras';
+        if (containerPeriodo) containerPeriodo.classList.add('hidden');
+        if (btnCrear) btnCrear.classList.remove('hidden');
+
+        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 transition-subtle text-left';
+        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-subtle text-left';
+
+        if (window.AsistenteModule) window.AsistenteModule.init();
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+}
 
 // Función de renderizado según sesión y rol
 function renderAppView() {
     const viewLogin = document.getElementById('view-login');
     const viewApp = document.getElementById('view-app');
-    const moduleAsistente = document.getElementById('module-asistente');
-    const moduleGerente = document.getElementById('module-gerente');
     const userDisplayName = document.getElementById('user-display-name');
     const userDisplayRole = document.getElementById('user-display-role');
 
@@ -123,19 +168,7 @@ function renderAppView() {
     userDisplayName.textContent = user.nombre_completo || user.username;
     userDisplayRole.textContent = user.rol === 'gerente' ? 'Gerente' : 'Asistente';
 
-    if (user.rol === 'gerente') {
-        moduleGerente.classList.remove('hidden');
-        moduleAsistente.classList.add('hidden');
-        if (window.GerenteModule) {
-            window.GerenteModule.init();
-        }
-    } else {
-        moduleAsistente.classList.remove('hidden');
-        moduleGerente.classList.add('hidden');
-        if (window.AsistenteModule) {
-            window.AsistenteModule.init();
-        }
-    }
+    switchModulo(user.rol === 'gerente' ? 'gerente' : 'asistente');
 
     if (window.lucide) {
         window.lucide.createIcons();
