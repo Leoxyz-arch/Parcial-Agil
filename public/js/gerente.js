@@ -161,18 +161,16 @@ window.GerenteModule = {
                 }
             };
 
-            // Semáforo con status-pill sobrio y altamente visible
+            // Etiquetas literales solicitadas: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
                 semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
             } else if (item.estado === 'anulado') {
                 semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
-            } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>En Mora</span>';
-            } else if (item.semaforo.codigo === 'por_vencer') {
-                semaforoHtml = `<span class="status-pill status-por-vencer"><span class="status-pill-dot"></span>${item.semaforo.etiqueta || 'Por Vencer'}</span>`;
-            } else {
+            } else if (item.semaforo.codigo === 'programado') {
                 semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
+            } else {
+                semaforoHtml = '<span class="status-pill status-por-pagar"><span class="status-pill-dot"></span>Por Pagar</span>';
             }
 
             let compHtml = '<span class="text-slate-400 font-mono text-xs">—</span>';

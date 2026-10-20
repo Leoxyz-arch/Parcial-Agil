@@ -287,18 +287,16 @@ window.AsistenteModule = {
             tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
             tr.onclick = () => AsistenteModule.abrirDetalle(item.id);
 
-            // Semáforo con status-pill sobrio y altamente visible
+            // Etiquetas literales solicitadas: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
                 semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
             } else if (item.estado === 'anulado') {
                 semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
-            } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>En Mora</span>';
-            } else if (item.semaforo.codigo === 'por_vencer') {
-                semaforoHtml = `<span class="status-pill status-por-vencer"><span class="status-pill-dot"></span>${item.semaforo.etiqueta || 'Por Vencer'}</span>`;
-            } else {
+            } else if (item.semaforo.codigo === 'programado') {
                 semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
+            } else {
+                semaforoHtml = '<span class="status-pill status-por-pagar"><span class="status-pill-dot"></span>Por Pagar</span>';
             }
 
             // Concepto legible con detalles secundarios
@@ -381,15 +379,13 @@ window.AsistenteModule = {
 
         let badgeHtml = '';
         if (item.estado === 'pagado') {
-            badgeHtml = '<span class="status-pill status-pagado text-xs"><span class="status-pill-dot"></span>Liquidado / Pagado</span>';
+            badgeHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
         } else if (item.estado === 'anulado') {
-            badgeHtml = '<span class="status-pill status-anulado text-xs"><span class="status-pill-dot"></span>Comprobante Anulado</span>';
-        } else if (item.semaforo.codigo === 'vencido') {
-            badgeHtml = '<span class="status-pill status-vencido text-xs"><span class="status-pill-dot"></span>Vencido en Mora</span>';
-        } else if (item.semaforo.codigo === 'por_vencer') {
-            badgeHtml = '<span class="status-pill status-por-vencer text-xs"><span class="status-pill-dot"></span>Por Vencer (≤ 3 días)</span>';
+            badgeHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
+        } else if (item.semaforo.codigo === 'programado') {
+            badgeHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
         } else {
-            badgeHtml = '<span class="status-pill status-programado text-xs"><span class="status-pill-dot"></span>Programado Normal</span>';
+            badgeHtml = '<span class="status-pill status-por-pagar"><span class="status-pill-dot"></span>Por Pagar</span>';
         }
 
         document.getElementById('detalle-estado-badge').innerHTML = badgeHtml;

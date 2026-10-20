@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const status = await API.getStatus();
         const badgeDb = document.getElementById('badge-db');
         const textDb = document.getElementById('text-db-status');
-        if (status && status.ok) {
+        if (status && status.ok && textDb && badgeDb) {
             textDb.textContent = status.motor_db;
             badgeDb.classList.remove('hidden');
         }

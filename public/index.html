@@ -88,18 +88,17 @@
     <!-- ========================================== -->
     <div id="view-app" class="hidden flex-1 flex h-screen overflow-hidden">
         
-        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Estilo Corporativo Sobrio) -->
-        <aside class="w-56 app-sidebar flex flex-col justify-between flex-shrink-0 z-20">
+        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Estilo Corporativo Sobrio y Delgado) -->
+        <aside class="w-48 app-sidebar flex flex-col justify-between flex-shrink-0 z-20">
             <!-- Top: Brand -->
             <div>
-                <div class="h-12 px-3.5 border-b border-slate-800 flex items-center justify-between">
+                <div class="h-12 px-3 border-b border-slate-800 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
                             <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                         </div>
                         <span class="font-semibold text-xs text-white tracking-tight">CashFlow Guard</span>
                     </div>
-                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">v1.0</span>
                 </div>
 
                 <!-- Navigation Modules -->
@@ -118,7 +117,7 @@
                         class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left">
                         <div class="flex items-center gap-2">
                             <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
-                            <span>Dashboard Ejecutivo</span>
+                            <span>Dashboard</span>
                         </div>
                     </button>
 
@@ -139,20 +138,12 @@
                 </div>
             </div>
 
-            <!-- Bottom: User & Status -->
-            <div class="p-2 border-t border-slate-800 bg-slate-950/60 space-y-2">
-                <div id="badge-db" class="hidden w-full flex items-center justify-between px-2 py-1 rounded text-[10px] font-mono bg-slate-800 text-emerald-400 border border-slate-700">
-                    <span class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="text-db-status">PostgreSQL</span>
-                    </span>
-                    <span class="text-[9px] uppercase font-bold text-emerald-400">ONLINE</span>
-                </div>
-
-                <div class="flex items-center justify-between px-1.5 pt-1">
+            <!-- Bottom: User & Status (Compacto sin motor local redundante) -->
+            <div class="p-2 border-t border-slate-800 bg-slate-950/60">
+                <div class="flex items-center justify-between px-1.5 py-1">
                     <div class="min-w-0 pr-1">
                         <p id="user-display-name" class="text-xs font-medium text-white truncate">Usuario</p>
-                        <span id="user-display-role" class="inline-block text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">ROL</span>
+                        <span id="user-display-role" class="inline-block text-[10px] uppercase font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">ROL</span>
                     </div>
                     <button type="button" id="btn-logout" title="Cerrar Sesión"
                         class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-subtle">
@@ -327,51 +318,51 @@
                 <section id="module-gerente" class="space-y-3 hidden">
                     
                     <!-- BENTO 1: 4 KPIs Principales -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                        <div class="bento-card p-3">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Total Compromisos</span>
-                                <i data-lucide="wallet" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="bento-card p-3.5">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Compromisos</span>
+                                <i data-lucide="wallet" class="w-4 h-4 text-slate-400"></i>
                             </div>
-                            <p id="kpi-total-gastos" class="text-lg font-bold font-mono-numbers text-slate-900">S/ 0.00</p>
-                            <span class="text-[9px] text-slate-400">Mes consultado</span>
+                            <p id="kpi-total-gastos" class="text-xl font-bold font-mono-numbers text-slate-900">S/ 0.00</p>
+                            <span class="text-xs text-slate-400">Mes consultado</span>
                         </div>
 
-                        <div class="bento-card p-3 border-emerald-300 bg-emerald-50/20">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700">Total Liquidado</span>
-                                <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <div class="bento-card p-3.5 border-l-4 border-l-emerald-600">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Total Liquidado</span>
+                                <i data-lucide="check-check" class="w-4 h-4 text-emerald-600"></i>
                             </div>
-                            <p id="kpi-total-pagado" class="text-lg font-bold font-mono-numbers text-emerald-700">S/ 0.00</p>
+                            <p id="kpi-total-pagado" class="text-xl font-bold font-mono-numbers text-emerald-700">S/ 0.00</p>
                             <div class="mt-1 flex items-center gap-1.5">
                                 <div class="w-full bg-slate-200 h-1.5 rounded overflow-hidden">
                                     <div id="kpi-barra-progreso" class="bg-emerald-600 h-1.5" style="width: 0%"></div>
                                 </div>
-                                <span id="kpi-porcentaje-pagado" class="text-[9px] font-bold text-emerald-700">0%</span>
+                                <span id="kpi-porcentaje-pagado" class="text-xs font-bold text-emerald-700">0%</span>
                             </div>
                         </div>
 
-                        <div class="bento-card p-3 border-blue-300 bg-blue-50/20">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-blue-700">Pendiente Regular</span>
-                                <i data-lucide="hourglass" class="w-3.5 h-3.5 text-blue-600"></i>
+                        <div class="bento-card p-3.5 border-l-4 border-l-blue-600">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-blue-700">Pendiente Regular</span>
+                                <i data-lucide="hourglass" class="w-4 h-4 text-blue-600"></i>
                             </div>
-                            <p id="kpi-total-pendiente" class="text-lg font-bold font-mono-numbers text-blue-800">S/ 0.00</p>
-                            <span class="text-[9px] text-blue-600 font-medium">En plazo de pago</span>
+                            <p id="kpi-total-pendiente" class="text-xl font-bold font-mono-numbers text-blue-800">S/ 0.00</p>
+                            <span class="text-xs text-blue-600 font-medium">En plazo de pago</span>
                         </div>
 
-                        <div class="bento-card p-3 border-rose-300 bg-rose-50/40">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1">
-                                    <i data-lucide="alert-triangle" class="w-3 h-3 text-rose-600"></i>
+                        <div class="bento-card p-3.5 border-l-4 border-l-rose-600">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-rose-800 flex items-center gap-1">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
                                     Riesgo de Mora
                                 </span>
-                                <span id="badge-critico-kpi" class="text-[9px] font-bold uppercase px-1 py-0.2 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                                <span id="badge-critico-kpi" class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
                                     Al día
                                 </span>
                             </div>
-                            <p id="kpi-total-riesgo-mora" class="text-lg font-bold font-mono-numbers text-rose-700">S/ 0.00</p>
-                            <span class="text-[9px] text-rose-600 font-medium">Vencidos + ≤ 3 días</span>
+                            <p id="kpi-total-riesgo-mora" class="text-xl font-bold font-mono-numbers text-rose-700">S/ 0.00</p>
+                            <span class="text-xs text-rose-600 font-medium">Vencidos + ≤ 3 días</span>
                         </div>
                     </div>
 
