@@ -1,4 +1,4 @@
-// api.js - Cliente HTTP para consumir los endpoints REST de CashFlow Guard
+// api.js - Cliente HTTP para consumir los endpoints REST de Castillo Robles
 
 const API = {
     // 1. Autenticación
@@ -57,6 +57,22 @@ const API = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ motivo })
+        });
+        return await res.json();
+    },
+
+    eliminarObligacion: async (id) => {
+        const res = await fetch(`/api/obligaciones/${id}`, {
+            method: 'DELETE'
+        });
+        return await res.json();
+    },
+
+    editarObligacion: async (id, datos) => {
+        const res = await fetch(`/api/obligaciones/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
         });
         return await res.json();
     },

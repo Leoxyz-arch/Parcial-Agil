@@ -1,11 +1,11 @@
-// auth.js - Manejo de Autenticación, Sesión y Control de Roles
+// auth.js - Control de Sesión, Roles y Permisos en el Cliente
 
-const Auth = {
-    SESSION_KEY: 'cashflow_user_session',
+const AUTH = {
+    TOKEN_KEY: 'cashflow_user_session',
 
     getUser: () => {
-        const raw = sessionStorage.getItem(Auth.SESSION_KEY);
         try {
+            const raw = localStorage.getItem(AUTH.TOKEN_KEY);
             return raw ? JSON.parse(raw) : null;
         } catch (e) {
             return null;
@@ -13,20 +13,26 @@ const Auth = {
     },
 
     setUser: (userData) => {
-        sessionStorage.setItem(Auth.SESSION_KEY, JSON.stringify(userData));
+        localStorage.setItem(AUTH.TOKEN_KEY, JSON.stringify(userData));
     },
 
-    clearUser: () => {
-        sessionStorage.removeItem(Auth.SESSION_KEY);
+    logout: () => {
+        localStorage.removeItem(AUTH.TOKEN_KEY);
+        window.location.reload();
     },
 
-    isLoggedIn: () => {
-        return !!Auth.getUser();
+    isAuthenticated: () => {
+        return AUTH.getUser() !== null;
     },
 
-    getRole: () => {
-        const u = Auth.getUser();
-        return u ? u.rol : null;
+    isGerente: () => {
+        const u = AUTH.getUser();
+        return u && u.rol === 'gerente';
+    },
+
+    isAsistente: () => {
+        const u = AUTH.getUser();
+        return u && u.rol === 'asistente';
     }
 };
 
@@ -75,15 +81,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const res = await API.login(username, password);
-                if (res.ok && res.usuario) {
-                    Auth.setUser(res.usuario);
+                if (res.ok) {
+                    AUTH.setUser(res.usuario);
                     renderAppView();
                 } else {
-                    showError(res.mensaje || 'Usuario o contraseña incorrectos.');
+                    showError(res.mensaje || 'Credenciales inválidas.');
                 }
             } catch (err) {
-                showError('Error de conexión con el servidor.');
+                showError('Error al conectar con el servidor.');
             }
+        });
+    }
+
+    // Logout
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            AUTH.logout();
         });
     }
 
@@ -92,83 +105,79 @@ document.addEventListener('DOMContentLoaded', () => {
         loginError.classList.remove('hidden');
     }
 
-    // Logout
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            Auth.clearUser();
-            renderAppView();
-        });
-    }
-
-    // Navegación Sidebar de Módulos
-    const navBtnAsistente = document.getElementById('nav-btn-asistente');
-    const navBtnGerente = document.getElementById('nav-btn-gerente');
-
-    if (navBtnAsistente) {
-        navBtnAsistente.onclick = () => switchModulo('asistente');
-    }
-    if (navBtnGerente) {
-        navBtnGerente.onclick = () => switchModulo('gerente');
-    }
+    // Inicializar Vista inicial
+    renderAppView();
 });
 
-function switchModulo(modulo) {
-    const moduleAsistente = document.getElementById('module-asistente');
-    const moduleGerente = document.getElementById('module-gerente');
-    const breadcrumb = document.getElementById('view-title-breadcrumb');
-    const containerPeriodo = document.getElementById('container-periodo-gerente');
-    const btnCrear = document.getElementById('btn-open-modal-crear');
-    const navBtnAsistente = document.getElementById('nav-btn-asistente');
-    const navBtnGerente = document.getElementById('nav-btn-gerente');
-
-    if (modulo === 'gerente') {
-        moduleGerente.classList.remove('hidden');
-        moduleAsistente.classList.add('hidden');
-        if (breadcrumb) breadcrumb.textContent = 'Dashboard Ejecutivo';
-        if (containerPeriodo) containerPeriodo.classList.remove('hidden');
-        if (btnCrear) btnCrear.classList.add('hidden');
-
-        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium bg-blue-600 text-white transition-subtle text-left shadow-xs';
-        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left';
-
-        if (window.GerenteModule) window.GerenteModule.init();
-    } else {
-        moduleAsistente.classList.remove('hidden');
-        moduleGerente.classList.add('hidden');
-        if (breadcrumb) breadcrumb.textContent = 'Obligaciones Financieras';
-        if (containerPeriodo) containerPeriodo.classList.add('hidden');
-        if (btnCrear) btnCrear.classList.remove('hidden');
-
-        if (navBtnAsistente) navBtnAsistente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium bg-blue-600 text-white transition-subtle text-left shadow-xs';
-        if (navBtnGerente) navBtnGerente.className = 'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left';
-
-        if (window.AsistenteModule) window.AsistenteModule.init();
-    }
-
-    if (window.lucide) window.lucide.createIcons();
-}
-
-// Función de renderizado según sesión y rol
+// Renderizar la vista según el rol autenticado
 function renderAppView() {
     const viewLogin = document.getElementById('view-login');
     const viewApp = document.getElementById('view-app');
+    const moduleAsistente = document.getElementById('module-asistente');
+    const moduleGerente = document.getElementById('module-gerente');
     const userDisplayName = document.getElementById('user-display-name');
     const userDisplayRole = document.getElementById('user-display-role');
 
-    if (!Auth.isLoggedIn()) {
+    if (!AUTH.isAuthenticated()) {
         viewLogin.classList.remove('hidden');
         viewApp.classList.add('hidden');
         return;
     }
 
-    const user = Auth.getUser();
+    const user = AUTH.getUser();
     viewLogin.classList.add('hidden');
     viewApp.classList.remove('hidden');
 
     userDisplayName.textContent = user.nombre_completo || user.username;
     userDisplayRole.textContent = user.rol === 'gerente' ? 'Gerente' : 'Asistente';
 
-    switchModulo(user.rol === 'gerente' ? 'gerente' : 'asistente');
+    if (user.rol === 'gerente') {
+        moduleGerente.classList.remove('hidden');
+        moduleAsistente.classList.add('hidden');
+        if (window.GerenteModule && typeof window.GerenteModule.init === 'function') {
+            window.GerenteModule.init();
+        }
+    } else {
+        moduleAsistente.classList.remove('hidden');
+        moduleGerente.classList.add('hidden');
+        if (window.AsistenteModule && typeof window.AsistenteModule.init === 'function') {
+            window.AsistenteModule.init();
+        }
+    }
+
+    // Configurar tabs en la barra lateral si el usuario es Gerente
+    const tabAsistente = document.getElementById('nav-btn-asistente') || document.getElementById('tab-nav-asistente');
+    const tabGerente = document.getElementById('nav-btn-gerente') || document.getElementById('tab-nav-gerente');
+
+    if (tabAsistente && tabGerente) {
+        if (user.rol === 'gerente') {
+            tabAsistente.classList.remove('hidden');
+            tabGerente.classList.remove('hidden');
+
+            tabAsistente.onclick = () => {
+                moduleAsistente.classList.remove('hidden');
+                moduleGerente.classList.add('hidden');
+                tabAsistente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
+                tabAsistente.classList.remove('text-slate-400');
+                tabGerente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
+                tabGerente.classList.add('text-slate-400');
+                if (window.AsistenteModule) window.AsistenteModule.init();
+            };
+
+            tabGerente.onclick = () => {
+                moduleGerente.classList.remove('hidden');
+                moduleAsistente.classList.add('hidden');
+                tabGerente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
+                tabGerente.classList.remove('text-slate-400');
+                tabAsistente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
+                tabAsistente.classList.add('text-slate-400');
+                if (window.GerenteModule) window.GerenteModule.init();
+            };
+        } else {
+            tabAsistente.classList.remove('hidden');
+            tabGerente.classList.add('hidden');
+        }
+    }
 
     if (window.lucide) {
         window.lucide.createIcons();

@@ -32,7 +32,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.get('/api/status', (req, res) => {
     res.json({
         ok: true,
-        nombre: 'CashFlow Guard API',
+        nombre: 'Castillo Robles API',
         estado: 'operativo',
         motor_db: db.isPostgres() ? 'Neon PostgreSQL (Cloud)' : 'Motor Local Persistente (Fallback)',
         timestamp: new Date().toISOString()
@@ -52,19 +52,19 @@ app.get('*', (req, res) => {
 // Iniciar Servidor
 async function startServer() {
     try {
-        console.log('🚀 Inicializando CashFlow Guard...');
+        console.log('Inicializando Sistema Castillo Robles...');
         await db.initDatabase();
 
         app.listen(PORT, () => {
             console.log(`=======================================================`);
-            console.log(`✅ CashFlow Guard escuchando en: http://localhost:${PORT}`);
-            console.log(`💼 Perfil Gerente:   usuario: gerente   | clave: gerente123`);
-            console.log(`📋 Perfil Asistente: usuario: asistente | clave: asistente123`);
-            console.log(`💾 Base de Datos:    ${db.isPostgres() ? 'Neon PostgreSQL' : 'Local Fallback'}`);
+            console.log(`Castillo Robles escuchando en: http://localhost:${PORT}`);
+            console.log(`Perfil Gerente:   usuario: gerente   | clave: gerente123`);
+            console.log(`Perfil Asistente: usuario: asistente | clave: asistente123`);
+            console.log(`Base de Datos:    ${db.isPostgres() ? 'Neon PostgreSQL' : 'Local Fallback'}`);
             console.log(`=======================================================`);
         });
     } catch (error) {
-        console.error('❌ Error fatal al iniciar el servidor:', error);
+        console.error('Error fatal al iniciar el servidor:', error);
         process.exit(1);
     }
 }

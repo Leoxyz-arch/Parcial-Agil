@@ -3,38 +3,21 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+// Pool de conexión para Neon PostgreSQL
 let pool = null;
 let usePostgres = false;
 
-// Almacén de fallback local en caso de que aún no se configure Neon o no haya internet
+// Ruta de persistencia local (fallback confiable si no hay internet o DATABASE_URL)
 const localDbPath = path.join(__dirname, '..', 'data', 'local_db.json');
 
-function ensureLocalDataDir() {
-    const dir = path.dirname(localDbPath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(localDbPath)) {
-        const initialData = {
-            usuarios: [],
-            obligaciones: []
-        };
-        fs.writeFileSync(localDbPath, JSON.stringify(initialData, null, 2), 'utf-8');
-    }
+// Utilidad para fechas relativas
+function addDays(days) {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
 }
 
-function readLocalDb() {
-    ensureLocalDataDir();
-    const raw = fs.readFileSync(localDbPath, 'utf-8');
-    return JSON.parse(raw);
-}
-
-function writeLocalDb(data) {
-    ensureLocalDataDir();
-    fs.writeFileSync(localDbPath, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-// Inicializar conexión
+// Inicializar la conexión a la base de datos (PostgreSQL Neon o Fallback Local)
 async function initDatabase() {
     const connectionString = process.env.DATABASE_URL;
 
@@ -80,8 +63,8 @@ async function createTablesPostgres() {
     CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
         username VARCHAR(50) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        nombre_completo VARCHAR(120) NOT NULL,
+        password VARCHAR(100) NOT NULL,
+        nombre_completo VARCHAR(100) NOT NULL,
         rol VARCHAR(20) NOT NULL CHECK (rol IN ('gerente', 'asistente')),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
@@ -108,24 +91,52 @@ async function createTablesPostgres() {
     );
     `;
     await pool.query(ddl);
+    console.log('📋 Esquema de tablas verificado en Neon PostgreSQL.');
 }
 
-// Datos semilla
-const defaultUsers = [
-    { username: 'gerente', password_hash: 'gerente123', nombre_completo: 'Lic. Roberto Gerente', rol: 'gerente' },
-    { username: 'asistente', password_hash: 'asistente123', nombre_completo: 'Ana María Asistente', rol: 'asistente' }
-];
+// Datos semilla en Postgres si está vacío
+async function seedInitialDataPostgres() {
+    const checkUsers = await pool.query('SELECT COUNT(*) FROM usuarios');
+    if (parseInt(checkUsers.rows[0].count, 10) === 0) {
+        await pool.query(`
+            INSERT INTO usuarios (username, password, nombre_completo, rol) VALUES
+            ('gerente', 'gerente123', 'Carlos Mendoza', 'gerente'),
+            ('asistente', 'asistente123', 'Ana Morales', 'asistente');
+        `);
+        console.log('👤 Usuarios sembrados en Neon PostgreSQL.');
+    }
+
+    const checkObligaciones = await pool.query('SELECT COUNT(*) FROM obligaciones');
+    if (parseInt(checkObligaciones.rows[0].count, 10) === 0) {
+        const seedItems = getSampleObligaciones();
+        for (const item of seedItems) {
+            await pool.query(`
+                INSERT INTO obligaciones 
+                (categoria, tipo_comprobante, descripcion, beneficiario, ruc_beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, estado, fecha_pago, nro_operacion, comprobante_url, comprobante_tipo, motivo_anulacion)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            `, [
+                item.categoria,
+                item.tipo_comprobante || 'Factura Electrónica',
+                item.descripcion,
+                item.beneficiario,
+                item.ruc_beneficiario || null,
+                item.monto,
+                item.fecha_emision,
+                item.fecha_vencimiento,
+                item.cuota_info,
+                item.estado,
+                item.fecha_pago,
+                item.nro_operacion,
+                item.comprobante_url,
+                item.comprobante_tipo,
+                item.motivo_anulacion || null
+            ]);
+        }
+        console.log('💼 Obligaciones iniciales sembradas en Neon PostgreSQL.');
+    }
+}
 
 function getSampleObligaciones() {
-    const today = new Date();
-    
-    // Función auxiliar para fechas relativas ISO (YYYY-MM-DD)
-    const addDays = (days) => {
-        const d = new Date(today);
-        d.setDate(d.getDate() + days);
-        return d.toISOString().split('T')[0];
-    };
-
     return [
         {
             categoria: 'servicio',
@@ -135,7 +146,7 @@ function getSampleObligaciones() {
             ruc_beneficiario: '20331898971',
             monto: 850.50,
             fecha_emision: addDays(-20),
-            fecha_vencimiento: addDays(2), // Por vencer en 2 días (Alerta naranja/roja <= 3 días)
+            fecha_vencimiento: addDays(2),
             cuota_info: null,
             estado: 'pendiente',
             fecha_pago: null,
@@ -152,7 +163,7 @@ function getSampleObligaciones() {
             ruc_beneficiario: '20131312955',
             monto: 2450.00,
             fecha_emision: addDays(-25),
-            fecha_vencimiento: addDays(-1), // Vencido hace 1 día (Alerta roja mora)
+            fecha_vencimiento: addDays(-1),
             cuota_info: null,
             estado: 'pendiente',
             fecha_pago: null,
@@ -163,30 +174,30 @@ function getSampleObligaciones() {
         },
         {
             categoria: 'prestamo',
-            tipo_comprobante: 'Liquidación de Crédito',
-            descripcion: 'Crédito de Capital de Trabajo Pyme',
-            beneficiario: 'Banco BCP',
+            tipo_comprobante: 'Cronograma Bancario',
+            descripcion: 'Amortización Préstamo Capital de Trabajo',
+            beneficiario: 'Banco de Crédito del Perú (BCP)',
             ruc_beneficiario: '20100047218',
-            monto: 1600.00,
+            monto: 3200.00,
             fecha_emision: addDays(-30),
-            fecha_vencimiento: addDays(-5),
-            cuota_info: 'Cuota 3 de 12',
-            estado: 'pagado',
-            fecha_pago: addDays(-6),
-            nro_operacion: 'BCP-OP-894120',
-            comprobante_url: '/uploads/sample_voucher_bcp.svg',
-            comprobante_tipo: 'imagen',
+            fecha_vencimiento: addDays(3),
+            cuota_info: 'Cuota 08/24',
+            estado: 'pendiente',
+            fecha_pago: null,
+            nro_operacion: null,
+            comprobante_url: null,
+            comprobante_tipo: null,
             motivo_anulacion: null
         },
         {
             categoria: 'proveedores',
             tipo_comprobante: 'Factura Electrónica',
-            descripcion: 'Factura F001-00293 Suministros y Empaques',
-            beneficiario: 'Distribuidora Alfa S.A.C.',
-            ruc_beneficiario: '20554819231',
-            monto: 3200.00,
-            fecha_emision: addDays(-5),
-            fecha_vencimiento: addDays(12), // Programado (> 3 días)
+            descripcion: 'Suministros Operativos de Limpieza y Mantenimiento',
+            beneficiario: 'Distribuidora Industrial Lima S.A.C.',
+            ruc_beneficiario: '20502391044',
+            monto: 1120.00,
+            fecha_emision: addDays(-15),
+            fecha_vencimiento: addDays(12),
             cuota_info: null,
             estado: 'pendiente',
             fecha_pago: null,
@@ -194,34 +205,53 @@ function getSampleObligaciones() {
             comprobante_url: null,
             comprobante_tipo: null,
             motivo_anulacion: null
+        },
+        {
+            categoria: 'servicio',
+            tipo_comprobante: 'Recibo Servicios Públicos',
+            descripcion: 'Servicio de Internet Fibra Dedicada 500Mbps',
+            beneficiario: 'Telefónica del Perú S.A.A.',
+            ruc_beneficiario: '20100017491',
+            monto: 420.00,
+            fecha_emision: addDays(-40),
+            fecha_vencimiento: addDays(-5),
+            cuota_info: null,
+            estado: 'pagado',
+            fecha_pago: addDays(-6),
+            nro_operacion: 'OP-7782193',
+            comprobante_url: '/img/voucher-sample.svg',
+            comprobante_tipo: 'image/svg+xml',
+            motivo_anulacion: null
         }
     ];
 }
 
-async function seedInitialDataPostgres() {
-    const userCountRes = await pool.query('SELECT COUNT(*) FROM usuarios');
-    if (parseInt(userCountRes.rows[0].count, 10) === 0) {
-        console.log('🌱 Sembrando usuarios iniciales en Neon PostgreSQL...');
-        for (const u of defaultUsers) {
-            await pool.query(
-                'INSERT INTO usuarios (username, password_hash, nombre_completo, rol) VALUES ($1, $2, $3, $4)',
-                [u.username, u.password_hash, u.nombre_completo, u.rol]
-            );
-        }
-    }
+// ----------------- MOTOR LOCAL (FALLBACK EN ARCHIVO JSON) -----------------
 
-    const obligCountRes = await pool.query('SELECT COUNT(*) FROM obligaciones');
-    if (parseInt(obligCountRes.rows[0].count, 10) === 0) {
-        console.log('🌱 Sembrando obligaciones iniciales de prueba en Neon PostgreSQL...');
-        const samples = getSampleObligaciones();
-        for (const s of samples) {
-            await pool.query(
-                `INSERT INTO obligaciones 
-                (categoria, tipo_comprobante, descripcion, beneficiario, ruc_beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, estado, fecha_pago, nro_operacion, comprobante_url, comprobante_tipo)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-                [s.categoria, s.tipo_comprobante, s.descripcion, s.beneficiario, s.ruc_beneficiario, s.monto, s.fecha_emision, s.fecha_vencimiento, s.cuota_info, s.estado, s.fecha_pago, s.nro_operacion, s.comprobante_url, s.comprobante_tipo]
-            );
+function readLocalDb() {
+    try {
+        if (!fs.existsSync(localDbPath)) {
+            const dataDir = path.dirname(localDbPath);
+            if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir, { recursive: true });
+            }
+            const initial = { usuarios: [], obligaciones: [] };
+            fs.writeFileSync(localDbPath, JSON.stringify(initial, null, 2), 'utf8');
+            return initial;
         }
+        const raw = fs.readFileSync(localDbPath, 'utf8');
+        return JSON.parse(raw);
+    } catch (e) {
+        console.error('Error leyendo base local:', e);
+        return { usuarios: [], obligaciones: [] };
+    }
+}
+
+function writeLocalDb(data) {
+    try {
+        fs.writeFileSync(localDbPath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Error escribiendo base local:', e);
     }
 }
 
@@ -230,13 +260,20 @@ function initLocalDb() {
     let changed = false;
 
     if (!db.usuarios || db.usuarios.length === 0) {
-        db.usuarios = defaultUsers.map((u, idx) => ({ id: idx + 1, ...u, created_at: new Date().toISOString() }));
+        db.usuarios = [
+            { id: 1, username: 'gerente', password: 'gerente123', nombre_completo: 'Carlos Mendoza', rol: 'gerente' },
+            { id: 2, username: 'asistente', password: 'asistente123', nombre_completo: 'Ana Morales', rol: 'asistente' }
+        ];
         changed = true;
     }
 
     if (!db.obligaciones || db.obligaciones.length === 0) {
-        const samples = getSampleObligaciones();
-        db.obligaciones = samples.map((s, idx) => ({ id: idx + 1, ...s, created_at: new Date().toISOString() }));
+        const seed = getSampleObligaciones();
+        db.obligaciones = seed.map((item, idx) => ({
+            id: idx + 1,
+            ...item,
+            created_at: new Date().toISOString()
+        }));
         changed = true;
     }
 
@@ -270,25 +307,52 @@ function executeLocalQuery(sqlText, params = []) {
     // 2. INSERT INTO obligaciones
     if (text.startsWith('insert into obligaciones')) {
         const newId = db.obligaciones.length > 0 ? Math.max(...db.obligaciones.map(o => o.id)) + 1 : 1;
-        const newRecord = {
-            id: newId,
-            categoria: params[0],
-            tipo_comprobante: params[1] || 'Factura Electrónica',
-            descripcion: params[2],
-            beneficiario: params[3],
-            ruc_beneficiario: params[4] || null,
-            monto: parseFloat(params[5]),
-            fecha_emision: params[6],
-            fecha_vencimiento: params[7],
-            cuota_info: params[8] || null,
-            estado: 'pendiente',
-            fecha_pago: null,
-            nro_operacion: null,
-            comprobante_url: null,
-            comprobante_tipo: null,
-            motivo_anulacion: null,
-            created_at: new Date().toISOString()
-        };
+        
+        let newRecord;
+        if (params.length === 7) {
+            // Formato standard de cuotas/simple: [categoria, desc, bene, monto, fEmis, fVenc, cuota_info]
+            newRecord = {
+                id: newId,
+                categoria: params[0],
+                tipo_comprobante: 'Factura Electrónica',
+                descripcion: params[1],
+                beneficiario: params[2],
+                ruc_beneficiario: null,
+                monto: parseFloat(params[3]),
+                fecha_emision: params[4],
+                fecha_vencimiento: params[5],
+                cuota_info: params[6] || null,
+                estado: 'pendiente',
+                fecha_pago: null,
+                nro_operacion: null,
+                comprobante_url: null,
+                comprobante_tipo: null,
+                motivo_anulacion: null,
+                created_at: new Date().toISOString()
+            };
+        } else {
+            // Formato extendido con RUC y comprobante
+            newRecord = {
+                id: newId,
+                categoria: params[0],
+                tipo_comprobante: params[1] || 'Factura Electrónica',
+                descripcion: params[2],
+                beneficiario: params[3],
+                ruc_beneficiario: params[4] || null,
+                monto: parseFloat(params[5]),
+                fecha_emision: params[6],
+                fecha_vencimiento: params[7],
+                cuota_info: params[8] || null,
+                estado: 'pendiente',
+                fecha_pago: null,
+                nro_operacion: null,
+                comprobante_url: null,
+                comprobante_tipo: null,
+                motivo_anulacion: null,
+                created_at: new Date().toISOString()
+            };
+        }
+
         db.obligaciones.push(newRecord);
         writeLocalDb(db);
         return { rows: [newRecord] };
@@ -312,6 +376,26 @@ function executeLocalQuery(sqlText, params = []) {
         return { rows: [] };
     }
 
+    // 3.1 UPDATE obligaciones editar
+    if (text.startsWith('update obligaciones') && text.includes('set categoria =')) {
+        // params: [categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info, id]
+        const id = parseInt(params[7], 10);
+        const item = db.obligaciones.find(o => o.id === id);
+        if (item) {
+            item.categoria = params[0];
+            item.descripcion = params[1];
+            item.beneficiario = params[2];
+            item.monto = parseFloat(params[3]);
+            item.fecha_emision = params[4];
+            item.fecha_vencimiento = params[5];
+            item.cuota_info = params[6] || null;
+            item.updated_at = new Date().toISOString();
+            writeLocalDb(db);
+            return { rows: [item] };
+        }
+        return { rows: [] };
+    }
+
     // 4. UPDATE obligaciones anular
     if (text.startsWith('update obligaciones') && text.includes("set estado = 'anulado'")) {
         // params: [motivo_anulacion, id]
@@ -327,10 +411,27 @@ function executeLocalQuery(sqlText, params = []) {
         return { rows: [] };
     }
 
-    // 5. SELECT obligaciones (general)
+    // 5. SELECT obligaciones (general o por id)
     if (text.includes('from obligaciones')) {
+        if (text.includes('where id =')) {
+            const id = parseInt(params[0], 10);
+            const found = db.obligaciones.find(o => o.id === id);
+            return { rows: found ? [found] : [] };
+        }
         let items = [...db.obligaciones];
         return { rows: items };
+    }
+
+    // 6. DELETE obligaciones
+    if (text.startsWith('delete from obligaciones')) {
+        const id = parseInt(params[0], 10);
+        const index = db.obligaciones.findIndex(o => o.id === id);
+        if (index !== -1) {
+            const deleted = db.obligaciones.splice(index, 1);
+            writeLocalDb(db);
+            return { rows: deleted };
+        }
+        return { rows: [] };
     }
 
     return { rows: [] };

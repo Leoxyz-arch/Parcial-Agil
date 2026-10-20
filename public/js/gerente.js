@@ -2,6 +2,8 @@
 
 window.GerenteModule = {
     obligaciones: [],
+    paginaActual: 1,
+    ITEMS_POR_PAGINA: 15,
 
     init: async () => {
         GerenteModule.setDefaultPeriod();
@@ -21,22 +23,51 @@ window.GerenteModule = {
     bindEvents: () => {
         const btnConsultar = document.getElementById('btn-consultar-gerente');
         const filtroCat = document.getElementById('filtro-categoria-gerente');
+        const filtroEst = document.getElementById('filtro-estado-gerente');
         const btnExportCsv = document.getElementById('btn-export-csv');
         const buscador = document.getElementById('buscador-gerente');
 
-        if (btnConsultar) {
-            btnConsultar.onclick = () => GerenteModule.cargarDashboard();
-        }
+        const resetYcargar = () => {
+            GerenteModule.paginaActual = 1;
+            GerenteModule.cargarDashboard();
+        };
 
-        if (filtroCat) {
-            filtroCat.onchange = () => GerenteModule.renderTablaAuditoria();
+        const resetYfiltrar = () => {
+            GerenteModule.paginaActual = 1;
+            GerenteModule.renderTablaAuditoria();
+        };
+
+        if (btnConsultar) btnConsultar.onclick = resetYcargar;
+        if (filtroCat) filtroCat.onchange = resetYfiltrar;
+        if (filtroEst) filtroEst.onchange = resetYfiltrar;
+
+        // Paginación Gerente
+        const btnPrev = document.getElementById('btn-prev-gerente');
+        const btnNext = document.getElementById('btn-next-gerente');
+        if (btnPrev) {
+            btnPrev.onclick = () => {
+                if (GerenteModule.paginaActual > 1) {
+                    GerenteModule.paginaActual--;
+                    GerenteModule.renderTablaAuditoria();
+                }
+            };
+        }
+        if (btnNext) {
+            btnNext.onclick = () => {
+                const totalFiltradas = GerenteModule.getFiltradas().length;
+                const maxPag = Math.ceil(totalFiltradas / GerenteModule.ITEMS_POR_PAGINA) || 1;
+                if (GerenteModule.paginaActual < maxPag) {
+                    GerenteModule.paginaActual++;
+                    GerenteModule.renderTablaAuditoria();
+                }
+            };
         }
 
         if (btnExportCsv) {
             btnExportCsv.onclick = () => {
                 const mes = document.getElementById('gerente-mes').value;
                 const anio = document.getElementById('gerente-anio').value;
-                Toast.info('Descargando libro de compromisos y auditoría en formato CSV...', 3000);
+                window.Toast.info('Descargando libro de compromisos y auditoría en formato CSV...', 3000);
                 window.location.href = API.getExportCsvUrl(mes, anio);
             };
         }
@@ -46,6 +77,7 @@ window.GerenteModule = {
             buscador.oninput = () => {
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
+                    GerenteModule.paginaActual = 1;
                     GerenteModule.renderTablaAuditoria();
                 }, 150);
             };
@@ -71,7 +103,7 @@ window.GerenteModule = {
             }
         } catch (error) {
             console.error('Error al cargar dashboard del gerente:', error);
-            Toast.error('Error de sincronización con el panel gerencial.');
+            window.Toast.error('Error de sincronización con el panel gerencial.');
         }
     },
 
@@ -90,7 +122,7 @@ window.GerenteModule = {
         document.getElementById('kpi-porcentaje-pagado').textContent = `${pct}%`;
         document.getElementById('kpi-barra-progreso').style.width = `${pct}%`;
 
-        // Alerta crítica si hay riesgo de mora
+        // Alerta si hay riesgo de mora
         const badgeCritico = document.getElementById('badge-critico-kpi');
         if (kpis.total_riesgo_mora > 0) {
             badgeCritico.textContent = `${conteos.en_alerta} En Riesgo`;
@@ -117,17 +149,22 @@ window.GerenteModule = {
         if (window.lucide) window.lucide.createIcons();
     },
 
-    renderTablaAuditoria: () => {
-        const tbody = document.getElementById('tabla-obligaciones-gerente');
-        const filtroCat = document.getElementById('filtro-categoria-gerente').value;
+    getFiltradas: () => {
+        const filtroCat = document.getElementById('filtro-categoria-gerente');
+        const catVal = filtroCat ? filtroCat.value : 'todas';
+        const selectEst = document.getElementById('filtro-estado-gerente');
+        const filtroEst = selectEst ? selectEst.value : 'pagado';
         const buscador = document.getElementById('buscador-gerente');
         const q = buscador ? buscador.value.trim().toLowerCase() : '';
 
-        tbody.innerHTML = '';
-
         let filtradas = GerenteModule.obligaciones;
-        if (filtroCat && filtroCat !== 'todas') {
-            filtradas = filtradas.filter(o => o.categoria.toLowerCase() === filtroCat.toLowerCase());
+
+        if (filtroEst && filtroEst !== 'todos') {
+            filtradas = filtradas.filter(o => o.estado === filtroEst);
+        }
+
+        if (catVal && catVal !== 'todas') {
+            filtradas = filtradas.filter(o => o.categoria.toLowerCase() === catVal.toLowerCase());
         }
 
         if (q) {
@@ -139,7 +176,26 @@ window.GerenteModule = {
             );
         }
 
-        if (filtradas.length === 0) {
+        return filtradas;
+    },
+
+    renderTablaAuditoria: () => {
+        const tbody = document.getElementById('tabla-obligaciones-gerente');
+        tbody.innerHTML = '';
+
+        const filtradas = GerenteModule.getFiltradas();
+        const totalItems = filtradas.length;
+        const totalPaginas = Math.ceil(totalItems / GerenteModule.ITEMS_POR_PAGINA) || 1;
+        if (GerenteModule.paginaActual > totalPaginas) {
+            GerenteModule.paginaActual = totalPaginas;
+        }
+
+        const infoPaginacion = document.getElementById('info-paginacion-gerente');
+        const badgePagina = document.getElementById('badge-pagina-gerente');
+        const btnPrev = document.getElementById('btn-prev-gerente');
+        const btnNext = document.getElementById('btn-next-gerente');
+
+        if (totalItems === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="py-10 text-center text-slate-400">
@@ -148,11 +204,28 @@ window.GerenteModule = {
                     </td>
                 </tr>
             `;
+            if (infoPaginacion) infoPaginacion.textContent = 'Mostrando 0';
+            if (badgePagina) badgePagina.textContent = '1 / 1';
+            if (btnPrev) btnPrev.disabled = true;
+            if (btnNext) btnNext.disabled = true;
             if (window.lucide) window.lucide.createIcons();
             return;
         }
 
-        filtradas.forEach(item => {
+        const inicio = (GerenteModule.paginaActual - 1) * GerenteModule.ITEMS_POR_PAGINA;
+        const fin = Math.min(inicio + GerenteModule.ITEMS_POR_PAGINA, totalItems);
+        const itemsPagina = filtradas.slice(inicio, fin);
+
+        if (infoPaginacion) {
+            infoPaginacion.textContent = `Mostrando ${inicio + 1} - ${fin} de ${totalItems}`;
+        }
+        if (badgePagina) {
+            badgePagina.textContent = `${GerenteModule.paginaActual} / ${totalPaginas}`;
+        }
+        if (btnPrev) btnPrev.disabled = GerenteModule.paginaActual <= 1;
+        if (btnNext) btnNext.disabled = GerenteModule.paginaActual >= totalPaginas;
+
+        itemsPagina.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
             tr.onclick = () => {
@@ -212,7 +285,7 @@ window.GerenteModule = {
         }
 
         if (!item || !item.comprobante_url) {
-            Toast.warning('Esta obligación aún no cuenta con comprobante de pago digital adjunto.');
+            window.Toast.warning('Esta obligación aún no cuenta con comprobante de pago digital adjunto.');
             return;
         }
 
@@ -230,7 +303,7 @@ window.GerenteModule = {
         fechaText.textContent = item.fecha_pago || 'No registrada';
         btnDescargar.href = item.comprobante_url;
 
-        if (item.comprobante_tipo === 'pdf') {
+        if (item.comprobante_tipo === 'pdf' || (item.comprobante_url && item.comprobante_url.endsWith('.pdf'))) {
             contenido.innerHTML = `
                 <iframe src="${item.comprobante_url}" class="w-full h-96 rounded border border-slate-200 bg-white"></iframe>
             `;
