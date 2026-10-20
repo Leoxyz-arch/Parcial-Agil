@@ -616,8 +616,10 @@ window.AsistenteModule = {
         if (errInline) errInline.classList.add('hidden');
         if (checkDecl) checkDecl.checked = false;
 
-        document.getElementById('modal-pagar-header-titulo').textContent = 'Registrar Pago al 100%';
-        document.getElementById('modal-pagar-header-subtitulo').textContent = 'Adjunta el comprobante o fotografía para certificar la cancelación';
+        const headerTitulo = document.getElementById('modal-pagar-header-titulo');
+        const headerSubtitulo = document.getElementById('modal-pagar-header-subtitulo');
+        if (headerTitulo) headerTitulo.textContent = 'Registrar Pago al 100%';
+        if (headerSubtitulo) headerSubtitulo.textContent = 'Adjunta el comprobante o fotografía para certificar la cancelación';
 
         // Reset vista previa
         const previewPlaceholder = document.getElementById('preview-placeholder');
