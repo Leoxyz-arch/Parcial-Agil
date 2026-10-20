@@ -161,41 +161,41 @@ window.GerenteModule = {
                 }
             };
 
-            // Semáforo sobrio estilo dot
+            // Semáforo con status-pill sobrio y altamente visible
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Pagado</span>';
+                semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
             } else if (item.estado === 'anulado') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-300"></span>Anulado</span>';
+                semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-700"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido</span>';
+                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>En Mora</span>';
             } else if (item.semaforo.codigo === 'por_vencer') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por vencer</span>';
+                semaforoHtml = `<span class="status-pill status-por-vencer"><span class="status-pill-dot"></span>${item.semaforo.etiqueta || 'Por Vencer'}</span>`;
             } else {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado</span>';
+                semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
             }
 
-            let compHtml = '<span class="text-slate-400 font-mono text-[11px]">—</span>';
+            let compHtml = '<span class="text-slate-400 font-mono text-xs">—</span>';
             if (item.estado === 'pagado') {
                 compHtml = `
                     <button type="button" onclick="event.stopPropagation(); window.GerenteModule.abrirVisorComprobante(${item.id})"
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 transition-subtle text-xs font-medium" title="Auditar comprobante">
-                        <i data-lucide="file-check-2" class="w-3 h-3 text-emerald-600"></i>
+                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 transition-subtle text-xs font-medium" title="Auditar comprobante">
+                        <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-emerald-600"></i>
                         <span>Auditar</span>
                     </button>
                 `;
             } else if (item.estado === 'anulado') {
-                compHtml = '<span class="text-slate-400 font-mono text-[10px]">ANULADO</span>';
+                compHtml = '<span class="text-slate-400 font-mono text-xs">ANULADO</span>';
             }
 
             tr.innerHTML = `
                 <td>${semaforoHtml}</td>
-                <td class="font-medium text-slate-900 max-w-xs truncate" title="${item.descripcion}">
+                <td class="font-medium text-slate-900 max-w-xs truncate text-sm" title="${item.descripcion}">
                     ${item.descripcion}
                 </td>
-                <td class="text-slate-500 capitalize text-xs">${item.categoria}</td>
+                <td><span class="chip-category capitalize">${item.categoria}</span></td>
                 <td class="font-mono-numbers text-xs text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="text-right font-mono-numbers font-semibold text-xs text-slate-900">
+                <td class="text-right font-mono-numbers font-semibold text-sm text-slate-900">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="text-center">${compHtml}</td>

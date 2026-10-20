@@ -287,23 +287,23 @@ window.AsistenteModule = {
             tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
             tr.onclick = () => AsistenteModule.abrirDetalle(item.id);
 
-            // Semáforo sobrio estilo GitHub / Dot Indicator
+            // Semáforo con status-pill sobrio y altamente visible
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Pagado</span>';
+                semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
             } else if (item.estado === 'anulado') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-300"></span>Anulado</span>';
+                semaforoHtml = '<span class="status-pill status-anulado"><span class="status-pill-dot"></span>Anulado</span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-rose-700"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido</span>';
+                semaforoHtml = '<span class="status-pill status-vencido"><span class="status-pill-dot"></span>En Mora</span>';
             } else if (item.semaforo.codigo === 'por_vencer') {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por vencer</span>';
+                semaforoHtml = `<span class="status-pill status-por-vencer"><span class="status-pill-dot"></span>${item.semaforo.etiqueta || 'Por Vencer'}</span>`;
             } else {
-                semaforoHtml = '<span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado</span>';
+                semaforoHtml = '<span class="status-pill status-programado"><span class="status-pill-dot"></span>Programado</span>';
             }
 
-            // Concepto limpio con detalles secundarios discretos
-            const cuotaText = item.cuota_info ? ` <span class="text-slate-400 font-mono text-[11px]">(${item.cuota_info})</span>` : '';
-            const legalIndicator = item.advertencia_legal ? ` <span class="cursor-help text-amber-600" title="${item.advertencia_legal}"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline"></i></span>` : '';
+            // Concepto legible con detalles secundarios
+            const cuotaText = item.cuota_info ? ` <span class="text-slate-500 font-mono text-xs">(${item.cuota_info})</span>` : '';
+            const legalIndicator = item.advertencia_legal ? ` <span class="chip-legal ml-1" title="${item.advertencia_legal}"><i data-lucide="scale" class="w-3 h-3"></i><span>TIM</span></span>` : '';
 
             // Botones de acción compactos
             let actionHtml = '';
@@ -311,12 +311,12 @@ window.AsistenteModule = {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
                         <button type="button" onclick="event.stopPropagation(); window.GerenteModule.abrirVisorComprobante(${item.id})"
-                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle" title="Ver comprobante auditado">
-                            <i data-lucide="file-check-2" class="w-3 h-3 text-emerald-600"></i>
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle" title="Ver comprobante auditado">
+                            <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-emerald-600"></i>
                             <span>Auditar</span>
                         </button>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
+                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
                             <i data-lucide="info" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -324,9 +324,9 @@ window.AsistenteModule = {
             } else if (item.estado === 'anulado') {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
-                        <span class="text-[11px] text-slate-400 font-mono">ANULADO</span>
+                        <span class="text-xs text-slate-400 font-mono">ANULADO</span>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver motivo de anulación">
+                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver motivo de anulación">
                             <i data-lucide="info" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -335,15 +335,15 @@ window.AsistenteModule = {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalPagar(${item.id})"
-                            class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-subtle" title="Registrar pago">
+                            class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-subtle shadow-2xs" title="Registrar pago">
                             Pagar
                         </button>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-0.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
+                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ver ficha técnica">
                             <i data-lucide="info" class="w-3.5 h-3.5"></i>
                         </button>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalAnular(${item.id})"
-                            class="p-0.5 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle" title="Anular obligación">
+                            class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle" title="Anular obligación">
                             <i data-lucide="ban" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -352,15 +352,15 @@ window.AsistenteModule = {
 
             tr.innerHTML = `
                 <td>${semaforoHtml}</td>
-                <td class="font-medium text-slate-900 max-w-xs truncate" title="${item.descripcion}">
+                <td class="font-medium text-slate-900 max-w-xs truncate text-sm" title="${item.descripcion}">
                     ${item.descripcion}${cuotaText}${legalIndicator}
                 </td>
-                <td class="text-slate-700 max-w-[180px] truncate" title="${item.beneficiario}">
+                <td class="text-slate-700 max-w-[180px] truncate text-xs" title="${item.beneficiario}">
                     ${item.beneficiario}
                 </td>
-                <td class="text-slate-500">${item.tipo_comprobante || 'Factura'}</td>
-                <td class="font-mono-numbers text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="text-right font-mono-numbers font-semibold text-slate-900">
+                <td><span class="chip-category">${item.tipo_comprobante || 'Factura'}</span></td>
+                <td class="font-mono-numbers text-slate-600 text-xs">${item.fecha_vencimiento}</td>
+                <td class="text-right font-mono-numbers font-semibold text-slate-900 text-sm">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="text-center">${actionHtml}</td>
@@ -381,15 +381,15 @@ window.AsistenteModule = {
 
         let badgeHtml = '';
         if (item.estado === 'pagado') {
-            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-emerald-700 font-semibold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Liquidado / Pagado</span>';
+            badgeHtml = '<span class="status-pill status-pagado text-xs"><span class="status-pill-dot"></span>Liquidado / Pagado</span>';
         } else if (item.estado === 'anulado') {
-            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-slate-400 line-through"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Comprobante Anulado</span>';
+            badgeHtml = '<span class="status-pill status-anulado text-xs"><span class="status-pill-dot"></span>Comprobante Anulado</span>';
         } else if (item.semaforo.codigo === 'vencido') {
-            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-rose-700 font-bold"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Vencido en Mora</span>';
+            badgeHtml = '<span class="status-pill status-vencido text-xs"><span class="status-pill-dot"></span>Vencido en Mora</span>';
         } else if (item.semaforo.codigo === 'por_vencer') {
-            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-amber-700 font-semibold"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Por Vencer</span>';
+            badgeHtml = '<span class="status-pill status-por-vencer text-xs"><span class="status-pill-dot"></span>Por Vencer (≤ 3 días)</span>';
         } else {
-            badgeHtml = '<span class="inline-flex items-center gap-1.5 text-slate-600 font-medium"><span class="w-2 h-2 rounded-full bg-slate-400"></span>Programado Normal</span>';
+            badgeHtml = '<span class="status-pill status-programado text-xs"><span class="status-pill-dot"></span>Programado Normal</span>';
         }
 
         document.getElementById('detalle-estado-badge').innerHTML = badgeHtml;
