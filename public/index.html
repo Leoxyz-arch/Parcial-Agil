@@ -72,51 +72,51 @@
     <!-- ========================================== -->
     <div id="view-app" class="hidden flex-1 flex h-screen overflow-hidden">
         
-        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Estilo Corporativo Sobrio y Delgado) -->
-        <aside class="w-48 app-sidebar flex flex-col justify-between flex-shrink-0 z-20">
+        <!-- SIDEBAR IZQUIERDA DE MÓDULOS (Escala Cómoda y Legible) -->
+        <aside class="w-56 app-sidebar flex flex-col justify-between flex-shrink-0 z-20">
             <!-- Top: Brand -->
             <div>
-                <div class="h-12 px-3 border-b border-slate-800 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
-                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <div class="h-14 px-3.5 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
                         </div>
-                        <span class="font-semibold text-xs text-white tracking-tight">CASTILLO ROBLES</span>
+                        <span class="font-bold text-sm text-white tracking-tight">CASTILLO ROBLES</span>
                     </div>
                 </div>
 
                 <!-- Navigation Modules -->
-                <div class="p-2 space-y-1">
-                    <p class="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Módulos</p>
+                <div class="p-2.5 space-y-1.5">
+                    <p class="px-2.5 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Módulos</p>
                     
                     <button type="button" id="nav-btn-asistente"
-                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="receipt" class="w-4 h-4 text-blue-400"></i>
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="receipt" class="w-4.5 h-4.5 text-blue-400"></i>
                             <span>Obligaciones</span>
                         </div>
                     </button>
 
                     <button type="button" id="nav-btn-gerente"
-                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
+                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="layout-dashboard" class="w-4.5 h-4.5 text-slate-400"></i>
                             <span>Dashboard</span>
                         </div>
                     </button>
                 </div>
             </div>
 
-            <!-- Bottom: User & Status (Compacto) -->
-            <div class="p-2 border-t border-slate-800 bg-slate-950/60">
-                <div class="flex items-center justify-between px-1.5 py-1">
+            <!-- Bottom: User & Status (Legible y Cómodo) -->
+            <div class="p-3 border-t border-slate-800 bg-slate-950/60">
+                <div class="flex items-center justify-between px-1 py-1">
                     <div class="min-w-0 pr-1">
-                        <p id="user-display-name" class="text-xs font-medium text-white truncate">Usuario</p>
-                        <span id="user-display-role" class="inline-block text-[10px] uppercase font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">ROL</span>
+                        <p id="user-display-name" class="text-[13.5px] font-semibold text-white truncate">Usuario</p>
+                        <span id="user-display-role" class="inline-block text-[11px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">ROL</span>
                     </div>
                     <button type="button" id="btn-logout" title="Cerrar Sesión"
-                        class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-subtle">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        class="p-1.5 rounded-md text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-subtle">
+                        <i data-lucide="log-out" class="w-4.5 h-4.5"></i>
                     </button>
                 </div>
             </div>
