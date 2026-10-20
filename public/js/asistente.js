@@ -574,13 +574,9 @@ window.AsistenteModule = {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
                         <button type="button" onclick="event.stopPropagation(); window.GerenteModule.abrirVisorComprobante(${item.id})"
-                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle" title="Ver comprobante auditado">
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle" title="Ver comprobante auditado">
                             <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-emerald-600"></i>
                             <span>Auditar</span>
-                        </button>
-                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ficha técnica">
-                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 `;
@@ -588,17 +584,13 @@ window.AsistenteModule = {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
                         <span class="text-xs text-slate-400 font-mono">ANULADO</span>
-                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Motivo anulación">
-                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
-                        </button>
                     </div>
                 `;
             } else {
                 actionHtml = `
                     <div class="inline-flex items-center gap-1 justify-center">
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalPagar(${item.id})"
-                            class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-subtle shadow-2xs" title="Registrar pago">
+                            class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-subtle shadow-2xs" title="Registrar pago">
                             Pagar
                         </button>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirModalEditar(${item.id})"
@@ -606,12 +598,8 @@ window.AsistenteModule = {
                             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                         </button>
                         <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.eliminarObligacion(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle" title="Anular o eliminar">
+                            class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-subtle" title="Anular obligación">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button type="button" onclick="event.stopPropagation(); window.AsistenteModule.abrirDetalle(${item.id})"
-                            class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-subtle" title="Ficha técnica">
-                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 `;

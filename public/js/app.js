@@ -85,16 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 3. Modal de Contexto Scrum / Proyecto
-    const btnShowContext = document.getElementById('btn-show-context');
-    const modalContext = document.getElementById('modal-contexto-scrum');
-
-    if (btnShowContext && modalContext) {
-        btnShowContext.addEventListener('click', () => {
-            modalContext.classList.remove('hidden');
-            if (window.lucide) window.lucide.createIcons();
-        });
-    }
 
     // 4. Render inicial según sesión previa
     renderAppView();
@@ -200,3 +190,4 @@ window.mostrarConfirmacion = ({ titulo = 'Confirmación', subtitulo = '¿Estás 
     modal.classList.remove('hidden');
     if (window.lucide) window.lucide.createIcons();
 };
+

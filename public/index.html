@@ -63,22 +63,6 @@
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </form>
-
-                <div class="pt-3 border-t border-slate-200">
-                    <p class="text-xs text-slate-500 mb-2 font-semibold uppercase tracking-wider text-center">Acceso Rápido de Evaluación</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" id="btn-quick-asistente"
-                            class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle">
-                            <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-blue-600"></i>
-                            <span>Asistente</span>
-                        </button>
-                        <button type="button" id="btn-quick-gerente"
-                            class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-subtle">
-                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-indigo-600"></i>
-                            <span>Gerente</span>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -119,21 +103,6 @@
                             <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
                             <span>Dashboard</span>
                         </div>
-                    </button>
-
-                    <div class="pt-2 border-t border-slate-800 my-1"></div>
-                    <p class="px-2 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Herramientas</p>
-
-                    <button type="button" id="btn-export-csv"
-                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-300 transition-subtle text-left">
-                        <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
-                        <span>Exportar CSV</span>
-                    </button>
-
-                    <button type="button" id="btn-show-context"
-                        class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-subtle text-left">
-                        <i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
-                        <span>Ficha Técnica</span>
                     </button>
                 </div>
             </div>
@@ -1056,60 +1025,6 @@
                         <span>Registro de Anulación</span>
                     </div>
                     <p id="detalle-motivo-anulacion" class="text-[11px] text-rose-800"></p>
-                </div>
-            </div>
-
-            <div class="p-2.5 border-t border-slate-200 bg-slate-50 flex justify-end">
-                <button type="button" class="btn-close-modal px-3 py-1 rounded border border-slate-300 text-xs text-slate-700 hover:bg-slate-100">
-                    Cerrar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL 8: FICHA TÉCNICA DEL SISTEMA         -->
-    <!-- ========================================== -->
-    <div id="modal-contexto-scrum" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white rounded shadow-2xl max-w-xl w-full overflow-hidden border border-slate-300 max-h-[85vh] flex flex-col">
-            <div class="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div class="flex items-center gap-1.5">
-                    <i data-lucide="book-open" class="w-4 h-4 text-blue-700"></i>
-                    <h3 class="font-bold text-xs text-slate-900">Especificaciones Técnicas del Sistema</h3>
-                </div>
-                <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-700">
-                <div class="grid grid-cols-2 gap-2 p-2.5 bg-slate-50 rounded border border-slate-200">
-                    <div>
-                        <span class="text-[9px] font-mono uppercase text-slate-500 block">Arquitectura API</span>
-                        <span class="font-semibold text-slate-800">Node.js • Express REST</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] font-mono uppercase text-slate-500 block">Persistencia</span>
-                        <span class="font-semibold text-slate-800">PostgreSQL (Neon) + Fallback</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] font-mono uppercase text-slate-500 block">Archivos Digitales</span>
-                        <span class="font-semibold text-slate-800">Multer (JPG, PNG, PDF)</span>
-                    </div>
-                    <div>
-                        <span class="text-[9px] font-mono uppercase text-slate-500 block">Testing</span>
-                        <span class="font-semibold text-slate-800">Playwright E2E Suite</span>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="font-mono uppercase text-[10px] font-bold text-slate-900 mb-1">Mecanismos de Integridad</h4>
-                    <ul class="space-y-1 list-disc list-inside text-slate-600">
-                        <li>Validación estricta de vencimiento &ge; emisión.</li>
-                        <li>Identificador fiscal formal con RUC (11 dígitos) según normativa SUNAT.</li>
-                        <li>Anulación documentada con motivo formal sin pérdida de trazabilidad.</li>
-                        <li>Simulación y generación de cuotas progresivas para préstamos en tiempo real.</li>
-                    </ul>
                 </div>
             </div>
 

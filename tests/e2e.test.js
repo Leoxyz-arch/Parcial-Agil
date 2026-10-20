@@ -45,7 +45,9 @@ async function runTestSuite() {
 
   // TEST 2: Acceso Autorizado Asistente
   await test('HU-01: Acceso correcto de Asistente', async () => {
-    await page.click('#btn-quick-asistente');
+    await page.fill('#login-username', 'asistente');
+    await page.fill('#login-password', 'asistente123');
+    await page.click('button[type="submit"]');
     await page.waitForSelector('#module-asistente', { state: 'visible' });
     const roleText = await page.textContent('#user-display-role');
     assert(roleText.includes('Asistente'), 'El rol mostrado debe ser Asistente');
@@ -116,7 +118,9 @@ async function runTestSuite() {
     await page.click('#btn-logout');
     await page.waitForSelector('#view-login:not(.hidden)');
 
-    await page.click('#btn-quick-gerente');
+    await page.fill('#login-username', 'gerente');
+    await page.fill('#login-password', 'gerente123');
+    await page.click('button[type="submit"]');
     await page.waitForSelector('#module-gerente', { state: 'visible' });
 
     const totalGastos = await page.textContent('#kpi-total-gastos');
