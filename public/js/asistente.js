@@ -164,7 +164,7 @@ window.AsistenteModule = {
             const hoyISO = new Date().toISOString().split('T')[0];
 
             if (cat === 'prestamo' && fEmis && fEmis < hoyISO) {
-                mostrarAvisoCrear('La fecha del préstamo no puede ser anterior a la fecha de hoy.', 'error');
+                mostrarAvisoCrear('La fecha del préstamo no puede ser anterior a la fecha actual.', 'error');
                 return false;
             }
 
@@ -251,7 +251,6 @@ window.AsistenteModule = {
                 const cuota_info = categoria === 'prestamo' && !esAutoCuotas ? document.getElementById('crear-cuota').value.trim() : null;
 
                 if (esAutoCuotas) {
-                    // La fecha de vencimiento inicial se calcula con el mes 1
                     fecha_vencimiento = fecha_emision;
                 }
 
@@ -284,18 +283,16 @@ window.AsistenteModule = {
             };
         }
 
-        // Modal Registrar Pago con Doble Verificación In-App
+        // Modal Registrar Pago con Método de Pago y Doble Verificación en 1 Paso
         const modalPagar = document.getElementById('modal-pagar-obligacion');
         const formPagar = document.getElementById('form-pagar-obligacion');
-        const vistaConf = document.getElementById('pago-vista-confirmacion');
         const inputArchivo = document.getElementById('pagar-archivo');
         const previewPlaceholder = document.getElementById('preview-placeholder');
         const previewContainer = document.getElementById('preview-container');
         const previewImg = document.getElementById('preview-img');
         const previewFilename = document.getElementById('preview-filename');
         const checkDeclaracion = document.getElementById('pagar-declaracion-responsabilidad');
-        const btnVolverEditar = document.getElementById('btn-pago-volver-editar');
-        const btnConfirmarFinal = document.getElementById('btn-pago-confirmar-final');
+        const btnSubmitPago = document.getElementById('btn-submit-pago');
 
         if (inputArchivo) {
             inputArchivo.onchange = (e) => {
@@ -319,14 +316,14 @@ window.AsistenteModule = {
             };
         }
 
-        // Paso 1: Valida y pasa a la Doble Verificación
         if (formPagar) {
-            formPagar.onsubmit = (e) => {
+            formPagar.onsubmit = async (e) => {
                 e.preventDefault();
-                const id = parseInt(document.getElementById('pagar-id').value, 10);
-                const oblig = AsistenteModule.obligaciones.find(o => o.id === id);
+                const id = document.getElementById('pagar-id').value;
                 const fecha_pago = document.getElementById('pagar-fecha').value;
                 const nro_operacion = document.getElementById('pagar-nro-operacion').value.trim();
+                const metodoSelect = document.getElementById('pagar-metodo');
+                const metodo_pago = (metodoSelect ? metodoSelect.value : 'Transferencia Bancaria').trim();
                 const file = inputArchivo.files[0];
 
                 if (!file) {
@@ -340,60 +337,27 @@ window.AsistenteModule = {
                 }
 
                 if (!checkDeclaracion.checked) {
-                    window.Toast.warning('Debe marcar la declaración de responsabilidad.');
+                    window.Toast.warning('Debe marcar la casilla de doble verificación y responsabilidad.');
                     return;
                 }
-
-                // Llenar vista de confirmación
-                document.getElementById('conf-pago-desc').textContent = oblig ? oblig.descripcion : 'Obligación';
-                document.getElementById('conf-pago-benef').textContent = oblig ? oblig.beneficiario : 'Beneficiario';
-                document.getElementById('conf-pago-monto').textContent = oblig ? `S/ ${oblig.monto.toFixed(2)}` : 'S/ 0.00';
-                document.getElementById('conf-pago-fecha').textContent = fecha_pago;
-                document.getElementById('conf-pago-nro').textContent = nro_operacion;
-                document.getElementById('conf-pago-archivo').textContent = file.name;
-
-                // Transición a la vista de confirmación
-                formPagar.classList.add('hidden');
-                vistaConf.classList.remove('hidden');
-                document.getElementById('modal-pagar-header-titulo').textContent = 'Confirmación de Liquidación';
-                if (window.lucide) window.lucide.createIcons();
-            };
-        }
-
-        if (btnVolverEditar) {
-            btnVolverEditar.onclick = () => {
-                vistaConf.classList.add('hidden');
-                formPagar.classList.remove('hidden');
-                document.getElementById('modal-pagar-header-titulo').textContent = 'Certificar Pago al 100%';
-            };
-        }
-
-        // Paso 2: Envío definitivo con comprobante
-        if (btnConfirmarFinal) {
-            btnConfirmarFinal.onclick = async () => {
-                const id = document.getElementById('pagar-id').value;
-                const fecha_pago = document.getElementById('pagar-fecha').value;
-                const nro_operacion = document.getElementById('pagar-nro-operacion').value.trim();
-                const file = inputArchivo.files[0];
 
                 const formData = new FormData();
                 formData.append('fecha_pago', fecha_pago);
                 formData.append('nro_operacion', nro_operacion);
+                formData.append('metodo_pago', metodo_pago);
                 formData.append('comprobante', file);
 
-                btnConfirmarFinal.disabled = true;
-                btnConfirmarFinal.textContent = 'Procesando liquidación...';
+                btnSubmitPago.disabled = true;
+                btnSubmitPago.textContent = 'Certificando pago...';
 
                 try {
                     const res = await API.pagarObligacion(id, formData);
-                    btnConfirmarFinal.disabled = false;
-                    btnConfirmarFinal.innerHTML = `<i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>Sí, Registrar Pago</span>`;
+                    btnSubmitPago.disabled = false;
+                    btnSubmitPago.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Confirmar Pago al 100%</span>`;
 
                     if (res.ok) {
                         modalPagar.classList.add('hidden');
                         formPagar.reset();
-                        vistaConf.classList.add('hidden');
-                        formPagar.classList.remove('hidden');
                         previewPlaceholder.classList.remove('hidden');
                         previewContainer.classList.add('hidden');
                         window.Toast.success('Pago liquidado y comprobante archivado correctamente.');
@@ -402,14 +366,14 @@ window.AsistenteModule = {
                         window.Toast.error(res.mensaje || 'Error al procesar el pago.');
                     }
                 } catch (err) {
-                    btnConfirmarFinal.disabled = false;
-                    btnConfirmarFinal.innerHTML = `<i data-lucide="check-check" class="w-3.5 h-3.5"></i><span>Sí, Registrar Pago</span>`;
+                    btnSubmitPago.disabled = false;
+                    btnSubmitPago.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Confirmar Pago al 100%</span>`;
                     window.Toast.error('Error de comunicación con el servidor.');
                 }
             };
         }
 
-        // Modal Editar Obligación
+        // Modal Editar Obligación (Emisión fija/solo lectura, solo vencimiento/monto/datos editables)
         const modalEditar = document.getElementById('modal-editar-obligacion');
         const formEditar = document.getElementById('form-editar-obligacion');
         const selectCatEditar = document.getElementById('editar-categoria');
@@ -590,7 +554,7 @@ window.AsistenteModule = {
             tr.className = 'hover:bg-slate-50 transition-subtle border-b border-slate-100 cursor-pointer';
             tr.onclick = () => AsistenteModule.abrirDetalle(item.id);
 
-            // Etiquetas literales solicitadas: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
+            // Etiquetas literales: Pagado (Verde), Programado (Azul), Por Pagar (Amarillo)
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
                 semaforoHtml = '<span class="status-pill status-pagado"><span class="status-pill-dot"></span>Pagado</span>';
@@ -775,7 +739,7 @@ window.AsistenteModule = {
         if (item.estado === 'pagado') {
             containerPago.classList.remove('hidden');
             document.getElementById('detalle-fecha-pago').textContent = item.fecha_pago || 'No registrada';
-            document.getElementById('detalle-nro-operacion').textContent = item.nro_operacion || 'Sin Nro.';
+            document.getElementById('detalle-nro-operacion').textContent = `${item.nro_operacion || 'Sin Nro.'} (${item.metodo_pago || 'Transferencia'})`;
         } else {
             containerPago.classList.add('hidden');
         }
@@ -803,15 +767,11 @@ window.AsistenteModule = {
         document.getElementById('pagar-fecha').value = new Date().toISOString().split('T')[0];
         document.getElementById('pagar-nro-operacion').value = '';
 
-        // Reset vistas a paso 1
-        const formPagar = document.getElementById('form-pagar-obligacion');
-        const vistaConf = document.getElementById('pago-vista-confirmacion');
-        const checkDecl = document.getElementById('pagar-declaracion-responsabilidad');
-        if (formPagar) formPagar.classList.remove('hidden');
-        if (vistaConf) vistaConf.classList.add('hidden');
-        if (checkDecl) checkDecl.checked = false;
+        const selMetodo = document.getElementById('pagar-metodo');
+        if (selMetodo) selMetodo.value = 'Transferencia Bancaria';
 
-        document.getElementById('modal-pagar-header-titulo').textContent = 'Certificar Pago al 100%';
+        const checkDecl = document.getElementById('pagar-declaracion-responsabilidad');
+        if (checkDecl) checkDecl.checked = false;
 
         const previewPlaceholder = document.getElementById('preview-placeholder');
         const previewContainer = document.getElementById('preview-container');

@@ -138,7 +138,7 @@
                 </div>
             </div>
 
-            <!-- Bottom: User & Status (Compacto sin motor local redundante) -->
+            <!-- Bottom: User & Status (Compacto) -->
             <div class="p-2 border-t border-slate-800 bg-slate-950/60">
                 <div class="flex items-center justify-between px-1.5 py-1">
                     <div class="min-w-0 pr-1">
@@ -679,21 +679,21 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- MODAL 2: REGISTRAR PAGO (CON DOBLE VERIFICACIÓN IN-APP) -->
+    <!-- MODAL 2: REGISTRAR PAGO (CON MÉTODO Y DOBLE VERIFICACIÓN) -->
     <!-- ======================================================== -->
     <div id="modal-pagar-obligacion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white rounded shadow-2xl max-w-sm w-full overflow-hidden border border-slate-300">
             <div class="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div class="flex items-center gap-1.5">
                     <i data-lucide="receipt" class="w-4 h-4 text-emerald-600"></i>
-                    <h3 id="modal-pagar-header-titulo" class="font-bold text-xs text-slate-900">Certificar Pago al 100%</h3>
+                    <h3 class="font-bold text-xs text-slate-900">Certificar Pago al 100%</h3>
                 </div>
                 <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- PASO 1: Formulario de Pago y Voucher -->
+            <!-- Formulario Directo con Método de Pago y Declaración In-App -->
             <form id="form-pagar-obligacion" class="p-4 space-y-2.5">
                 <input type="hidden" id="pagar-id">
 
@@ -705,6 +705,19 @@
                         <span id="pagar-benef-resumen">Proveedor</span>
                         <span id="pagar-monto-resumen" class="font-mono-numbers font-bold text-emerald-700">S/ 0.00</span>
                     </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-600 mb-0.5">Método de Pago</label>
+                    <select id="pagar-metodo" required class="w-full px-2 py-1 rounded bg-white border border-slate-300 text-xs text-slate-800 font-medium">
+                        <option value="Transferencia Bancaria" selected>Transferencia Bancaria</option>
+                        <option value="Yape / Plin">Yape / Plin (Billetera Digital)</option>
+                        <option value="Depósito en Cuenta">Depósito en Cuenta Bancaria</option>
+                        <option value="Tarjeta de Débito/Crédito">Tarjeta de Débito / Crédito</option>
+                        <option value="Cheque de Gerencia">Cheque de Gerencia</option>
+                        <option value="Efectivo">Efectivo / Caja</option>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
@@ -737,12 +750,12 @@
                     </div>
                 </div>
 
-                <!-- Declaración Jurada de Responsabilidad -->
-                <div class="p-2 bg-amber-50 rounded border border-amber-200">
+                <!-- Doble Verificación en la Misma Interfaz -->
+                <div class="p-2 bg-amber-50 rounded border border-amber-300">
                     <label class="flex items-start gap-1.5 cursor-pointer">
                         <input type="checkbox" id="pagar-declaracion-responsabilidad" required class="mt-0.5 text-emerald-600 w-3.5 h-3.5">
                         <span class="text-[10px] text-amber-950 leading-snug">
-                            <b>Declaración:</b> Certifico que el comprobante corresponde a este beneficiario e importe.
+                            <b>Doble Verificación:</b> Confirmo que el comprobante, método y monto son legítimos y exactos. Asumo la responsabilidad por este registro definitivo.
                         </span>
                     </label>
                 </div>
@@ -752,44 +765,11 @@
                         Cancelar
                     </button>
                     <button type="submit" id="btn-submit-pago" class="px-3 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center gap-1">
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        <span>Continuar Verificación</span>
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span>Confirmar Pago al 100%</span>
                     </button>
                 </div>
             </form>
-
-            <!-- PASO 2: Vista de Doble Verificación In-App -->
-            <div id="pago-vista-confirmacion" class="hidden p-4 space-y-3">
-                <div class="p-2.5 bg-amber-50 border border-amber-300 rounded space-y-2">
-                    <div class="flex items-center gap-1.5 text-amber-900 font-bold text-xs">
-                        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 shrink-0"></i>
-                        <span>Doble Verificación In-App de Pago</span>
-                    </div>
-                    <p class="text-[10px] text-slate-700 leading-relaxed">
-                        Revisa detenidamente los datos antes de formalizar la liquidación. Al procesar, el estado cambiará a <b>Pagado al 100%</b>.
-                    </p>
-
-                    <div class="bg-white rounded p-2.5 border border-amber-200 divide-y divide-slate-100 text-[11px]">
-                        <div class="flex justify-between py-1"><span class="text-slate-500">Obligación:</span> <b class="text-slate-900 truncate max-w-[170px]" id="conf-pago-desc">--</b></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">Beneficiario:</span> <b class="text-slate-900 truncate max-w-[170px]" id="conf-pago-benef">--</b></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">Monto:</span> <b class="text-emerald-700 font-bold font-mono" id="conf-pago-monto">S/ 0.00</b></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">F. Pago:</span> <b class="text-slate-900 font-mono" id="conf-pago-fecha">--</b></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">N° Operación:</span> <b class="text-slate-900 font-mono" id="conf-pago-nro">--</b></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">Archivo:</span> <b class="text-blue-700 truncate max-w-[170px]" id="conf-pago-archivo">--</b></div>
-                    </div>
-                </div>
-
-                <div class="pt-2 border-t border-slate-200 flex justify-end gap-1.5">
-                    <button type="button" id="btn-pago-volver-editar" class="px-2.5 py-1 rounded border border-slate-300 text-xs text-slate-700 hover:bg-slate-100 flex items-center gap-1">
-                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                        <span>Corregir</span>
-                    </button>
-                    <button type="button" id="btn-pago-confirmar-final" class="px-3 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center gap-1">
-                        <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
-                        <span>Sí, Registrar Pago</span>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -848,9 +828,11 @@
                             class="w-full px-2 py-1 rounded bg-white border border-slate-300 text-xs font-mono font-bold text-slate-900">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-slate-600 mb-0.5">F. Emisión</label>
-                        <input type="date" id="editar-emision" required
-                            class="w-full px-1.5 py-1 rounded bg-white border border-slate-300 text-xs text-slate-900 font-mono-numbers">
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">
+                            F. Emisión <span class="text-[9px] text-slate-400 font-normal">(Fija)</span>
+                        </label>
+                        <input type="date" id="editar-emision" readonly tabindex="-1"
+                            class="w-full px-1.5 py-1 rounded bg-slate-100 border border-slate-200 text-xs text-slate-500 font-mono-numbers cursor-not-allowed select-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase text-slate-600 mb-0.5">F. Vencimiento</label>

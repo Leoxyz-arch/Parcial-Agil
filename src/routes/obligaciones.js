@@ -381,11 +381,11 @@ router.post('/', async (req, res) => {
     }
 });
 
-// POST /api/obligaciones/:id/pagar (Registro de pago con comprobante y control de inmutabilidad)
+// POST /api/obligaciones/:id/pagar (Registro de pago con evidencia y método de pago)
 router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const { nro_operacion, fecha_pago } = req.body;
+        const { nro_operacion, fecha_pago, metodo_pago } = req.body;
 
         // Comprobar estado previo
         const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
@@ -428,8 +428,9 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
                 nro_operacion = $2,
                 comprobante_url = $3,
                 comprobante_tipo = $4,
+                metodo_pago = $5,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = $5
+            WHERE id = $6
             RETURNING *
         `;
 
@@ -438,6 +439,7 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
             nro_operacion.trim(),
             comprobanteUrl,
             comprobanteTipo,
+            metodoPagoVal,
             id
         ]);
 

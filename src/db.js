@@ -83,6 +83,7 @@ async function createTablesPostgres() {
         estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
         fecha_pago DATE DEFAULT NULL,
         nro_operacion VARCHAR(80) DEFAULT NULL,
+        metodo_pago VARCHAR(50) DEFAULT 'Transferencia Bancaria',
         comprobante_url TEXT DEFAULT NULL,
         comprobante_tipo VARCHAR(20) DEFAULT NULL,
         motivo_anulacion TEXT DEFAULT NULL,
@@ -360,8 +361,8 @@ function executeLocalQuery(sqlText, params = []) {
 
     // 3. UPDATE obligaciones pagar
     if (text.startsWith('update obligaciones') && text.includes("set estado = 'pagado'")) {
-        // params: [fecha_pago, nro_operacion, comprobante_url, comprobante_tipo, id]
-        const id = parseInt(params[4], 10);
+        // params: [fecha_pago, nro_operacion, comprobante_url, comprobante_tipo, metodo_pago, id]
+        const id = parseInt(params[params.length - 1], 10);
         const item = db.obligaciones.find(o => o.id === id);
         if (item) {
             item.estado = 'pagado';
@@ -369,6 +370,7 @@ function executeLocalQuery(sqlText, params = []) {
             item.nro_operacion = params[1];
             item.comprobante_url = params[2];
             item.comprobante_tipo = params[3];
+            item.metodo_pago = params.length > 5 ? params[4] : 'Transferencia Bancaria';
             item.updated_at = new Date().toISOString();
             writeLocalDb(db);
             return { rows: [item] };
