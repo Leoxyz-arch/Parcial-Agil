@@ -67,39 +67,79 @@ window.AsistenteModule = {
         const subManual = document.getElementById('subcontainer-cuota-manual');
         const subAuto = document.getElementById('subcontainer-cuota-auto');
         const inputMonto = document.getElementById('crear-monto');
+        const inputInteres = document.getElementById('crear-interes');
         const inputNumCuotas = document.getElementById('crear-num-cuotas');
         const displayMontoCuota = document.getElementById('display-monto-cuota');
+        const calcCapital = document.getElementById('calc-prestamo-capital');
+        const calcTasaLbl = document.getElementById('calc-prestamo-tasa-lbl');
+        const calcInteres = document.getElementById('calc-prestamo-interes');
+        const calcTotal = document.getElementById('calc-prestamo-total');
+        const calcDiaMesPreview = document.getElementById('calc-dia-mes-preview');
         const inputEmision = document.getElementById('crear-emision');
         const inputVencimiento = document.getElementById('crear-vencimiento');
+        const lblEmision = document.getElementById('lbl-crear-emision');
+        const lblVencimiento = document.getElementById('lbl-crear-vencimiento');
 
         const recalcularMontoCuota = () => {
             const m = parseFloat(inputMonto.value) || 0;
+            const t = parseFloat(inputInteres ? inputInteres.value : 0) || 0;
             const c = parseInt(inputNumCuotas.value, 10) || 1;
-            if (m > 0 && c > 0) {
-                displayMontoCuota.textContent = `S/ ${(m / c).toFixed(2)}`;
-            } else {
-                displayMontoCuota.textContent = 'S/ 0.00';
+
+            const intMonto = +(m * (t / 100)).toFixed(2);
+            const totalDeuda = +(m + intMonto).toFixed(2);
+            const cuotaMonto = +(totalDeuda / c).toFixed(2);
+
+            if (calcCapital) calcCapital.textContent = `S/ ${m.toFixed(2)}`;
+            if (calcTasaLbl) calcTasaLbl.textContent = `${t}%`;
+            if (calcInteres) calcInteres.textContent = `+ S/ ${intMonto.toFixed(2)}`;
+            if (calcTotal) calcTotal.textContent = `S/ ${totalDeuda.toFixed(2)}`;
+            if (displayMontoCuota) displayMontoCuota.textContent = `S/ ${cuotaMonto.toFixed(2)} / mes`;
+
+            if (inputEmision && inputEmision.value) {
+                const parts = inputEmision.value.split('-').map(Number);
+                if (parts.length === 3 && calcDiaMesPreview) {
+                    calcDiaMesPreview.textContent = `Día ${parts[2]}`;
+                }
+
+                // Si es modalidad automática de cuotas, la 1ra cuota vence el mismo día del mes siguiente
+                if (modAuto && modAuto.checked) {
+                    const targetMonthIdx = (parts[1] - 1) + 1;
+                    const targetY = parts[0] + Math.floor(targetMonthIdx / 12);
+                    const targetM = ((targetMonthIdx % 12) + 12) % 12;
+                    const maxD = new Date(targetY, targetM + 1, 0).getDate();
+                    const finalD = Math.min(parts[2], maxD);
+                    inputVencimiento.value = `${targetY}-${String(targetM + 1).padStart(2, '0')}-${String(finalD).padStart(2, '0')}`;
+                }
             }
         };
 
         if (inputMonto) inputMonto.addEventListener('input', recalcularMontoCuota);
+        if (inputInteres) inputInteres.addEventListener('input', recalcularMontoCuota);
         if (inputNumCuotas) inputNumCuotas.addEventListener('input', recalcularMontoCuota);
 
         if (modManual && modAuto) {
             modManual.onchange = () => {
                 subManual.classList.remove('hidden');
                 subAuto.classList.add('hidden');
+                if (lblVencimiento) lblVencimiento.textContent = 'F. Vencimiento';
             };
             modAuto.onchange = () => {
                 subManual.classList.add('hidden');
                 subAuto.classList.remove('hidden');
+                if (lblVencimiento) lblVencimiento.textContent = 'F. Vencimiento (1ra Cuota)';
                 recalcularMontoCuota();
             };
         }
 
         if (inputEmision && inputVencimiento) {
             inputEmision.addEventListener('change', () => {
+                const hoyStr = new Date().toISOString().split('T')[0];
+                if (selectCatCrear && selectCatCrear.value === 'prestamo' && inputEmision.value < hoyStr) {
+                    alert('Atención: La fecha del préstamo no puede ser menor a la fecha actual.');
+                    inputEmision.value = hoyStr;
+                }
                 inputVencimiento.min = inputEmision.value;
+                recalcularMontoCuota();
             });
         }
 
@@ -113,17 +153,27 @@ window.AsistenteModule = {
                 if (modManual) modManual.checked = true;
                 if (subManual) subManual.classList.remove('hidden');
                 if (subAuto) subAuto.classList.add('hidden');
+                if (lblEmision) lblEmision.textContent = 'F. Emisión';
+                if (lblVencimiento) lblVencimiento.textContent = 'F. Vencimiento';
                 modalCrear.classList.remove('hidden');
             };
         }
 
         if (selectCatCrear) {
             selectCatCrear.onchange = (e) => {
+                const hoyStr = new Date().toISOString().split('T')[0];
                 if (e.target.value === 'prestamo') {
                     containerCuota.classList.remove('hidden');
+                    if (lblEmision) lblEmision.textContent = 'Fecha Préstamo (Desembolso)';
+                    if (lblVencimiento) lblVencimiento.textContent = modAuto && modAuto.checked ? 'F. Vencimiento (1ra Cuota)' : 'F. Vencimiento';
+                    inputEmision.min = hoyStr;
+                    if (inputEmision.value < hoyStr) inputEmision.value = hoyStr;
                     recalcularMontoCuota();
                 } else {
                     containerCuota.classList.add('hidden');
+                    if (lblEmision) lblEmision.textContent = 'F. Emisión';
+                    if (lblVencimiento) lblVencimiento.textContent = 'F. Vencimiento';
+                    inputEmision.removeAttribute('min');
                 }
             };
         }
@@ -137,6 +187,12 @@ window.AsistenteModule = {
                 const monto = parseFloat(document.getElementById('crear-monto').value);
                 const fecha_emision = document.getElementById('crear-emision').value;
                 const fecha_vencimiento = document.getElementById('crear-vencimiento').value;
+                const hoyStr = new Date().toISOString().split('T')[0];
+
+                if (categoria === 'prestamo' && fecha_emision < hoyStr) {
+                    alert('Error de validación: La fecha del préstamo no puede ser menor a la fecha actual.');
+                    return;
+                }
 
                 // Validación de coherencia de fechas
                 if (fecha_vencimiento < fecha_emision) {
@@ -147,8 +203,10 @@ window.AsistenteModule = {
                 let cuota_info = null;
                 let generar_cuotas = false;
                 let num_cuotas = 1;
+                let tasa_interes = 0;
 
                 if (categoria === 'prestamo') {
+                    tasa_interes = parseFloat(inputInteres ? inputInteres.value : 0) || 0;
                     if (modAuto && modAuto.checked) {
                         generar_cuotas = true;
                         num_cuotas = parseInt(inputNumCuotas.value, 10) || 6;
@@ -167,7 +225,8 @@ window.AsistenteModule = {
                         fecha_vencimiento,
                         cuota_info,
                         generar_cuotas,
-                        num_cuotas
+                        num_cuotas,
+                        tasa_interes
                     });
 
                     if (res.ok) {
@@ -186,6 +245,7 @@ window.AsistenteModule = {
         const modalPagar = document.getElementById('modal-pagar-obligacion');
         const formPagar = document.getElementById('form-pagar-obligacion');
         const inputArchivo = document.getElementById('pagar-archivo');
+        const checkDeclaracion = document.getElementById('pagar-declaracion-responsabilidad');
         const previewPlaceholder = document.getElementById('preview-placeholder');
         const previewContainer = document.getElementById('preview-container');
         const previewImg = document.getElementById('preview-img');
@@ -228,6 +288,29 @@ window.AsistenteModule = {
                     return;
                 }
 
+                // Doble Verificación: 1) Casilla de asunción de responsabilidad obligatoria
+                if (!checkDeclaracion || !checkDeclaracion.checked) {
+                    alert('Debe marcar la casilla de verificación y asunción de responsabilidad para poder registrar el pago.');
+                    return;
+                }
+
+                // Doble Verificación: 2) Diálogo formal de confirmación con detalle
+                const descResumen = document.getElementById('pagar-desc-resumen').textContent;
+                const benefResumen = document.getElementById('pagar-benef-resumen').textContent;
+                const montoResumen = document.getElementById('pagar-monto-resumen').textContent;
+
+                const confirmar = confirm(
+                    `DOBLE VERIFICACIÓN DE PAGO (ASUNCIÓN DE RESPONSABILIDAD):\n\n` +
+                    `• Obligación: ${descResumen}\n` +
+                    `• Beneficiario: ${benefResumen}\n` +
+                    `• Monto: ${montoResumen}\n` +
+                    `• N° de Operación: ${nro_operacion}\n` +
+                    `• Archivo: ${file.name}\n\n` +
+                    `¿Declara y asume formalmente la responsabilidad de que este pago y su comprobante son correctos y verídicos?\n(Esta acción no se puede revertir).`
+                );
+
+                if (!confirmar) return;
+
                 const formData = new FormData();
                 formData.append('fecha_pago', fecha_pago);
                 formData.append('nro_operacion', nro_operacion);
@@ -245,6 +328,7 @@ window.AsistenteModule = {
                     if (res.ok) {
                         modalPagar.classList.add('hidden');
                         formPagar.reset();
+                        if (checkDeclaracion) checkDeclaracion.checked = false;
                         previewPlaceholder.classList.remove('hidden');
                         previewContainer.classList.add('hidden');
                         await AsistenteModule.cargarObligaciones();

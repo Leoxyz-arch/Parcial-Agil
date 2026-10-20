@@ -224,6 +224,16 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: 'Debe seleccionar la fecha de emisión y de vencimiento.' });
         }
 
+        const hoyISO = new Date().toISOString().split('T')[0];
+
+        // Regla: En préstamos, la fecha de desembolso no puede ser menor a la fecha actual
+        if (categoria.toLowerCase() === 'prestamo' && fecha_emision < hoyISO) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La fecha del préstamo no puede ser anterior a la fecha actual.'
+            });
+        }
+
         if (fecha_vencimiento < fecha_emision) {
             return res.status(400).json({
                 ok: false,
@@ -231,18 +241,35 @@ router.post('/', async (req, res) => {
             });
         }
 
+        // Función auxiliar para calcular el mismo día del mes en meses sucesivos
+        const calcularFechaMesSucesivo = (baseY, baseM, baseD, offsetMeses) => {
+            const targetMonthIdx = (baseM - 1) + offsetMeses;
+            const targetYear = baseY + Math.floor(targetMonthIdx / 12);
+            const targetMonth = ((targetMonthIdx % 12) + 12) % 12; // 0..11
+            const maxDiasMes = new Date(targetYear, targetMonth + 1, 0).getDate();
+            const diaFinal = Math.min(baseD, maxDiasMes);
+            return `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(diaFinal).padStart(2, '0')}`;
+        };
+
         // Si es préstamo y se solicita amortización progresiva en cuotas automáticas
         const numCuotas = parseInt(req.body.num_cuotas, 10);
+        const tasaInteres = parseFloat(req.body.tasa_interes) || 0;
+
         if (categoria.toLowerCase() === 'prestamo' && req.body.generar_cuotas && numCuotas > 1) {
-            const montoCuota = +(montoNum / numCuotas).toFixed(2);
-            const [y, m, d] = fecha_vencimiento.split('-').map(Number);
+            const montoInteresTotal = +(montoNum * (tasaInteres / 100)).toFixed(2);
+            const montoTotalDeuda = +(montoNum + montoInteresTotal).toFixed(2);
+            const montoCuota = +(montoTotalDeuda / numCuotas).toFixed(2);
+
+            // La fecha base para el día de vencimiento mensual se toma de fecha_emision (fecha del préstamo)
+            const [baseY, baseM, baseD] = fecha_emision.split('-').map(Number);
             const creadas = [];
 
             for (let i = 1; i <= numCuotas; i++) {
-                const fVencCuota = new Date(y, (m - 1) + (i - 1), d);
-                const fVencISO = fVencCuota.toISOString().split('T')[0];
+                // Cuota i vence i meses después en el mismo día del mes
+                const fVencISO = calcularFechaMesSucesivo(baseY, baseM, baseD, i);
                 const cuotaLabel = `Cuota ${i} de ${numCuotas}`;
-                const descCuota = `${descripcion.trim()} (${cuotaLabel})`;
+                const interesTxt = tasaInteres > 0 ? ` (Int. ${tasaInteres}%)` : '';
+                const descCuota = `${descripcion.trim()} (${cuotaLabel}${interesTxt})`;
 
                 const sql = `
                     INSERT INTO obligaciones 
@@ -266,9 +293,18 @@ router.post('/', async (req, res) => {
 
             return res.status(201).json({
                 ok: true,
-                mensaje: `Préstamo registrado exitosamente con ${numCuotas} cuotas amortizadas mensualmente (S/ ${montoCuota} c/u).`,
+                mensaje: `Préstamo registrado: ${numCuotas} cuotas de S/ ${montoCuota} (vence día ${baseD} de cada mes). Total: S/ ${montoTotalDeuda}.`,
                 obligaciones: creadas
             });
+        }
+
+        // Si es préstamo individual con interés
+        let montoFinal = montoNum;
+        let descFinal = descripcion.trim();
+        if (categoria.toLowerCase() === 'prestamo' && tasaInteres > 0) {
+            const intVal = +(montoNum * (tasaInteres / 100)).toFixed(2);
+            montoFinal = +(montoNum + intVal).toFixed(2);
+            descFinal = `${descFinal} (Int. ${tasaInteres}%)`;
         }
 
         const sql = `
@@ -280,9 +316,9 @@ router.post('/', async (req, res) => {
 
         const params = [
             categoria.toLowerCase(),
-            descripcion.trim(),
+            descFinal,
             beneficiario.trim(),
-            montoNum,
+            montoFinal,
             fecha_emision,
             fecha_vencimiento,
             cuota_info ? cuota_info.trim() : null
