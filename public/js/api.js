@@ -28,6 +28,7 @@ const API = {
         if (filtros.anio) queryParams.append('anio', filtros.anio);
         if (filtros.categoria && filtros.categoria !== 'todas') queryParams.append('categoria', filtros.categoria);
         if (filtros.estado && filtros.estado !== 'todos') queryParams.append('estado', filtros.estado);
+        if (filtros.q && filtros.q.trim() !== '') queryParams.append('q', filtros.q.trim());
 
         const url = `/api/obligaciones?${queryParams.toString()}`;
         const res = await fetch(url);
@@ -51,6 +52,15 @@ const API = {
         return await res.json();
     },
 
+    anularObligacion: async (id, motivo) => {
+        const res = await fetch(`/api/obligaciones/${id}/anular`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ motivo })
+        });
+        return await res.json();
+    },
+
     // 4. Dashboard Gerencial
     getKpis: async (mes, anio) => {
         const queryParams = new URLSearchParams();
@@ -60,5 +70,9 @@ const API = {
         const url = `/api/dashboard/kpis?${queryParams.toString()}`;
         const res = await fetch(url);
         return await res.json();
+    },
+
+    getExportCsvUrl: (mes, anio) => {
+        return `/api/dashboard/export/csv?mes=${mes || ''}&anio=${anio || ''}`;
     }
 };

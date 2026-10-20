@@ -28,7 +28,7 @@ const fileFilter = (req, file, cb) => {
     if (allowedExtensions.includes(ext)) {
         cb(null, true);
     } else {
-        cb(new Error('Tipo de archivo no permitido. Solo se aceptan imágenes (JPG, PNG, WEBP) o documentos PDF.'));
+        cb(new Error('Formato no admitido. Solo se admiten archivos JPG, PNG, WEBP, PDF o SVG.'));
     }
 };
 
@@ -46,6 +46,18 @@ function formatDateISO(val) {
     return String(val).split('T')[0];
 }
 
+// Validación de RUC (Perú SUNAT: 11 dígitos, inicia con 10, 15, 17 o 20) o DNI (8 dígitos)
+function validarIdentificadorFiscal(idStr) {
+    if (!idStr) return true; // Opcional
+    const clean = idStr.trim();
+    if (/^\d{8}$/.test(clean)) return true; // DNI válido
+    if (/^\d{11}$/.test(clean)) {
+        const prefijo = clean.substring(0, 2);
+        return ['10', '15', '17', '20'].includes(prefijo);
+    }
+    return false;
+}
+
 // Función auxiliar para calcular el semáforo y días restantes
 function enrichObligacionWithSemaforo(rawItem) {
     const fVencStr = formatDateISO(rawItem.fecha_vencimiento);
@@ -54,6 +66,8 @@ function enrichObligacionWithSemaforo(rawItem) {
 
     const item = {
         ...rawItem,
+        tipo_comprobante: rawItem.tipo_comprobante || 'Factura Electrónica',
+        ruc_beneficiario: rawItem.ruc_beneficiario || 'No especificado',
         fecha_vencimiento: fVencStr,
         fecha_emision: fEmisStr,
         fecha_pago: fPagoStr
@@ -74,59 +88,78 @@ function enrichObligacionWithSemaforo(rawItem) {
         codigo: 'programado',
         color: 'azul',
         etiqueta: 'Programado',
+        detalle_tiempo: diffDias > 1 ? `Plazo: ${diffDias} días` : 'Plazo regular',
         dias_restantes: diffDias,
-        clase_badge: 'bg-blue-100 text-blue-800 border-blue-200',
+        clase_badge: 'bg-slate-100 text-slate-700 border-slate-300',
         alerta_critica: false
     };
 
-    if (item.estado === 'pagado') {
+    if (item.estado === 'anulado') {
+        semaforo = {
+            codigo: 'anulado',
+            color: 'gris',
+            etiqueta: 'Anulado',
+            detalle_tiempo: item.motivo_anulacion || 'Cancelado por error humano',
+            dias_restantes: diffDias,
+            clase_badge: 'bg-zinc-100 text-zinc-500 border-zinc-200 line-through',
+            alerta_critica: false
+        };
+    } else if (item.estado === 'pagado') {
         semaforo = {
             codigo: 'pagado',
             color: 'verde',
-            etiqueta: 'Pagado al 100%',
+            etiqueta: 'Liquidado al 100%',
+            detalle_tiempo: item.fecha_pago ? `Pagado el ${item.fecha_pago}` : 'Certificado',
             dias_restantes: diffDias,
-            clase_badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+            clase_badge: 'bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold',
             alerta_critica: false
         };
     } else if (diffDias < 0) {
+        const diasTarde = Math.abs(diffDias);
         semaforo = {
             codigo: 'vencido',
             color: 'rojo',
-            etiqueta: `¡VENCIDO / EN MORA! (${Math.abs(diffDias)} ${Math.abs(diffDias) === 1 ? 'día' : 'días'} tarde)`,
+            etiqueta: 'Mora Activa',
+            detalle_tiempo: `${diasTarde} ${diasTarde === 1 ? 'día' : 'días'} de retraso`,
             dias_restantes: diffDias,
-            clase_badge: 'bg-red-600 text-white font-bold animate-pulse shadow-md',
+            clase_badge: 'bg-rose-600 text-white font-bold',
             alerta_critica: true
         };
     } else if (diffDias <= 3) {
-        // Regla: 3 días o menos
-        const textoDias = diffDias === 0 ? 'Vence Hoy' : `Quedan ${diffDias} ${diffDias === 1 ? 'día' : 'días'}`;
+        const textoDias = diffDias === 0 ? 'Vence hoy' : `Vence en ${diffDias} ${diffDias === 1 ? 'día' : 'días'}`;
         semaforo = {
             codigo: 'por_vencer',
             color: 'naranja',
-            etiqueta: `¡POR VENCER! (${textoDias})`,
+            etiqueta: 'Vencimiento Inminente',
+            detalle_tiempo: textoDias,
             dias_restantes: diffDias,
-            clase_badge: 'bg-amber-500 text-white font-semibold',
+            clase_badge: 'bg-amber-600 text-white font-semibold',
             alerta_critica: true
         };
     }
 
+    // Regla legal tributaria: Sanción SUNAT para obligaciones tributarias en mora
+    const esImpuesto = (item.categoria || '').toLowerCase() === 'impuesto';
+    const advertenciaLegal = (esImpuesto && semaforo.alerta_critica)
+        ? 'Riesgo SUNAT: Aplicación de TIM diaria + Multa por Omisión (Art. 178 Num. 1 C.T.)'
+        : null;
+
     return {
         ...item,
         monto: parseFloat(item.monto),
-        semaforo
+        semaforo,
+        advertencia_legal: advertenciaLegal
     };
 }
 
 // GET /api/obligaciones
-// Soporta query params: mes, anio, categoria, estado
 router.get('/', async (req, res) => {
     try {
-        const { mes, anio, categoria, estado } = req.query;
+        const { mes, anio, categoria, estado, q } = req.query;
 
         const result = await db.query('SELECT * FROM obligaciones ORDER BY fecha_vencimiento ASC');
         let list = result.rows || [];
 
-        // Filtrar y enriquecer
         let enriched = list.map(enrichObligacionWithSemaforo);
 
         if (mes) {
@@ -146,17 +179,31 @@ router.get('/', async (req, res) => {
         }
 
         if (categoria && categoria !== 'todas') {
-            enriched = enriched.filter(o => o.categoria.toLowerCase() === categoria.toLowerCase());
+            enriched = enriched.filter(o => (o.categoria || '').toLowerCase() === categoria.toLowerCase());
         }
 
         if (estado && estado !== 'todos') {
             if (estado === 'riesgo') {
-                enriched = enriched.filter(o => o.semaforo.alerta_critica);
+                enriched = enriched.filter(o => o.semaforo.alerta_critica && o.estado !== 'anulado');
             } else if (estado === 'pagado') {
                 enriched = enriched.filter(o => o.estado === 'pagado');
             } else if (estado === 'pendiente') {
                 enriched = enriched.filter(o => o.estado === 'pendiente');
+            } else if (estado === 'anulado') {
+                enriched = enriched.filter(o => o.estado === 'anulado');
             }
+        }
+
+        // Búsqueda textual en tiempo real (por descripción, beneficiario o RUC)
+        if (q && q.trim() !== '') {
+            const queryClean = q.trim().toLowerCase();
+            enriched = enriched.filter(o =>
+                (o.descripcion || '').toLowerCase().includes(queryClean) ||
+                (o.beneficiario || '').toLowerCase().includes(queryClean) ||
+                (o.ruc_beneficiario || '').toLowerCase().includes(queryClean) ||
+                (o.tipo_comprobante || '').toLowerCase().includes(queryClean) ||
+                (o.nro_operacion || '').toLowerCase().includes(queryClean)
+            );
         }
 
         res.json({
@@ -170,56 +217,94 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST /api/obligaciones (Registro ágil para Asistente)
+// POST /api/obligaciones (Registro estricto con validaciones tributarias y humanas)
 router.post('/', async (req, res) => {
     try {
         const {
             categoria,
+            tipo_comprobante,
             descripcion,
             beneficiario,
+            ruc_beneficiario,
             monto,
             fecha_emision,
             fecha_vencimiento,
             cuota_info
         } = req.body;
 
-        // Validaciones
+        // 1. Validación de Categoría
         const validCategorias = ['servicio', 'impuesto', 'proveedores', 'prestamo'];
         if (!categoria || !validCategorias.includes(categoria.toLowerCase())) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'La categoría debe ser: Servicio, Impuesto, Proveedores o Préstamo.'
+                mensaje: 'Categoría inválida. Debe ser: Servicio, Impuesto, Proveedores o Préstamo.'
             });
         }
 
-        if (!descripcion || descripcion.trim() === '') {
-            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar una descripción de la obligación.' });
+        // 2. Validación de campos obligatorios
+        if (!descripcion || descripcion.trim().length < 3) {
+            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar un concepto o descripción clara (mínimo 3 caracteres).' });
         }
 
-        if (!beneficiario || beneficiario.trim() === '') {
-            return res.status(400).json({ ok: false, mensaje: 'Debe ingresar el beneficiario o proveedor.' });
+        if (!beneficiario || beneficiario.trim().length < 2) {
+            return res.status(400).json({ ok: false, mensaje: 'Debe indicar la razón social del beneficiario o proveedor.' });
         }
 
+        // 3. Validación de Monto (no cero, no negativo)
         const montoNum = parseFloat(monto);
         if (isNaN(montoNum) || montoNum <= 0) {
-            return res.status(400).json({ ok: false, mensaje: 'El monto debe ser un número mayor a cero.' });
+            return res.status(400).json({ ok: false, mensaje: 'El importe a pagar debe ser un valor numérico estrictamente mayor a cero.' });
         }
 
+        // 4. Validación de Fechas (Prevención de Error Humano: Vencimiento previo a Emisión)
         if (!fecha_emision || !fecha_vencimiento) {
-            return res.status(400).json({ ok: false, mensaje: 'Debe seleccionar la fecha de emisión y de vencimiento.' });
+            return res.status(400).json({ ok: false, mensaje: 'Debe registrar tanto la fecha de emisión como la de vencimiento.' });
+        }
+
+        if (fecha_vencimiento < fecha_emision) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Inconsistencia temporal: La fecha de vencimiento no puede ser anterior a la fecha de emisión del comprobante.'
+            });
+        }
+
+        // 5. Validación Legal Tributaria (RUC SUNAT o DNI)
+        if (ruc_beneficiario && !validarIdentificadorFiscal(ruc_beneficiario)) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Identificador fiscal no válido. Debe ser un RUC válido de 11 dígitos (10, 15, 17, 20) o DNI de 8 dígitos.'
+            });
+        }
+
+        // 6. Prevención de Duplicidad Humana
+        const existingRes = await db.query('SELECT * FROM obligaciones');
+        const duplicates = (existingRes.rows || []).filter(o =>
+            o.estado !== 'anulado' &&
+            o.beneficiario.toLowerCase() === beneficiario.trim().toLowerCase() &&
+            Math.abs(parseFloat(o.monto) - montoNum) < 0.01 &&
+            formatDateISO(o.fecha_vencimiento) === fecha_vencimiento
+        );
+
+        if (duplicates.length > 0) {
+            return res.status(409).json({
+                ok: false,
+                mensaje: `Alerta de duplicidad: Ya existe una obligación registrada para "${beneficiario.trim()}" con el mismo importe y fecha de vencimiento.`
+            });
         }
 
         const sql = `
             INSERT INTO obligaciones 
-            (categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            (categoria, tipo_comprobante, descripcion, beneficiario, ruc_beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *
         `;
 
         const params = [
             categoria.toLowerCase(),
+            tipo_comprobante ? tipo_comprobante.trim() : 'Factura Electrónica',
             descripcion.trim(),
             beneficiario.trim(),
+            ruc_beneficiario ? ruc_beneficiario.trim() : null,
             montoNum,
             fecha_emision,
             fecha_vencimiento,
@@ -231,7 +316,7 @@ router.post('/', async (req, res) => {
 
         res.status(201).json({
             ok: true,
-            mensaje: 'Obligación registrada exitosamente.',
+            mensaje: 'Obligación financiera registrada en el sistema.',
             obligacion: nuevaObligacion
         });
     } catch (error) {
@@ -240,24 +325,39 @@ router.post('/', async (req, res) => {
     }
 });
 
-// POST /api/obligaciones/:id/pagar (Registro de pago con evidencia fotográfica o PDF)
+// POST /api/obligaciones/:id/pagar (Registro de pago con comprobante y control de inmutabilidad)
 router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
         const { nro_operacion, fecha_pago } = req.body;
 
-        // Validar evidencia
+        // Comprobar estado previo
+        const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
+        const actual = (findRes.rows || []).find(o => o.id === id);
+
+        if (!actual) {
+            return res.status(404).json({ ok: false, mensaje: 'Obligación no encontrada.' });
+        }
+
+        if (actual.estado === 'pagado') {
+            return res.status(400).json({ ok: false, mensaje: 'Esta obligación ya se encuentra liquidada y cuenta con comprobante archivado.' });
+        }
+
+        if (actual.estado === 'anulado') {
+            return res.status(400).json({ ok: false, mensaje: 'No se puede ejecutar el pago de una obligación que ha sido anulada.' });
+        }
+
         if (!req.file) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Se requiere adjuntar la evidencia fotográfica o PDF del comprobante de pago.'
+                mensaje: 'Es obligatorio adjuntar el archivo digital del voucher o comprobante de transferencia bancaria.'
             });
         }
 
         if (!nro_operacion || nro_operacion.trim() === '') {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Debe ingresar el número de operación o referencia bancaria.'
+                mensaje: 'Debe ingresar el código de operación o trazabilidad bancaria.'
             });
         }
 
@@ -286,20 +386,61 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
             id
         ]);
 
-        if (!updateRes.rows || updateRes.rows.length === 0) {
-            return res.status(404).json({ ok: false, mensaje: 'Obligación no encontrada.' });
-        }
-
         const pagada = enrichObligacionWithSemaforo(updateRes.rows[0]);
 
         res.json({
             ok: true,
-            mensaje: 'Pago registrado exitosamente con evidencia fotográfica.',
+            mensaje: 'Pago certificado y archivado exitosamente.',
             obligacion: pagada
         });
     } catch (error) {
         console.error('Error en POST /api/obligaciones/:id/pagar:', error);
         res.status(500).json({ ok: false, mensaje: 'Error al registrar el pago: ' + error.message });
+    }
+});
+
+// POST /api/obligaciones/:id/anular (Manejo de Error Humano: Anulación formal con motivo)
+router.post('/:id/anular', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const { motivo } = req.body;
+
+        const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
+        const actual = (findRes.rows || []).find(o => o.id === id);
+
+        if (!actual) {
+            return res.status(404).json({ ok: false, mensaje: 'Obligación no encontrada.' });
+        }
+
+        if (actual.estado === 'pagado') {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No es posible anular una obligación ya liquidada. Requiere procedimiento de nota de crédito contable.'
+            });
+        }
+
+        const motivoFinal = (motivo && motivo.trim() !== '') ? motivo.trim() : 'Corrección por error de digitación';
+
+        const updateSql = `
+            UPDATE obligaciones 
+            SET estado = 'anulado',
+                motivo_anulacion = $1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $2
+            RETURNING *
+        `;
+
+        const updateRes = await db.query(updateSql, [motivoFinal, id]);
+        const anulada = enrichObligacionWithSemaforo(updateRes.rows[0]);
+
+        res.json({
+            ok: true,
+            mensaje: 'Obligación anulada correctamente en el libro de compromisos.',
+            obligacion: anulada
+        });
+    } catch (error) {
+        console.error('Error en anular obligación:', error);
+        res.status(500).json({ ok: false, mensaje: 'Error interno al anular la obligación.' });
     }
 });
 

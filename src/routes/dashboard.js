@@ -25,9 +25,11 @@ router.get('/kpis', async (req, res) => {
 
         hoy.setHours(0, 0, 0, 0);
 
-        // Filtrar obligaciones del mes y año consultado
+        // Filtrar obligaciones del mes y año consultado (excluyendo anuladas de los cálculos monetarios)
         const obligacionesMes = todas.map(o => ({
             ...o,
+            tipo_comprobante: o.tipo_comprobante || 'Factura Electrónica',
+            ruc_beneficiario: o.ruc_beneficiario || 'No especificado',
             fecha_vencimiento: formatDateISO(o.fecha_vencimiento),
             fecha_emision: formatDateISO(o.fecha_emision),
             fecha_pago: formatDateISO(o.fecha_pago)
@@ -48,8 +50,8 @@ router.get('/kpis', async (req, res) => {
         let cantVencidos = 0;
         let cantPorVencer = 0;
         let cantProgramados = 0;
+        let cantAnulados = 0;
 
-        // Desglose por categoría
         const categoriasTotal = {
             servicio: 0,
             impuesto: 0,
@@ -58,10 +60,14 @@ router.get('/kpis', async (req, res) => {
         };
 
         obligacionesMes.forEach(item => {
+            if (item.estado === 'anulado') {
+                cantAnulados++;
+                return; // No computa pasivos financieros
+            }
+
             const monto = parseFloat(item.monto) || 0;
             totalGastosMes += monto;
 
-            // Desglose categoría
             const cat = (item.categoria || '').toLowerCase();
             if (categoriasTotal[cat] !== undefined) {
                 categoriasTotal[cat] += monto;
@@ -71,7 +77,6 @@ router.get('/kpis', async (req, res) => {
                 totalPagado += monto;
                 cantPagados++;
             } else {
-                // Calcular días restantes
                 const [y, m, d] = (item.fecha_vencimiento || '').split('-').map(Number);
                 const fVenc = new Date(y, m - 1, d);
                 fVenc.setHours(0, 0, 0, 0);
@@ -79,22 +84,18 @@ router.get('/kpis', async (req, res) => {
                 const diffDias = Math.round((fVenc.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
 
                 if (diffDias < 0) {
-                    // Vencido
                     cantVencidos++;
                     totalRiesgoMora += monto;
                 } else if (diffDias <= 3) {
-                    // Por vencer (<= 3 días)
                     cantPorVencer++;
                     totalRiesgoMora += monto;
                 } else {
-                    // Programado normal (> 3 días)
                     cantProgramados++;
                     totalPendiente += monto;
                 }
             }
         });
 
-        // Porcentaje pagado
         const porcentajePagado = totalGastosMes > 0 
             ? Math.round((totalPagado / totalGastosMes) * 100) 
             : 0;
@@ -115,6 +116,7 @@ router.get('/kpis', async (req, res) => {
                 vencidos: cantVencidos,
                 por_vencer: cantPorVencer,
                 programados: cantProgramados,
+                anulados: cantAnulados,
                 en_alerta: cantVencidos + cantPorVencer
             },
             por_categoria: categoriasTotal
@@ -122,6 +124,53 @@ router.get('/kpis', async (req, res) => {
     } catch (error) {
         console.error('Error en /api/dashboard/kpis:', error);
         res.status(500).json({ ok: false, mensaje: 'Error al calcular los KPIs del dashboard.' });
+    }
+});
+
+// GET /api/dashboard/export/csv?mes=10&anio=2026 (Exportación contable legal para el Gerente)
+router.get('/export/csv', async (req, res) => {
+    try {
+        const { mes, anio } = req.query;
+        const result = await db.query('SELECT * FROM obligaciones ORDER BY fecha_vencimiento ASC');
+        let list = result.rows || [];
+
+        if (mes) {
+            const m = parseInt(mes, 10);
+            list = list.filter(o => parseInt(formatDateISO(o.fecha_vencimiento).split('-')[1], 10) === m);
+        }
+        if (anio) {
+            const a = parseInt(anio, 10);
+            list = list.filter(o => parseInt(formatDateISO(o.fecha_vencimiento).split('-')[0], 10) === a);
+        }
+
+        // Generar formato CSV con BOM UTF-8 para apertura directa en Excel
+        let csv = '\uFEFF';
+        csv += 'ID;Categoria;Tipo Comprobante;Beneficiario / Proveedor;RUC / Identificador;Concepto / Descripcion;Monto (PEN);Emision;Vencimiento;Estado;Fecha Pago;Nro Operacion\n';
+
+        list.forEach(o => {
+            const row = [
+                o.id,
+                o.categoria,
+                `"${(o.tipo_comprobante || 'Factura').replace(/"/g, '""')}"`,
+                `"${(o.beneficiario || '').replace(/"/g, '""')}"`,
+                `"${o.ruc_beneficiario || 'S/N'}"`,
+                `"${(o.descripcion || '').replace(/"/g, '""')}"`,
+                parseFloat(o.monto || 0).toFixed(2),
+                formatDateISO(o.fecha_emision),
+                formatDateISO(o.fecha_vencimiento),
+                o.estado,
+                formatDateISO(o.fecha_pago) || 'N/A',
+                `"${o.nro_operacion || 'N/A'}"`
+            ];
+            csv += row.join(';') + '\n';
+        });
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="Reporte_Obligaciones_${anio || 'Periodo'}_${mes || 'Mes'}.csv"`);
+        res.send(csv);
+    } catch (err) {
+        console.error('Error al exportar CSV:', err);
+        res.status(500).json({ ok: false, mensaje: 'Error al exportar reporte contable.' });
     }
 });
 

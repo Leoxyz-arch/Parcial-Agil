@@ -7,7 +7,15 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
-  "keywords": ["scrum", "agile", "mvp", "cashflow", "neon", "postgresql", "nodejs"],
+  "keywords": [
+    "scrum",
+    "agile",
+    "mvp",
+    "cashflow",
+    "neon",
+    "postgresql",
+    "nodejs"
+  ],
   "author": "Equipo de Desarrollo Agile",
   "license": "ISC",
   "dependencies": {
@@ -17,5 +25,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
   }
 }

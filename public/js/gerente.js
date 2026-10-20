@@ -21,6 +21,8 @@ window.GerenteModule = {
     bindEvents: () => {
         const btnConsultar = document.getElementById('btn-consultar-gerente');
         const filtroCat = document.getElementById('filtro-categoria-gerente');
+        const btnExportCsv = document.getElementById('btn-export-csv');
+        const buscador = document.getElementById('buscador-gerente');
 
         if (btnConsultar) {
             btnConsultar.onclick = () => GerenteModule.cargarDashboard();
@@ -28,6 +30,25 @@ window.GerenteModule = {
 
         if (filtroCat) {
             filtroCat.onchange = () => GerenteModule.renderTablaAuditoria();
+        }
+
+        if (btnExportCsv) {
+            btnExportCsv.onclick = () => {
+                const mes = document.getElementById('gerente-mes').value;
+                const anio = document.getElementById('gerente-anio').value;
+                Toast.info('Descargando libro de compromisos y auditoría en formato CSV...', 3000);
+                window.location.href = API.getExportCsvUrl(mes, anio);
+            };
+        }
+
+        if (buscador) {
+            let timeoutId = null;
+            buscador.oninput = () => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    GerenteModule.renderTablaAuditoria();
+                }, 150);
+            };
         }
     },
 
@@ -50,6 +71,7 @@ window.GerenteModule = {
             }
         } catch (error) {
             console.error('Error al cargar dashboard del gerente:', error);
+            Toast.error('Error de sincronización con el panel gerencial.');
         }
     },
 
@@ -71,18 +93,18 @@ window.GerenteModule = {
         // Alerta crítica si hay riesgo de mora
         const badgeCritico = document.getElementById('badge-critico-kpi');
         if (kpis.total_riesgo_mora > 0) {
-            badgeCritico.textContent = `${conteos.en_alerta} En Alerta`;
-            badgeCritico.className = 'text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-red-600 text-white animate-pulse';
+            badgeCritico.textContent = `${conteos.en_alerta} En Riesgo`;
+            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800';
         } else {
             badgeCritico.textContent = 'Al día';
-            badgeCritico.className = 'text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+            badgeCritico.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
         }
 
         // Desglose por categorías
-        const total = kpis.total_gastos_mes || 1; // Evitar división por cero
+        const total = kpis.total_gastos_mes || 1;
         const renderCat = (catName, barId, montoId) => {
             const monto = por_categoria[catName] || 0;
-            const barPct = Math.round((monto / total) * 100);
+            const barPct = Math.min(100, Math.round((monto / total) * 100));
             document.getElementById(montoId).textContent = formatMoney(monto);
             document.getElementById(barId).style.width = `${barPct}%`;
         };
@@ -98,6 +120,8 @@ window.GerenteModule = {
     renderTablaAuditoria: () => {
         const tbody = document.getElementById('tabla-obligaciones-gerente');
         const filtroCat = document.getElementById('filtro-categoria-gerente').value;
+        const buscador = document.getElementById('buscador-gerente');
+        const q = buscador ? buscador.value.trim().toLowerCase() : '';
 
         tbody.innerHTML = '';
 
@@ -106,53 +130,69 @@ window.GerenteModule = {
             filtradas = filtradas.filter(o => o.categoria.toLowerCase() === filtroCat.toLowerCase());
         }
 
+        if (q) {
+            filtradas = filtradas.filter(o =>
+                (o.descripcion || '').toLowerCase().includes(q) ||
+                (o.beneficiario || '').toLowerCase().includes(q) ||
+                (o.ruc_beneficiario || '').toLowerCase().includes(q) ||
+                (o.nro_operacion || '').toLowerCase().includes(q)
+            );
+        }
+
         if (filtradas.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="py-6 text-center text-slate-400">
-                        No hay obligaciones en el periodo seleccionado.
+                    <td colspan="6" class="py-10 text-center text-slate-500">
+                        <i data-lucide="folder-search" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                        <p class="text-xs">No se encontraron registros de auditoría en este periodo.</p>
                     </td>
                 </tr>
             `;
+            if (window.lucide) window.lucide.createIcons();
             return;
         }
 
         filtradas.forEach(item => {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+            tr.className = 'hover:bg-slate-800/40 transition-subtle border-b border-slate-800/80';
 
-            // Semáforo badge
             const semaforoBadge = `
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${item.semaforo.clase_badge}">
-                    ${item.semaforo.alerta_critica ? '⚠️ ' : ''}${item.semaforo.etiqueta}
-                </span>
+                <div class="inline-flex flex-col">
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${item.semaforo.clase_badge}">
+                        ${item.semaforo.alerta_critica ? '<i data-lucide="alert-triangle" class="w-2.5 h-2.5"></i>' : ''}
+                        <span>${item.semaforo.etiqueta}</span>
+                    </span>
+                    <span class="text-[9px] text-slate-400 mt-0.5">${item.semaforo.detalle_tiempo}</span>
+                </div>
             `;
 
-            // Botón voucher
-            let compHtml = '<span class="text-slate-400 text-[11px]">Sin pago</span>';
+            let compHtml = '<span class="text-slate-600 font-mono text-[11px]">—</span>';
             if (item.estado === 'pagado') {
                 compHtml = `
                     <button type="button" onclick="window.GerenteModule.abrirVisorComprobante(${item.id})"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition text-[11px] font-bold">
-                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                        <span>Auditar Foto</span>
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 hover:bg-emerald-900 transition-subtle text-[11px] font-medium" title="Auditar comprobante">
+                        <i data-lucide="eye" class="w-3 h-3"></i>
+                        <span>Auditar</span>
                     </button>
                 `;
+            } else if (item.estado === 'anulado') {
+                compHtml = '<span class="text-slate-500 font-mono text-[10px]">ANULADO</span>';
             }
 
             tr.innerHTML = `
                 <td class="py-2.5 px-3">${semaforoBadge}</td>
                 <td class="py-2.5 px-3">
-                    <span class="uppercase text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <span class="uppercase text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
                         ${item.categoria}
                     </span>
+                    <p class="text-[10px] text-slate-400 mt-0.5">${item.tipo_comprobante || 'Factura'}</p>
                 </td>
                 <td class="py-2.5 px-3">
-                    <p class="font-bold text-slate-800">${item.descripcion}</p>
-                    <p class="text-[10px] text-slate-600">${item.beneficiario} ${item.cuota_info ? `• ${item.cuota_info}` : ''}</p>
+                    <p class="font-semibold text-slate-200 text-xs">${item.descripcion}</p>
+                    <p class="text-[10px] text-slate-400">${item.beneficiario} • <span class="font-mono-numbers">RUC: ${item.ruc_beneficiario || 'S/N'}</span></p>
                 </td>
-                <td class="py-2.5 px-3 font-medium text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="py-2.5 px-3 text-right font-black text-slate-900">
+                <td class="py-2.5 px-3 font-mono-numbers text-xs text-slate-300">${item.fecha_vencimiento}</td>
+                <td class="py-2.5 px-3 text-right font-mono-numbers font-bold text-xs text-slate-100">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="py-2.5 px-3 text-center">${compHtml}</td>
@@ -165,14 +205,13 @@ window.GerenteModule = {
     },
 
     abrirVisorComprobante: async (id) => {
-        // Buscar en asistente u gerente
         let item = GerenteModule.obligaciones.find(o => o.id === id);
         if (!item && window.AsistenteModule) {
             item = window.AsistenteModule.obligaciones.find(o => o.id === id);
         }
 
         if (!item || !item.comprobante_url) {
-            alert('No se encontró el comprobante para esta obligación.');
+            Toast.warning('Esta obligación aún no cuenta con comprobante de pago digital adjunto.');
             return;
         }
 
@@ -184,20 +223,19 @@ window.GerenteModule = {
         const fechaText = document.getElementById('visor-fecha');
         const btnDescargar = document.getElementById('visor-descargar');
 
-        titulo.textContent = `Voucher: ${item.descripcion}`;
-        subtitulo.textContent = `${item.beneficiario} • Importe: S/ ${item.monto.toFixed(2)}`;
-        opText.textContent = item.nro_operacion || 'No registrado';
+        titulo.textContent = `Auditoría: ${item.descripcion}`;
+        subtitulo.textContent = `${item.beneficiario} (RUC: ${item.ruc_beneficiario || 'S/N'}) • Monto: S/ ${item.monto.toFixed(2)}`;
+        opText.textContent = item.nro_operacion || 'Sin registro';
         fechaText.textContent = item.fecha_pago || 'No registrada';
         btnDescargar.href = item.comprobante_url;
 
-        // Renderizar según tipo
         if (item.comprobante_tipo === 'pdf') {
             contenido.innerHTML = `
-                <iframe src="${item.comprobante_url}" class="w-full h-96 rounded-lg border border-slate-300"></iframe>
+                <iframe src="${item.comprobante_url}" class="w-full h-96 rounded border border-slate-700 bg-slate-900"></iframe>
             `;
         } else {
             contenido.innerHTML = `
-                <img src="${item.comprobante_url}" alt="Comprobante de Pago" class="max-h-[60vh] max-w-full rounded-xl shadow-lg border border-slate-200 mx-auto object-contain">
+                <img src="${item.comprobante_url}" alt="Comprobante de Pago" class="max-h-[60vh] max-w-full rounded border border-slate-700 mx-auto object-contain bg-slate-950 p-2">
             `;
         }
 

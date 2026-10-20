@@ -29,3 +29,9 @@ ehthumbs.db
 dist/
 build/
 .cache/
+
+
+# Demos & test uploads
+*.mp4
+*.webm
+uploads/voucher-*

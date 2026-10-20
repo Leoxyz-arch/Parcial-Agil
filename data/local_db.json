@@ -6,7 +6,7 @@
       "password_hash": "gerente123",
       "nombre_completo": "Lic. Roberto Gerente",
       "rol": "gerente",
-      "created_at": "2026-10-18T23:51:22.438Z"
+      "created_at": "2026-10-20T03:02:50.370Z"
     },
     {
       "id": 2,
@@ -14,73 +14,104 @@
       "password_hash": "asistente123",
       "nombre_completo": "Ana María Asistente",
       "rol": "asistente",
-      "created_at": "2026-10-18T23:51:22.439Z"
+      "created_at": "2026-10-20T03:02:50.371Z"
     }
   ],
   "obligaciones": [
     {
       "id": 1,
       "categoria": "servicio",
+      "tipo_comprobante": "Recibo Servicios Públicos",
       "descripcion": "Recibo de Energía Eléctrica - Sede Central",
       "beneficiario": "Luz del Sur S.A.A.",
+      "ruc_beneficiario": "20331898971",
       "monto": 850.5,
-      "fecha_emision": "2026-09-28",
-      "fecha_vencimiento": "2026-10-20",
+      "fecha_emision": "2026-09-30",
+      "fecha_vencimiento": "2026-10-22",
       "cuota_info": null,
       "estado": "pendiente",
       "fecha_pago": null,
       "nro_operacion": null,
       "comprobante_url": null,
       "comprobante_tipo": null,
-      "created_at": "2026-10-18T23:51:22.439Z"
+      "motivo_anulacion": null,
+      "created_at": "2026-10-20T03:02:50.372Z"
     },
     {
       "id": 2,
       "categoria": "impuesto",
+      "tipo_comprobante": "Declaración Jurada PDT",
       "descripcion": "Declaración y Pago IGV - Periodo Tributario",
       "beneficiario": "SUNAT",
+      "ruc_beneficiario": "20131312955",
       "monto": 2450,
-      "fecha_emision": "2026-09-23",
-      "fecha_vencimiento": "2026-10-17",
+      "fecha_emision": "2026-09-25",
+      "fecha_vencimiento": "2026-10-19",
       "cuota_info": null,
       "estado": "pendiente",
       "fecha_pago": null,
       "nro_operacion": null,
       "comprobante_url": null,
       "comprobante_tipo": null,
-      "created_at": "2026-10-18T23:51:22.439Z"
+      "motivo_anulacion": null,
+      "created_at": "2026-10-20T03:02:50.372Z"
     },
     {
       "id": 3,
       "categoria": "prestamo",
+      "tipo_comprobante": "Liquidación de Crédito",
       "descripcion": "Crédito de Capital de Trabajo Pyme",
       "beneficiario": "Banco BCP",
+      "ruc_beneficiario": "20100047218",
       "monto": 1600,
-      "fecha_emision": "2026-09-18",
-      "fecha_vencimiento": "2026-10-13",
+      "fecha_emision": "2026-09-20",
+      "fecha_vencimiento": "2026-10-15",
       "cuota_info": "Cuota 3 de 12",
       "estado": "pagado",
-      "fecha_pago": "2026-10-12",
+      "fecha_pago": "2026-10-14",
       "nro_operacion": "BCP-OP-894120",
       "comprobante_url": "/uploads/sample_voucher_bcp.svg",
       "comprobante_tipo": "imagen",
-      "created_at": "2026-10-18T23:51:22.439Z"
+      "motivo_anulacion": null,
+      "created_at": "2026-10-20T03:02:50.372Z"
     },
     {
       "id": 4,
       "categoria": "proveedores",
+      "tipo_comprobante": "Factura Electrónica",
       "descripcion": "Factura F001-00293 Suministros y Empaques",
       "beneficiario": "Distribuidora Alfa S.A.C.",
+      "ruc_beneficiario": "20554819231",
       "monto": 3200,
-      "fecha_emision": "2026-10-13",
-      "fecha_vencimiento": "2026-10-30",
+      "fecha_emision": "2026-10-15",
+      "fecha_vencimiento": "2026-11-01",
       "cuota_info": null,
       "estado": "pendiente",
       "fecha_pago": null,
       "nro_operacion": null,
       "comprobante_url": null,
       "comprobante_tipo": null,
-      "created_at": "2026-10-18T23:51:22.439Z"
+      "motivo_anulacion": null,
+      "created_at": "2026-10-20T03:02:50.372Z"
+    },
+    {
+      "id": 5,
+      "categoria": "servicio",
+      "tipo_comprobante": "Recibo Servicios Públicos",
+      "descripcion": "Suministro Eléctrico Subestación Planta 2",
+      "beneficiario": "Enel Distribución Perú S.A.A.",
+      "ruc_beneficiario": "20269985906",
+      "monto": 1850,
+      "fecha_emision": "2026-10-20",
+      "fecha_vencimiento": "2026-10-22",
+      "cuota_info": null,
+      "estado": "pendiente",
+      "fecha_pago": null,
+      "nro_operacion": null,
+      "comprobante_url": null,
+      "comprobante_tipo": null,
+      "motivo_anulacion": null,
+      "created_at": "2026-10-20T03:04:35.102Z"
     }
   ]
 }

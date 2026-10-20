@@ -1,5 +1,56 @@
 // app.js - Coordinador y Lifecycle Principal de la Aplicación
 
+// Sistema Profesional de Notificaciones Toast (Reemplaza los alert nativos)
+window.Toast = {
+    show: (mensaje, tipo = 'info', duracion = 4000) => {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${tipo}`;
+
+        const icons = {
+            success: 'check-circle-2',
+            error: 'alert-octagon',
+            warning: 'alert-triangle',
+            info: 'info'
+        };
+        const iconName = icons[tipo] || 'bell';
+
+        toast.innerHTML = `
+            <i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+            <div class="flex-1 font-medium">${mensaje}</div>
+            <button type="button" class="text-white/60 hover:text-white ml-2 flex-shrink-0" title="Cerrar">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+        `;
+
+        const closeBtn = toast.querySelector('button');
+        const dismiss = () => {
+            toast.style.animation = 'toastSlideOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+            setTimeout(() => {
+                if (toast.parentElement) toast.parentElement.removeChild(toast);
+            }, 200);
+        };
+
+        closeBtn.onclick = dismiss;
+        container.appendChild(toast);
+        if (window.lucide) window.lucide.createIcons();
+
+        if (duracion > 0) {
+            setTimeout(dismiss, duracion);
+        }
+    },
+    success: (msg, dur) => window.Toast.show(msg, 'success', dur),
+    error: (msg, dur) => window.Toast.show(msg, 'error', dur),
+    warning: (msg, dur) => window.Toast.show(msg, 'warning', dur),
+    info: (msg, dur) => window.Toast.show(msg, 'info', dur)
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando CashFlow Guard Web...');
 
