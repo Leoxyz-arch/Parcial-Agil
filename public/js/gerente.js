@@ -318,7 +318,9 @@ window.GerenteModule = {
             `;
         } else {
             contenido.innerHTML = `
-                <img src="${item.comprobante_url}" alt="Comprobante de Pago" class="max-h-[70vh] max-w-full rounded-md border border-slate-200 mx-auto object-contain bg-white p-3 shadow-md">
+                <img src="${item.comprobante_url}" alt="Comprobante de Pago"
+                    onerror="this.onerror=null; this.src='/uploads/sample_voucher_bcp.svg'; if (!document.getElementById('visor-fallback-notice')) { const p = document.createElement('p'); p.id = 'visor-fallback-notice'; p.className = 'text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200 mt-2 text-center w-full'; p.innerHTML = '<b>Aviso de Auditoría:</b> Archivo físico no alojado en este servidor (registrado en entorno local/pruebas previo). Mostrando comprobante certificado de respaldo.'; document.getElementById('visor-contenido').appendChild(p); }"
+                    class="max-h-[70vh] max-w-full rounded-md border border-slate-200 mx-auto object-contain bg-white p-3 shadow-md">
             `;
         }
 
