@@ -437,13 +437,20 @@
                                 </h3>
                                 <p class="text-xs text-slate-600">Haz clic en cualquier comprobante para auditar la evidencia fotográfica.</p>
                             </div>
-                            <select id="filtro-categoria-gerente" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold">
-                                <option value="todas">Todas las categorías</option>
-                                <option value="servicio">Servicios</option>
-                                <option value="impuesto">Impuestos</option>
-                                <option value="proveedores">Proveedores</option>
-                                <option value="prestamo">Préstamos</option>
-                            </select>
+                            <div class="flex items-center gap-2">
+                                <select id="filtro-estado-gerente" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold bg-emerald-50 text-emerald-800">
+                                    <option value="pagado" selected>✅ Solo Pagadas (Con Voucher)</option>
+                                    <option value="todos">Todos los Estados</option>
+                                    <option value="pendiente">⏳ Solo Pendientes</option>
+                                </select>
+                                <select id="filtro-categoria-gerente" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold">
+                                    <option value="todas">Todas las categorías</option>
+                                    <option value="servicio">Servicios</option>
+                                    <option value="impuesto">Impuestos</option>
+                                    <option value="proveedores">Proveedores</option>
+                                    <option value="prestamo">Préstamos</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="overflow-x-auto max-h-80 overflow-y-auto">
@@ -496,10 +503,46 @@
                 </div>
 
                 <!-- Campo específico si es préstamo -->
-                <div id="container-cuota-prestamo" class="hidden">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Detalle de Cuota</label>
-                    <input type="text" id="crear-cuota" placeholder="Ej. Cuota 4 de 12"
-                        class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500">
+                <div id="container-cuota-prestamo" class="hidden p-3.5 bg-emerald-50/50 rounded-xl border border-emerald-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold uppercase tracking-wider text-emerald-800">Modalidad del Préstamo</label>
+                        <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">Amortización</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-emerald-400">
+                            <input type="radio" name="prestamo-modalidad" id="modalidad-manual" value="manual" checked class="text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-xs font-medium text-slate-700">Cuota Individual</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-emerald-400">
+                            <input type="radio" name="prestamo-modalidad" id="modalidad-auto" value="auto" class="text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-xs font-bold text-emerald-800">Generar Cuotas (N meses)</span>
+                        </label>
+                    </div>
+
+                    <!-- Si es manual -->
+                    <div id="subcontainer-cuota-manual">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Detalle de Cuota</label>
+                        <input type="text" id="crear-cuota" placeholder="Ej. Cuota 4 de 12"
+                            class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <!-- Si es auto amortizable -->
+                    <div id="subcontainer-cuota-auto" class="hidden space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">N° de Cuotas Mensuales</label>
+                                <input type="number" id="crear-num-cuotas" min="2" max="60" value="6"
+                                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">Monto por Cuota</label>
+                                <div id="display-monto-cuota" class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-900 text-xs font-extrabold border border-emerald-300">
+                                    S/ 0.00
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-emerald-700">💡 Se generará una obligación para cada mes a partir de la fecha de vencimiento inicial con su respectiva amortización progresiva.</p>
+                    </div>
                 </div>
 
                 <div>

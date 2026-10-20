@@ -51,6 +51,13 @@ const API = {
         return await res.json();
     },
 
+    eliminarObligacion: async (id) => {
+        const res = await fetch(`/api/obligaciones/${id}`, {
+            method: 'DELETE'
+        });
+        return await res.json();
+    },
+
     // 4. Dashboard Gerencial
     getKpis: async (mes, anio) => {
         const queryParams = new URLSearchParams();

@@ -24,13 +24,57 @@ window.AsistenteModule = {
         const formCrear = document.getElementById('form-crear-obligacion');
         const selectCatCrear = document.getElementById('crear-categoria');
         const containerCuota = document.getElementById('container-cuota-prestamo');
+        const modManual = document.getElementById('modalidad-manual');
+        const modAuto = document.getElementById('modalidad-auto');
+        const subManual = document.getElementById('subcontainer-cuota-manual');
+        const subAuto = document.getElementById('subcontainer-cuota-auto');
+        const inputMonto = document.getElementById('crear-monto');
+        const inputNumCuotas = document.getElementById('crear-num-cuotas');
+        const displayMontoCuota = document.getElementById('display-monto-cuota');
+        const inputEmision = document.getElementById('crear-emision');
+        const inputVencimiento = document.getElementById('crear-vencimiento');
+
+        const recalcularMontoCuota = () => {
+            const m = parseFloat(inputMonto.value) || 0;
+            const c = parseInt(inputNumCuotas.value, 10) || 1;
+            if (m > 0 && c > 0) {
+                displayMontoCuota.textContent = `S/ ${(m / c).toFixed(2)}`;
+            } else {
+                displayMontoCuota.textContent = 'S/ 0.00';
+            }
+        };
+
+        if (inputMonto) inputMonto.addEventListener('input', recalcularMontoCuota);
+        if (inputNumCuotas) inputNumCuotas.addEventListener('input', recalcularMontoCuota);
+
+        if (modManual && modAuto) {
+            modManual.onchange = () => {
+                subManual.classList.remove('hidden');
+                subAuto.classList.add('hidden');
+            };
+            modAuto.onchange = () => {
+                subManual.classList.add('hidden');
+                subAuto.classList.remove('hidden');
+                recalcularMontoCuota();
+            };
+        }
+
+        if (inputEmision && inputVencimiento) {
+            inputEmision.addEventListener('change', () => {
+                inputVencimiento.min = inputEmision.value;
+            });
+        }
 
         if (btnOpenCrear) {
             btnOpenCrear.onclick = () => {
                 formCrear.reset();
-                // Fecha emisión por defecto hoy
-                document.getElementById('crear-emision').value = new Date().toISOString().split('T')[0];
+                const hoyStr = new Date().toISOString().split('T')[0];
+                inputEmision.value = hoyStr;
+                inputVencimiento.min = hoyStr;
                 containerCuota.classList.add('hidden');
+                if (modManual) modManual.checked = true;
+                if (subManual) subManual.classList.remove('hidden');
+                if (subAuto) subAuto.classList.add('hidden');
                 modalCrear.classList.remove('hidden');
             };
         }
@@ -39,6 +83,7 @@ window.AsistenteModule = {
             selectCatCrear.onchange = (e) => {
                 if (e.target.value === 'prestamo') {
                     containerCuota.classList.remove('hidden');
+                    recalcularMontoCuota();
                 } else {
                     containerCuota.classList.add('hidden');
                 }
@@ -54,7 +99,25 @@ window.AsistenteModule = {
                 const monto = parseFloat(document.getElementById('crear-monto').value);
                 const fecha_emision = document.getElementById('crear-emision').value;
                 const fecha_vencimiento = document.getElementById('crear-vencimiento').value;
-                const cuota_info = categoria === 'prestamo' ? document.getElementById('crear-cuota').value.trim() : null;
+
+                // Validación de coherencia de fechas
+                if (fecha_vencimiento < fecha_emision) {
+                    alert('⚠️ Error de validación: La fecha de vencimiento no puede ser anterior a la fecha de emisión.');
+                    return;
+                }
+
+                let cuota_info = null;
+                let generar_cuotas = false;
+                let num_cuotas = 1;
+
+                if (categoria === 'prestamo') {
+                    if (modAuto && modAuto.checked) {
+                        generar_cuotas = true;
+                        num_cuotas = parseInt(inputNumCuotas.value, 10) || 6;
+                    } else {
+                        cuota_info = document.getElementById('crear-cuota').value.trim() || 'Cuota de Préstamo';
+                    }
+                }
 
                 try {
                     const res = await API.crearObligacion({
@@ -64,7 +127,9 @@ window.AsistenteModule = {
                         monto,
                         fecha_emision,
                         fecha_vencimiento,
-                        cuota_info
+                        cuota_info,
+                        generar_cuotas,
+                        num_cuotas
                     });
 
                     if (res.ok) {
@@ -253,11 +318,18 @@ window.AsistenteModule = {
                 `;
             } else {
                 actionHtml = `
-                    <button type="button" onclick="window.AsistenteModule.abrirModalPagar(${item.id})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition text-xs font-bold">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                        <span>Pagar & Voucher</span>
-                    </button>
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button type="button" onclick="window.AsistenteModule.abrirModalPagar(${item.id})"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition text-xs font-bold">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Pagar</span>
+                        </button>
+                        <button type="button" onclick="window.AsistenteModule.eliminarObligacion(${item.id})"
+                            title="Anular obligación creada por error"
+                            class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 `;
             }
 
@@ -307,5 +379,24 @@ window.AsistenteModule = {
         document.getElementById('pagar-archivo').value = '';
 
         document.getElementById('modal-pagar-obligacion').classList.remove('hidden');
+    },
+
+    eliminarObligacion: async (id) => {
+        const item = AsistenteModule.obligaciones.find(o => o.id === id);
+        if (!item) return;
+
+        const confirmar = confirm(`¿Estás seguro de anular la obligación: "${item.descripcion}" por S/ ${item.monto.toFixed(2)}?\n\nEsta acción quitará el compromiso de pago del sistema.`);
+        if (!confirmar) return;
+
+        try {
+            const res = await API.eliminarObligacion(id);
+            if (res.ok) {
+                await AsistenteModule.cargarObligaciones();
+            } else {
+                alert(res.mensaje || 'No se pudo anular la obligación.');
+            }
+        } catch (e) {
+            alert('Error de conexión con el servidor.');
+        }
     }
 };

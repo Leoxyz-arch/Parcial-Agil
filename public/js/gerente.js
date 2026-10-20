@@ -21,6 +21,7 @@ window.GerenteModule = {
     bindEvents: () => {
         const btnConsultar = document.getElementById('btn-consultar-gerente');
         const filtroCat = document.getElementById('filtro-categoria-gerente');
+        const filtroEst = document.getElementById('filtro-estado-gerente');
 
         if (btnConsultar) {
             btnConsultar.onclick = () => GerenteModule.cargarDashboard();
@@ -28,6 +29,10 @@ window.GerenteModule = {
 
         if (filtroCat) {
             filtroCat.onchange = () => GerenteModule.renderTablaAuditoria();
+        }
+
+        if (filtroEst) {
+            filtroEst.onchange = () => GerenteModule.renderTablaAuditoria();
         }
     },
 
@@ -98,10 +103,19 @@ window.GerenteModule = {
     renderTablaAuditoria: () => {
         const tbody = document.getElementById('tabla-obligaciones-gerente');
         const filtroCat = document.getElementById('filtro-categoria-gerente').value;
+        const selectEst = document.getElementById('filtro-estado-gerente');
+        const filtroEst = selectEst ? selectEst.value : 'pagado';
 
         tbody.innerHTML = '';
 
         let filtradas = GerenteModule.obligaciones;
+
+        // Filtro por Estado (HU-06: Por defecto deudas pagadas con evidencia)
+        if (filtroEst && filtroEst !== 'todos') {
+            filtradas = filtradas.filter(o => o.estado === filtroEst);
+        }
+
+        // Filtro por Categoría
         if (filtroCat && filtroCat !== 'todas') {
             filtradas = filtradas.filter(o => o.categoria.toLowerCase() === filtroCat.toLowerCase());
         }
@@ -110,7 +124,7 @@ window.GerenteModule = {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="py-6 text-center text-slate-400">
-                        No hay obligaciones en el periodo seleccionado.
+                        No hay obligaciones coincidentes con los filtros seleccionados para este periodo.
                     </td>
                 </tr>
             `;

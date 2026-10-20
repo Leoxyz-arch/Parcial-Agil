@@ -209,6 +209,53 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: 'Debe seleccionar la fecha de emisión y de vencimiento.' });
         }
 
+        if (fecha_vencimiento < fecha_emision) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La fecha de vencimiento no puede ser anterior a la fecha de emisión.'
+            });
+        }
+
+        // Si es préstamo y se solicita amortización progresiva en cuotas automáticas
+        const numCuotas = parseInt(req.body.num_cuotas, 10);
+        if (categoria.toLowerCase() === 'prestamo' && req.body.generar_cuotas && numCuotas > 1) {
+            const montoCuota = +(montoNum / numCuotas).toFixed(2);
+            const [y, m, d] = fecha_vencimiento.split('-').map(Number);
+            const creadas = [];
+
+            for (let i = 1; i <= numCuotas; i++) {
+                const fVencCuota = new Date(y, (m - 1) + (i - 1), d);
+                const fVencISO = fVencCuota.toISOString().split('T')[0];
+                const cuotaLabel = `Cuota ${i} de ${numCuotas}`;
+                const descCuota = `${descripcion.trim()} (${cuotaLabel})`;
+
+                const sql = `
+                    INSERT INTO obligaciones 
+                    (categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING *
+                `;
+                const params = [
+                    'prestamo',
+                    descCuota,
+                    beneficiario.trim(),
+                    montoCuota,
+                    fecha_emision,
+                    fVencISO,
+                    cuotaLabel
+                ];
+
+                const insertRes = await db.query(sql, params);
+                creadas.push(enrichObligacionWithSemaforo(insertRes.rows[0]));
+            }
+
+            return res.status(201).json({
+                ok: true,
+                mensaje: `Préstamo registrado exitosamente con ${numCuotas} cuotas amortizadas mensualmente (S/ ${montoCuota} c/u).`,
+                obligaciones: creadas
+            });
+        }
+
         const sql = `
             INSERT INTO obligaciones 
             (categoria, descripcion, beneficiario, monto, fecha_emision, fecha_vencimiento, cuota_info)
@@ -300,6 +347,36 @@ router.post('/:id/pagar', upload.single('comprobante'), async (req, res) => {
     } catch (error) {
         console.error('Error en POST /api/obligaciones/:id/pagar:', error);
         res.status(500).json({ ok: false, mensaje: 'Error al registrar el pago: ' + error.message });
+    }
+});
+
+// DELETE /api/obligaciones/:id (Eliminar / Anular obligación pendiente)
+router.delete('/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+
+        const findRes = await db.query('SELECT * FROM obligaciones WHERE id = $1', [id]);
+        if (!findRes.rows || findRes.rows.length === 0) {
+            return res.status(404).json({ ok: false, mensaje: 'Obligación no encontrada.' });
+        }
+
+        const oblig = findRes.rows[0];
+        if (oblig.estado === 'pagado') {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No se puede anular una obligación que ya ha sido pagada y certificada con voucher.'
+            });
+        }
+
+        await db.query('DELETE FROM obligaciones WHERE id = $1', [id]);
+
+        res.json({
+            ok: true,
+            mensaje: 'Obligación eliminada exitosamente.'
+        });
+    } catch (error) {
+        console.error('Error en DELETE /api/obligaciones/:id:', error);
+        res.status(500).json({ ok: false, mensaje: 'Error al eliminar la obligación: ' + error.message });
     }
 });
 

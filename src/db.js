@@ -291,10 +291,27 @@ function executeLocalQuery(sqlText, params = []) {
         return { rows: [] };
     }
 
-    // 4. SELECT obligaciones (general)
+    // 4. SELECT obligaciones (general o por id)
     if (text.includes('from obligaciones')) {
+        if (text.includes('where id =')) {
+            const id = parseInt(params[0], 10);
+            const found = db.obligaciones.find(o => o.id === id);
+            return { rows: found ? [found] : [] };
+        }
         let items = [...db.obligaciones];
         return { rows: items };
+    }
+
+    // 5. DELETE obligaciones
+    if (text.startsWith('delete from obligaciones')) {
+        const id = parseInt(params[0], 10);
+        const index = db.obligaciones.findIndex(o => o.id === id);
+        if (index !== -1) {
+            const deleted = db.obligaciones.splice(index, 1);
+            writeLocalDb(db);
+            return { rows: deleted };
+        }
+        return { rows: [] };
     }
 
     return { rows: [] };
