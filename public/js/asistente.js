@@ -489,6 +489,7 @@ window.AsistenteModule = {
                         categoria,
                         descripcion,
                         beneficiario,
+                        ruc_beneficiario,
                         monto,
                         fecha_emision,
                         fecha_vencimiento,
