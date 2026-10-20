@@ -37,7 +37,7 @@ async function runTestSuite() {
     await page.fill('#login-username', 'hacker');
     await page.fill('#login-password', 'incorrecta');
     await page.click('button[type="submit"]');
-    await page.waitForTimeout(500);
+    await page.waitForSelector('#login-error:not(.hidden)');
 
     const errorVisible = await page.isVisible('#login-error');
     assert.strictEqual(errorVisible, true, 'El mensaje de error de login debe ser visible');
@@ -154,6 +154,7 @@ async function runTestSuite() {
     // Volver a la vista de obligaciones
     await page.click('#nav-btn-asistente');
     await page.waitForSelector('#module-asistente', { state: 'visible' });
+    await page.waitForSelector('#tabla-obligaciones-asistente tr', { state: 'visible' });
 
     // Hacer click en la primera fila de la tabla
     const firstRow = await page.$('#tabla-obligaciones-asistente tr');
