@@ -607,15 +607,15 @@ window.AsistenteModule = {
 
             tr.innerHTML = `
                 <td>${semaforoHtml}</td>
-                <td class="font-medium text-slate-900 max-w-xs truncate text-sm" title="${item.descripcion}">
+                <td class="font-medium text-slate-900 max-w-sm truncate text-[14.5px]" title="${item.descripcion}">
                     ${item.descripcion}${cuotaText}
                 </td>
-                <td class="text-slate-700 max-w-[180px] truncate text-xs" title="${item.beneficiario}">
+                <td class="text-slate-700 max-w-[200px] truncate text-[13.5px]" title="${item.beneficiario}">
                     ${item.beneficiario}
                 </td>
                 <td><span class="chip-category">${item.tipo_comprobante || 'Factura'}</span></td>
-                <td class="font-mono-numbers text-slate-600 text-xs">${item.fecha_vencimiento}</td>
-                <td class="text-right font-mono-numbers font-semibold text-slate-900 text-sm">
+                <td class="font-mono-numbers text-slate-600 text-[13.5px]">${item.fecha_vencimiento}</td>
+                <td class="text-right font-mono-numbers font-semibold text-slate-900 text-[15px]">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="text-center">${actionHtml}</td>

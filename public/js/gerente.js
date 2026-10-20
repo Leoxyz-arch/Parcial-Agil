@@ -261,12 +261,12 @@ window.GerenteModule = {
 
             tr.innerHTML = `
                 <td>${semaforoHtml}</td>
-                <td class="font-medium text-slate-900 max-w-xs truncate text-sm" title="${item.descripcion}">
+                <td class="font-medium text-slate-900 max-w-sm truncate text-[14.5px]" title="${item.descripcion}">
                     ${item.descripcion}
                 </td>
                 <td><span class="chip-category capitalize">${item.categoria}</span></td>
-                <td class="font-mono-numbers text-xs text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="text-right font-mono-numbers font-semibold text-sm text-slate-900">
+                <td class="font-mono-numbers text-[13.5px] text-slate-600">${item.fecha_vencimiento}</td>
+                <td class="text-right font-mono-numbers font-semibold text-[15px] text-slate-900">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td class="text-center">${compHtml}</td>
