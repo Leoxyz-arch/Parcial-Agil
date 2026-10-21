@@ -116,16 +116,31 @@ function renderAppView() {
     const tabGerente = document.getElementById('nav-btn-gerente') || document.getElementById('tab-nav-gerente');
 
     function switchModule(modulo) {
+        const iconAsistente = tabAsistente ? tabAsistente.querySelector('.nav-icon') : null;
+        const iconGerente = tabGerente ? tabGerente.querySelector('.nav-icon') : null;
+        const breadcrumb = document.getElementById('view-title-breadcrumb');
+
         if (modulo === 'gerente') {
             moduleGerente.classList.remove('hidden');
             moduleAsistente.classList.add('hidden');
             if (tabGerente) {
                 tabGerente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
                 tabGerente.classList.remove('text-slate-400');
+                if (iconGerente) {
+                    iconGerente.classList.add('text-blue-400');
+                    iconGerente.classList.remove('text-slate-400');
+                }
             }
             if (tabAsistente) {
                 tabAsistente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
                 tabAsistente.classList.add('text-slate-400');
+                if (iconAsistente) {
+                    iconAsistente.classList.remove('text-blue-400');
+                    iconAsistente.classList.add('text-slate-400');
+                }
+            }
+            if (breadcrumb) {
+                breadcrumb.textContent = 'Dashboard Gerencial y Auditoría';
             }
             if (window.GerenteModule && typeof window.GerenteModule.init === 'function') {
                 window.GerenteModule.init();
@@ -136,10 +151,21 @@ function renderAppView() {
             if (tabAsistente) {
                 tabAsistente.classList.add('bg-slate-800', 'text-white', 'border-slate-700');
                 tabAsistente.classList.remove('text-slate-400');
+                if (iconAsistente) {
+                    iconAsistente.classList.add('text-blue-400');
+                    iconAsistente.classList.remove('text-slate-400');
+                }
             }
             if (tabGerente) {
                 tabGerente.classList.remove('bg-slate-800', 'text-white', 'border-slate-700');
                 tabGerente.classList.add('text-slate-400');
+                if (iconGerente) {
+                    iconGerente.classList.remove('text-blue-400');
+                    iconGerente.classList.add('text-slate-400');
+                }
+            }
+            if (breadcrumb) {
+                breadcrumb.textContent = 'Control de Obligaciones y Pagos';
             }
             if (window.AsistenteModule && typeof window.AsistenteModule.init === 'function') {
                 window.AsistenteModule.init();

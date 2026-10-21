@@ -144,16 +144,26 @@ router.get('/', async (req, res) => {
         if (mes) {
             const mesNum = parseInt(mes, 10);
             enriched = enriched.filter(o => {
-                const parts = (o.fecha_vencimiento || '').split('-');
-                return parseInt(parts[1], 10) === mesNum;
+                const partsVenc = (o.fecha_vencimiento || '').split('-');
+                const matchVenc = parseInt(partsVenc[1], 10) === mesNum;
+                if (o.estado === 'pagado' && o.fecha_pago) {
+                    const partsPago = (o.fecha_pago || '').split('-');
+                    return matchVenc || (parseInt(partsPago[1], 10) === mesNum);
+                }
+                return matchVenc;
             });
         }
 
         if (anio) {
             const anioNum = parseInt(anio, 10);
             enriched = enriched.filter(o => {
-                const parts = (o.fecha_vencimiento || '').split('-');
-                return parseInt(parts[0], 10) === anioNum;
+                const partsVenc = (o.fecha_vencimiento || '').split('-');
+                const matchVenc = parseInt(partsVenc[0], 10) === anioNum;
+                if (o.estado === 'pagado' && o.fecha_pago) {
+                    const partsPago = (o.fecha_pago || '').split('-');
+                    return matchVenc || (parseInt(partsPago[0], 10) === anioNum);
+                }
+                return matchVenc;
             });
         }
 

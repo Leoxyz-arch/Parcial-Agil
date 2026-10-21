@@ -92,7 +92,7 @@
                     <button type="button" id="nav-btn-asistente"
                         class="w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
                         <div class="flex items-center gap-2.5">
-                            <i data-lucide="receipt" class="w-4.5 h-4.5 text-blue-400"></i>
+                            <i data-lucide="receipt" class="nav-icon w-4.5 h-4.5 text-slate-400"></i>
                             <span>Obligaciones</span>
                         </div>
                     </button>
@@ -100,7 +100,7 @@
                     <button type="button" id="nav-btn-gerente"
                         class="w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[13.5px] font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-subtle text-left">
                         <div class="flex items-center gap-2.5">
-                            <i data-lucide="layout-dashboard" class="w-4.5 h-4.5 text-slate-400"></i>
+                            <i data-lucide="layout-dashboard" class="nav-icon w-4.5 h-4.5 text-slate-400"></i>
                             <span>Dashboard</span>
                         </div>
                     </button>
@@ -323,10 +323,10 @@
                 <!-- ========================================== -->
                 <!-- VISTA GERENTE (DASHBOARD BENTO EJECUTIVO)  -->
                 <!-- ========================================== -->
-                <section id="module-gerente" class="space-y-3 hidden flex-1 min-h-0 overflow-y-auto pr-1">
+                <section id="module-gerente" class="space-y-3 hidden flex-1 flex flex-col min-h-0 overflow-hidden">
                     
                     <!-- BENTO 1: 4 KPIs Principales (Tarjetas con Color Sólido y Alto Contraste) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-shrink-0">
                         <div class="rounded-lg p-4 bg-slate-900 text-white shadow-xs border border-slate-800">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Total Compromisos</span>
@@ -380,12 +380,12 @@
                         </div>
                     </div>
 
-                    <!-- BENTO 2: Desglose Categoría + Auditoría -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <!-- BENTO 2: Desglose Categoría + Auditoría (Ocupa 100% de la altura restante) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 min-h-0">
                         <!-- Desglose por Categoría Ampliado y Proporcional -->
-                        <div class="bento-card p-4 flex flex-col justify-between">
+                        <div class="bento-card p-4 flex flex-col justify-between overflow-y-auto shadow-xs">
                             <div>
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4 flex-shrink-0">
                                     <div class="flex items-center gap-2">
                                         <div class="w-7 h-7 rounded-md bg-slate-900 text-white flex items-center justify-center">
                                             <i data-lucide="pie-chart" class="w-4 h-4"></i>
@@ -450,86 +450,84 @@
                                 </div>
                             </div>
 
-                            <div class="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                            <div class="pt-3 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium flex-shrink-0">
                                 <span>Control Presupuestal</span>
                                 <span class="font-mono text-[11px] text-slate-400">Castillo Robles</span>
                             </div>
                         </div>
 
-                        <!-- Auditoría de Comprobantes -->
-                        <div class="lg:col-span-2 bento-card overflow-hidden flex flex-col justify-between">
-                            <div>
-                                <div class="p-2 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2 flex-wrap">
-                                    <span class="text-xs font-bold text-slate-800">Auditoría de Comprobantes</span>
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <input type="text" id="buscador-gerente" placeholder="Filtrar auditoría..."
-                                            class="px-2 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-800 w-32 focus:border-blue-600">
-                                        
-                                        <!-- Filtro Mes Auditoría -->
-                                        <select id="filtro-mes-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700">
-                                            <option value="todos">Mes: Todos</option>
-                                            <option value="1">Enero</option>
-                                            <option value="2">Febrero</option>
-                                            <option value="3">Marzo</option>
-                                            <option value="4">Abril</option>
-                                            <option value="5">Mayo</option>
-                                            <option value="6">Junio</option>
-                                            <option value="7">Julio</option>
-                                            <option value="8">Agosto</option>
-                                            <option value="9">Septiembre</option>
-                                            <option value="10">Octubre</option>
-                                            <option value="11">Noviembre</option>
-                                            <option value="12">Diciembre</option>
-                                        </select>
+                        <!-- Auditoría de Comprobantes (Expandida hasta el fondo con scroll interno) -->
+                        <div class="lg:col-span-2 bento-card overflow-hidden flex flex-col min-h-0 shadow-xs">
+                            <div class="p-2 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2 flex-wrap flex-shrink-0">
+                                <span class="text-xs font-bold text-slate-800">Auditoría de Comprobantes</span>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <input type="text" id="buscador-gerente" placeholder="Filtrar auditoría..."
+                                        class="px-2 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-800 w-32 focus:border-blue-600">
+                                    
+                                    <!-- Filtro Mes Auditoría -->
+                                    <select id="filtro-mes-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700">
+                                        <option value="todos">Mes: Todos</option>
+                                        <option value="1">Enero</option>
+                                        <option value="2">Febrero</option>
+                                        <option value="3">Marzo</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Mayo</option>
+                                        <option value="6">Junio</option>
+                                        <option value="7">Julio</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
 
-                                        <!-- Filtro Año Auditoría -->
-                                        <select id="filtro-anio-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-mono-numbers">
-                                            <option value="todos">Año: Todos</option>
-                                            <option value="2025">2025</option>
-                                            <option value="2026">2026</option>
-                                            <option value="2027">2027</option>
-                                        </select>
+                                    <!-- Filtro Año Auditoría -->
+                                    <select id="filtro-anio-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-mono-numbers">
+                                        <option value="todos">Año: Todos</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
 
-                                        <select id="filtro-categoria-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700">
-                                            <option value="todas">Categorías</option>
-                                            <option value="servicio">Servicios</option>
-                                            <option value="impuesto">Impuestos</option>
-                                            <option value="proveedores">Proveedores</option>
-                                            <option value="prestamo">Préstamos</option>
-                                        </select>
-                                        
-                                        <select id="filtro-estado-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-semibold text-emerald-800">
-                                            <option value="pagado">Pagados (Con Voucher)</option>
-                                            <option value="todos">Todos los Estados</option>
-                                            <option value="vencido">Vencidos</option>
-                                            <option value="por_vencer">Por Vencer</option>
-                                            <option value="programado">Programados</option>
-                                            <option value="anulado">Anulados</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="overflow-x-auto max-h-72 overflow-y-auto">
-                                    <table class="w-full text-left dense-table text-slate-800">
-                                        <thead class="sticky top-0">
-                                            <tr>
-                                                <th class="w-32">Estado</th>
-                                                <th>Concepto</th>
-                                                <th class="w-36">Categoría</th>
-                                                <th class="w-32">Vencimiento</th>
-                                                <th class="w-32 text-right">Importe</th>
-                                                <th class="w-28 text-center">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tabla-obligaciones-gerente">
-                                            <!-- Filas dinámicas -->
-                                        </tbody>
-                                    </table>
+                                    <select id="filtro-categoria-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700">
+                                        <option value="todas">Categorías</option>
+                                        <option value="servicio">Servicios</option>
+                                        <option value="impuesto">Impuestos</option>
+                                        <option value="proveedores">Proveedores</option>
+                                        <option value="prestamo">Préstamos</option>
+                                    </select>
+                                    
+                                    <select id="filtro-estado-gerente" class="px-1.5 py-0.5 rounded bg-white border border-slate-300 text-xs text-slate-700 font-semibold text-emerald-800">
+                                        <option value="pagado">Pagados (Con Voucher)</option>
+                                        <option value="todos">Todos los Estados</option>
+                                        <option value="vencido">Vencidos</option>
+                                        <option value="por_vencer">Por Vencer</option>
+                                        <option value="programado">Programados</option>
+                                        <option value="anulado">Anulados</option>
+                                    </select>
                                 </div>
                             </div>
 
+                            <div class="flex-1 min-h-0 overflow-x-auto overflow-y-auto relative">
+                                <table class="w-full text-left dense-table text-slate-800">
+                                    <thead class="sticky top-0 bg-slate-50 z-10 shadow-2xs">
+                                        <tr>
+                                            <th class="w-32">Estado</th>
+                                            <th>Concepto</th>
+                                            <th class="w-36">Categoría</th>
+                                            <th class="w-32">Vencimiento</th>
+                                            <th class="w-32 text-right">Importe</th>
+                                            <th class="w-28 text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-obligaciones-gerente">
+                                        <!-- Filas dinámicas -->
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <!-- Footer Paginación Gerente -->
-                            <div class="p-2 border-t border-slate-200 bg-slate-50/70 flex items-center justify-between text-xs text-slate-600">
+                            <div class="p-2 border-t border-slate-200 bg-slate-50/70 flex items-center justify-between text-xs text-slate-600 flex-shrink-0">
                                 <span id="info-paginacion-gerente">Mostrando 0</span>
                                 <div class="flex items-center gap-2">
                                     <span id="badge-pagina-gerente" class="font-mono font-semibold px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-700">1 / 1</span>

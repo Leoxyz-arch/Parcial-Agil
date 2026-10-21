@@ -7,17 +7,27 @@ window.GerenteModule = {
 
     init: async () => {
         GerenteModule.setDefaultPeriod();
-        GerenteModule.bindEvents();
+        if (!GerenteModule.eventsBound) {
+            GerenteModule.bindEvents();
+            GerenteModule.eventsBound = true;
+        }
         await GerenteModule.cargarDashboard();
     },
 
     setDefaultPeriod: () => {
         const hoy = new Date();
+        const mesActual = (hoy.getMonth() + 1).toString();
+        const anioActual = hoy.getFullYear().toString();
+
         const selMes = document.getElementById('gerente-mes');
         const selAnio = document.getElementById('gerente-anio');
+        if (selMes) selMes.value = mesActual;
+        if (selAnio) selAnio.value = anioActual;
 
-        if (selMes) selMes.value = (hoy.getMonth() + 1).toString();
-        if (selAnio) selAnio.value = hoy.getFullYear().toString();
+        const filtroMesAuditoria = document.getElementById('filtro-mes-gerente');
+        const filtroAnioAuditoria = document.getElementById('filtro-anio-gerente');
+        if (filtroMesAuditoria) filtroMesAuditoria.value = mesActual;
+        if (filtroAnioAuditoria) filtroAnioAuditoria.value = anioActual;
     },
 
     bindEvents: () => {
@@ -162,6 +172,11 @@ window.GerenteModule = {
         const buscador = document.getElementById('buscador-gerente');
         const q = buscador ? buscador.value.trim().toLowerCase() : '';
 
+        const filtroMesAud = document.getElementById('filtro-mes-gerente');
+        const mesAudVal = filtroMesAud ? filtroMesAud.value : 'todos';
+        const filtroAnioAud = document.getElementById('filtro-anio-gerente');
+        const anioAudVal = filtroAnioAud ? filtroAnioAud.value : 'todos';
+
         let filtradas = GerenteModule.obligaciones;
 
         if (filtroEst && filtroEst !== 'todos') {
@@ -170,6 +185,32 @@ window.GerenteModule = {
 
         if (catVal && catVal !== 'todas') {
             filtradas = filtradas.filter(o => o.categoria.toLowerCase() === catVal.toLowerCase());
+        }
+
+        if (mesAudVal && mesAudVal !== 'todos') {
+            const mNum = parseInt(mesAudVal, 10);
+            filtradas = filtradas.filter(o => {
+                const partsVenc = (o.fecha_vencimiento || '').split('-');
+                const matchVenc = parseInt(partsVenc[1], 10) === mNum;
+                if (o.estado === 'pagado' && o.fecha_pago) {
+                    const partsPago = (o.fecha_pago || '').split('-');
+                    return matchVenc || (parseInt(partsPago[1], 10) === mNum);
+                }
+                return matchVenc;
+            });
+        }
+
+        if (anioAudVal && anioAudVal !== 'todos') {
+            const aNum = parseInt(anioAudVal, 10);
+            filtradas = filtradas.filter(o => {
+                const partsVenc = (o.fecha_vencimiento || '').split('-');
+                const matchVenc = parseInt(partsVenc[0], 10) === aNum;
+                if (o.estado === 'pagado' && o.fecha_pago) {
+                    const partsPago = (o.fecha_pago || '').split('-');
+                    return matchVenc || (parseInt(partsPago[0], 10) === aNum);
+                }
+                return matchVenc;
+            });
         }
 
         if (q) {

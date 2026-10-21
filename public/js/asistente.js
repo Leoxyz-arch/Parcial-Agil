@@ -29,14 +29,16 @@ window.AsistenteModule = {
         const hoy = new Date();
         const selMes = document.getElementById('filtro-mes-asistente');
         const selAnio = document.getElementById('filtro-anio-asistente');
-        if (selMes) selMes.value = 'todos';
-        if (selAnio) selAnio.value = 'todos';
+        if (selMes) selMes.value = (hoy.getMonth() + 1).toString();
+        if (selAnio) selAnio.value = hoy.getFullYear().toString();
 
         AsistenteModule.bindEvents();
         await AsistenteModule.cargarObligaciones();
     },
 
     bindEvents: () => {
+        if (AsistenteModule.eventsBound) return;
+        AsistenteModule.eventsBound = true;
         // Filtros y Buscador en tiempo real
         const filtroMes = document.getElementById('filtro-mes-asistente');
         const filtroAnio = document.getElementById('filtro-anio-asistente');
