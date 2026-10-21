@@ -98,20 +98,26 @@ async function runTestSuite() {
     await page.waitForSelector('#modal-crear-obligacion', { state: 'hidden' });
     await page.waitForTimeout(1000);
 
+    await page.fill('#buscador-asistente', uniqueId);
+    await page.waitForTimeout(500);
+
     const tableContent = await page.textContent('#tabla-obligaciones-asistente');
     assert(tableContent.includes(`Servicio de Enlace Troncal #${uniqueId}`), 'La obligación debe aparecer en la tabla');
+
+    await page.fill('#buscador-asistente', '');
+    await page.waitForTimeout(300);
   });
 
   // TEST 5: Buscador en tiempo real
   await test('Filtros: Buscador en tiempo real por texto', async () => {
     await page.fill('#buscador-asistente', 'Luz del Sur');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(900);
 
     const tableContent = await page.textContent('#tabla-obligaciones-asistente');
     assert(tableContent.includes('Luz del Sur'), 'El buscador debe encontrar a Luz del Sur');
 
     await page.fill('#buscador-asistente', '');
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
   });
 
   // TEST 6: Acceso Gerente y 4 KPIs
