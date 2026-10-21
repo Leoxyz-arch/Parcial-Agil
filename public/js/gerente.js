@@ -283,17 +283,15 @@ window.GerenteModule = {
             // Etiquetas sólidas de alto contraste con iconos simbólicos
             let semaforoHtml = '';
             if (item.estado === 'pagado') {
-                semaforoHtml = '<span class="status-pill status-pagado" title="Obligación liquidada al 100%"><i data-lucide="check" class="w-3.5 h-3.5"></i><span>Pagado al 100%</span></span>';
+                semaforoHtml = '<span class="status-pill status-pagado text-[11px] px-2 py-0.5" title="Liquidada al 100%"><i data-lucide="check" class="w-3 h-3"></i><span>Pagado</span></span>';
             } else if (item.estado === 'anulado') {
-                semaforoHtml = '<span class="status-pill status-anulado"><i data-lucide="ban" class="w-3.5 h-3.5"></i><span>Anulado</span></span>';
+                semaforoHtml = '<span class="status-pill status-anulado text-[11px] px-2 py-0.5" title="Obligación anulada"><i data-lucide="ban" class="w-3 h-3"></i><span>Anulado</span></span>';
             } else if (item.semaforo.codigo === 'vencido') {
-                const txt = item.semaforo.etiqueta || 'Vencido';
-                semaforoHtml = `<span class="status-pill status-vencido" title="${item.semaforo.detalle_tiempo || txt}"><i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i><span>${txt}</span></span>`;
+                semaforoHtml = `<span class="status-pill status-vencido text-[11px] px-2 py-0.5" title="${item.semaforo.detalle_tiempo || 'Vencido'}"><i data-lucide="alert-octagon" class="w-3 h-3"></i><span>Vencido</span></span>`;
             } else if (item.semaforo.codigo === 'programado') {
-                semaforoHtml = '<span class="status-pill status-programado"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>Programado</span></span>';
+                semaforoHtml = '<span class="status-pill status-programado text-[11px] px-2 py-0.5" title="Programado"><i data-lucide="calendar" class="w-3 h-3"></i><span>Programado</span></span>';
             } else {
-                const txt = item.semaforo.etiqueta || 'Por Vencer';
-                semaforoHtml = `<span class="status-pill status-por-pagar" title="${item.semaforo.detalle_tiempo || txt}"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>${txt}</span></span>`;
+                semaforoHtml = `<span class="status-pill status-por-pagar text-[11px] px-2 py-0.5" title="${item.semaforo.detalle_tiempo || 'Por Vencer'}"><i data-lucide="clock" class="w-3 h-3"></i><span>Por Vencer</span></span>`;
             }
 
             let compHtml = '<span class="text-slate-400 font-mono text-xs">—</span>';
@@ -309,17 +307,19 @@ window.GerenteModule = {
                 compHtml = '<span class="text-slate-400 font-mono text-xs">ANULADO</span>';
             }
 
+            const fechaFormat = typeof formatFechaDDMMAA === 'function' ? formatFechaDDMMAA(item.fecha_vencimiento) : item.fecha_vencimiento;
+
             tr.innerHTML = `
-                <td>${semaforoHtml}</td>
-                <td class="font-medium text-slate-900 max-w-sm truncate text-[14.5px]" title="${item.descripcion}">
+                <td class="w-24 whitespace-nowrap">${semaforoHtml}</td>
+                <td class="font-medium text-slate-900 max-w-[150px] lg:max-w-[200px] truncate text-xs" title="${item.descripcion}">
                     ${item.descripcion}
                 </td>
-                <td><span class="chip-category capitalize">${item.categoria}</span></td>
-                <td class="font-mono-numbers text-[13.5px] text-slate-600">${item.fecha_vencimiento}</td>
-                <td class="text-right font-mono-numbers font-semibold text-[15px] text-slate-900">
+                <td class="w-24 whitespace-nowrap"><span class="chip-category capitalize text-[11px] px-1.5 py-0.5">${item.categoria}</span></td>
+                <td class="w-20 font-mono-numbers text-xs text-slate-600 whitespace-nowrap" title="${item.fecha_vencimiento}">${fechaFormat}</td>
+                <td class="w-24 text-right font-mono-numbers font-semibold text-xs text-slate-900 whitespace-nowrap">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td class="text-center">${compHtml}</td>
+                <td class="w-20 text-center whitespace-nowrap">${compHtml}</td>
             `;
 
             tbody.appendChild(tr);

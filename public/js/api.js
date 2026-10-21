@@ -1,5 +1,15 @@
 // api.js - Cliente HTTP para consumir los endpoints REST de Castillo Robles
 
+// Función global utilitaria para formatear fechas a formato peruano DD-MM-AA
+function formatFechaDDMMAA(isoStr) {
+    if (!isoStr) return '—';
+    const parts = String(isoStr).split('-');
+    if (parts.length !== 3) return isoStr;
+    const yy = parts[0].length === 4 ? parts[0].slice(-2) : parts[0];
+    return `${parts[2]}-${parts[1]}-${yy}`;
+}
+window.formatFechaDDMMAA = formatFechaDDMMAA;
+
 const API = {
     // 1. Autenticación
     login: async (username, password) => {

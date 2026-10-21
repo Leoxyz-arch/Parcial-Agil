@@ -699,7 +699,7 @@ window.AsistenteModule = {
                     ${item.beneficiario}
                 </td>
                 <td><span class="chip-category">${item.tipo_comprobante || 'Factura'}</span></td>
-                <td class="font-mono-numbers text-slate-600 text-[13.5px]">${item.fecha_vencimiento}</td>
+                <td class="font-mono-numbers text-slate-600 text-[13.5px] whitespace-nowrap" title="${item.fecha_vencimiento}">${typeof formatFechaDDMMAA === 'function' ? formatFechaDDMMAA(item.fecha_vencimiento) : item.fecha_vencimiento}</td>
                 <td class="text-right font-mono-numbers font-semibold text-slate-900 text-[15px]">
                     S/ ${item.monto.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
