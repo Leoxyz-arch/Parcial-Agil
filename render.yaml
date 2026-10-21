@@ -3,7 +3,7 @@ services:
     name: castillo-robles
     runtime: node
     plan: free
-    branch: main
+    branch: pita-develop
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/status
