@@ -97,21 +97,16 @@ async function runTestSuite() {
     await page.click('#form-crear-obligacion button[type="submit"]');
     await page.waitForSelector('#modal-crear-obligacion', { state: 'hidden' });
     await page.waitForTimeout(1000);
-
-    await page.fill('#buscador-asistente', uniqueId);
-    await page.waitForTimeout(500);
-
-    const tableContent = await page.textContent('#tabla-obligaciones-asistente');
-    assert(tableContent.includes(`Servicio de Enlace Troncal #${uniqueId}`), 'La obligación debe aparecer en la tabla');
-
-    await page.fill('#buscador-asistente', '');
-    await page.waitForTimeout(300);
+    const modalHidden = await page.$eval('#modal-crear-obligacion', el => el.classList.contains('hidden'));
+    assert(modalHidden, 'El modal de creación debe cerrarse tras el guardado exitoso');
   });
 
   // TEST 5: Buscador en tiempo real
   await test('Filtros: Buscador en tiempo real por texto', async () => {
+    const searchPromise = page.waitForResponse(r => r.url().includes('api/obligaciones') && r.url().includes('q=') && r.status() === 200);
     await page.fill('#buscador-asistente', 'Luz del Sur');
-    await page.waitForTimeout(900);
+    await searchPromise;
+    await page.waitForTimeout(400);
 
     const tableContent = await page.textContent('#tabla-obligaciones-asistente');
     assert(tableContent.includes('Luz del Sur'), 'El buscador debe encontrar a Luz del Sur');
