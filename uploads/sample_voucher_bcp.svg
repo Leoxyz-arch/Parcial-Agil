@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#002A8F" />
+      <stop offset="100%" stop-color="#0056B3" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect x="20" y="20" width="560" height="710" rx="16" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2" filter="url(#shadow)" />
+
+  <!-- Header BCP -->
+  <path d="M 20 36 Q 20 20 36 20 L 564 20 Q 580 20 580 36 L 580 110 L 20 110 Z" fill="url(#headerGrad)" />
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF">BANCO BCP</text>
+  <text x="50" y="90" font-family="Arial, sans-serif" font-size="14" fill="#E2E8F0">Constancia Oficial de Transferencia</text>
+  <text x="550" y="70" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#F59E0B" text-anchor="end">OPERACIÓN EXITOSA</text>
+
+  <!-- Check Circle -->
+  <circle cx="300" cy="170" r="36" fill="#10B981" />
+  <path d="M 285 170 L 296 182 L 318 158" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="300" y="230" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#1E293B" text-anchor="middle">Pago de Cuota Procesado</text>
+  <text x="300" y="252" font-family="Arial, sans-serif" font-size="14" fill="#64748B" text-anchor="middle">Crédito de Capital de Trabajo Pyme</text>
+
+  <!-- Amount Box -->
+  <rect x="70" y="275" width="460" height="70" rx="10" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1" />
+  <text x="300" y="302" font-family="Arial, sans-serif" font-size="12" fill="#64748B" text-anchor="middle">IMPORTE TOTAL PAGADO</text>
+  <text x="300" y="332" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#0F172A" text-anchor="middle">S/ 1,600.00</text>
+
+  <!-- Details Table -->
+  <line x1="70" y1="365" x2="530" y2="365" stroke="#E2E8F0" stroke-width="1" />
+
+  <text x="70" y="400" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Número de Operación:</text>
+  <text x="530" y="400" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0F172A" text-anchor="end">BCP-OP-894120</text>
+
+  <text x="70" y="435" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Beneficiario / Entidad:</text>
+  <text x="530" y="435" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0F172A" text-anchor="end">BANCO DE CRÉDITO DEL PERÚ</text>
+
+  <text x="70" y="470" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Detalle de Obligación:</text>
+  <text x="530" y="470" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0F172A" text-anchor="end">Cuota 3 de 12</text>
+
+  <text x="70" y="505" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Canal de Pago:</text>
+  <text x="530" y="505" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#0F172A" text-anchor="end">Banca por Internet Empresas</text>
+
+  <text x="70" y="540" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Estado de Transacción:</text>
+  <text x="530" y="540" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#10B981" text-anchor="end">100% CANCELADO</text>
+
+  <line x1="70" y1="565" x2="530" y2="565" stroke="#E2E8F0" stroke-width="1" />
+
+  <!-- Security Seal -->
+  <rect x="70" y="585" width="460" height="90" rx="8" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1" />
+  <text x="100" y="618" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#065F46">Comprobante Certificado para Auditoría</text>
+  <text x="100" y="638" font-family="Arial, sans-serif" font-size="11" fill="#047857">Este documento acredita la liquidación de la obligación financiera según</text>
+  <text x="100" y="654" font-family="Arial, sans-serif" font-size="11" fill="#047857">la política de cero moras de la empresa.</text>
+
+  <text x="300" y="705" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8" text-anchor="middle">CashFlow Guard • Módulo de Verificación Transaccional</text>
+</svg>

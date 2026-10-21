@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: castillo-robles
+    runtime: node
+    plan: free
+    branch: pita-develop
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/status
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
